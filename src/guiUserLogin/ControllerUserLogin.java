@@ -68,8 +68,11 @@ public class ControllerUserLogin {
 		String password = ViewUserLogin.text_Password.getText();
     	boolean loginResult = false;
     	
-		// Fetch the user and verify the username
-     	if (theDatabase.getUserAccountDetails(username) == false) {
+    	
+    
+    	
+		// Check the length of the username input, then fetch the user and verify the username
+     	if (username.length() > 16 || theDatabase.getUserAccountDetails(username) == false) {
      		// Don't provide too much information.  Don't say the username is invalid or the
      		// password is invalid.  Just say the pair is invalid.
     		ViewUserLogin.alertUsernamePasswordError.setContentText(

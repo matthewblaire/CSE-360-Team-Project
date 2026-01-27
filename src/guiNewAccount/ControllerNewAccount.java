@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import database.Database;
 import entityClasses.User;
+import userNameRecognizer.UserNameRecognizer;
 
 /*******
  * <p> Title: ControllerNewAccount Class. </p>
@@ -67,6 +68,20 @@ public class ControllerNewAccount {
 		String username = ViewNewAccount.text_Username.getText();
 		String password = ViewNewAccount.text_Password1.getText();
 		
+		// Make sure the username is valid
+		String usernameError = UserNameRecognizer.checkForValidUserName(username);
+		if (usernameError.isEmpty() == false) {
+			// username is not valid. clear the username, explain why it was invalid, and 
+			// clear the message as soon as the first character is typed
+			
+			ViewNewAccount.text_Username.setText("");
+			ViewNewAccount.alertUsernameError.setHeaderText(usernameError); // pass the error to the alert
+			ViewNewAccount.alertUsernameError.showAndWait();
+			
+			return; // exit early
+			
+		}
+
 		// Display key information to the log
 		System.out.println("** Account for Username: " + username + "; theInvitationCode: "+
 				ViewNewAccount.theInvitationCode + "; email address: " + 

@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import database.Database;
 import entityClasses.User;
 import javafx.stage.Stage;
+import userNameRecognizer.UserNameRecognizer;
 
 /*******
  * <p> Title: ControllerFirstAdmin Class. </p>
@@ -65,6 +66,7 @@ public class ControllerFirstAdmin {
 	 */
 	protected static void setAdminUsername() {
 		adminUsername = ViewFirstAdmin.text_AdminUsername.getText();
+		ViewFirstAdmin.label_UsernameInvalid.setText("");
 	}
 	
 	
@@ -103,6 +105,15 @@ public class ControllerFirstAdmin {
 	 * 
 	 */
 	protected static void doSetupAdmin(Stage ps, int r) {
+		
+		// If username is invalid, tell the user why and exit early
+		String result = UserNameRecognizer.checkForValidUserName(adminUsername);
+		if (result.isEmpty() == false)
+		{
+			ViewFirstAdmin.text_AdminUsername.setText("");
+			ViewFirstAdmin.label_UsernameInvalid.setText(result);
+			return;
+		}
 		
 		// Make sure the two passwords are the same
 		if (adminPassword1.compareTo(adminPassword2) == 0) {

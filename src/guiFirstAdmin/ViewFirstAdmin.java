@@ -57,6 +57,8 @@ public class ViewFirstAdmin {
 					"Setup Admin Account.");
 	
 	protected static Label label_PasswordsDoNotMatch = new Label();
+	protected static Label label_UsernameInvalid = new Label();
+	
 	protected static TextField text_AdminUsername = new TextField();
 	protected static PasswordField text_AdminPassword1 = new PasswordField();
 	protected static PasswordField text_AdminPassword2 = new PasswordField();
@@ -182,6 +184,7 @@ public class ViewFirstAdmin {
 
 		// Label to display the Passwords do not match error message
 		setupLabelUI(label_PasswordsDoNotMatch, "Arial", 18, width, Pos.CENTER, 0, 300);
+		setupLabelUI(label_UsernameInvalid, "Arial", 18, width, Pos.CENTER, 0, 300);
 
 		setupButtonUI(button_Quit, "Dialog", 18, 250, Pos.CENTER, 300, 520);
 		button_Quit.setOnAction((_) -> {ControllerFirstAdmin.performQuit(); });
@@ -189,8 +192,8 @@ public class ViewFirstAdmin {
 		// Place all of the just-initialized GUI elements into the pane
 		theRootPane.getChildren().addAll(label_ApplicationTitle, label_TitleLine1,
 				label_TitleLine2, text_AdminUsername, text_AdminPassword1, 
-				text_AdminPassword2, button_AdminSetup, label_PasswordsDoNotMatch,
-				button_Quit);
+				text_AdminPassword2, button_AdminSetup, label_PasswordsDoNotMatch, 
+				label_UsernameInvalid, button_Quit);
 	}
 	
 	
