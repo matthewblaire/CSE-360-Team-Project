@@ -1,6 +1,8 @@
 package guiAdminHome;
 
 import database.Database;
+import entityClasses.User;
+import javafx.stage.Stage;
 
 /*******
  * <p> Title: GUIAdminHomePage Class. </p>
@@ -26,7 +28,7 @@ import database.Database;
  */
 
 public class ControllerAdminHome {
-	
+
 	/*-*******************************************************************************************
 
 	User Interface Actions for this page
@@ -142,12 +144,13 @@ public class ControllerAdminHome {
 	 * <p> Description: Protected method that is currently a stub informing the user that
 	 * this function has not yet been implemented. </p>
 	 */
-	protected static void listUsers() {
+	protected static void listUsers(Stage ps, User user) {
 		System.out.println("\n*** WARNING ***: List Users Not Yet Implemented");
 		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
 		ViewAdminHome.alertNotImplemented.setHeaderText("List User Issue");
 		ViewAdminHome.alertNotImplemented.setContentText("List Users Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.showAndWait();
+//		ViewAdminHome.alertNotImplemented.showAndWait();
+		ViewUserList.displayUserList(ps, user);
 	}
 	
 	/**********

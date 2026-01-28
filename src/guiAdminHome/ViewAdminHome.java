@@ -256,7 +256,7 @@ public class ViewAdminHome {
 		button_DeleteUser.setOnAction((_) -> {ControllerAdminHome.deleteUser(); });
 
 		setupButtonUI(button_ListUsers, "Dialog", 16, 250, Pos.CENTER, 20, 420);
-		button_ListUsers.setOnAction((_) -> {ControllerAdminHome.listUsers(); });
+		button_ListUsers.setOnAction((_) -> {ControllerAdminHome.listUsers(theStage, theUser); });
 
 		setupButtonUI(button_AddRemoveRoles, "Dialog", 16, 250, Pos.CENTER, 20, 470);
 		button_AddRemoveRoles.setOnAction((_) -> {ControllerAdminHome.addRemoveRoles(); });
