@@ -169,6 +169,47 @@ public class Database {
 	    }
 		return 0;
 	}
+	
+
+	
+/*******
+ * <p> Method: remove </p>
+ * 
+ * <p> Description: Removes the user with the matching userName. </p>
+ * 
+ * @return the number of user records in the database.
+ * 
+ */
+public void remove(String userName) throws SQLException 
+{
+	String removeUser = "DELETE FROM userDB WHERE userName = ?";
+	try (PreparedStatement pstmt = connection.prepareStatement(removeUser)){
+		pstmt.setString(1, userName);
+		pstmt.executeUpdate();
+	}
+}
+
+/*******
+ * <p> Method: getNumAdmins </p>
+ * 
+ * <p> Description: Returns and integer of the number of admins currently in the user database. </p>
+ * 
+ * @return the number of admin records in the database (users with adminRole = TRUE).
+ * 
+ */
+public int getNumAdmins() throws SQLException 
+{
+	String query = "SELECT COUNT(*) AS count FROM userDB WHERE adminRole = TRUE";
+	try {
+		ResultSet resultSet = statement.executeQuery(query);
+		if (resultSet.next()) {
+			return resultSet.getInt("count");
+		}
+	} catch (SQLException e) {
+        return 0;
+    }
+	return 0;
+}
 
 /*******
  * <p> Method: register(User user) </p>
@@ -269,6 +310,8 @@ public class Database {
 	    }
 		return false;
 	}
+	
+	
 	
 	
 /*******
