@@ -1,8 +1,12 @@
 package guiDeleteUser;
 
+import java.sql.SQLException;
+import java.util.Optional;
+
 import database.Database;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 
 /*******
@@ -114,6 +118,63 @@ public class ControllerDeleteUser {
 	
 	
 	/**********
+	 * <p> Method: deleteSelectedUser() </p>
+	 * 
+	 * <p> Description: This method deletes the user selected on the DeleteUser page. The method will NOT delete if the current user is the 
+	 * same as the one being deleted, or if the selected user is the last user with Admin role.  </p>
+	 * 
+	 */
+	protected static void deleteSelectedUser() {
+		System.out.println("*** Entering deleteSelectedUser");
+		// Make sure the selected user is not the current user
+		if (ViewDeleteUser.theSelectedUser.equals(ViewDeleteUser.theUser.getUserName()))
+		{
+			// TODO: Show an alert saying "You cannot delete your own account."
+			ViewDeleteUser.alertUserDeletionError.setTitle("Delete User");
+			ViewDeleteUser.alertUserDeletionError.setContentText("You cannot delete your own account.");
+			ViewDeleteUser.alertUserDeletionError.show();
+			return;
+		}
+		// Make sure the selected user is not the last admin
+		if (theDatabase.getCurrentAdminRole() == true)
+		{
+			// Selected user has Admin role, therefore we need to make sure this is not the last user with admin role
+			try {
+				int currentNumAdmins = theDatabase.getNumAdmins();
+				if (currentNumAdmins - 1 <= 0) 
+				{
+					// Subtracting one admin would result in having zero admins. Don't remove the selected user
+					ViewDeleteUser.alertUserDeletionError.setTitle("Delete User");
+					ViewDeleteUser.alertUserDeletionError.setContentText("You cannot delete the last Administrator account.");
+					ViewDeleteUser.alertUserDeletionError.show();
+					return; 
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		// Show delete user confirmation ("Are you sure?" -> "Yes" / "No")
+		ViewDeleteUser.alertConfirmUserDeletion.setTitle("Delete User");
+		ViewDeleteUser.alertConfirmUserDeletion.setHeaderText("Are you sure?");
+		ViewDeleteUser.alertConfirmUserDeletion.setContentText("This action is irreversible.");
+		Optional<ButtonType> result = ViewDeleteUser.alertConfirmUserDeletion.showAndWait();
+		if (result.isPresent() && result.get() == ButtonType.YES) {
+			// Deletion confirmed. Remove selected user from database then update the page
+			try {
+				theDatabase.remove(ViewDeleteUser.theSelectedUser);
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			// Reset the delete user page
+			ViewDeleteUser.displayDeleteUser(ViewDeleteUser.theStage, ViewDeleteUser.theUser);
+		}
+	}
+	
+	
+	/**********
 	 * <p> Method: setupSelectedUser() </p>
 	 * 
 	 * <p> Description: This method fetches the current values for the widgets whose values change
@@ -210,4 +271,6 @@ public class ControllerDeleteUser {
 	protected static void performQuit() {
 		System.exit(0);
 	}
+	
+	
 }

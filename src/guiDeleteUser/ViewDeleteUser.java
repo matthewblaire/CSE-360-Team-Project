@@ -237,52 +237,7 @@ public class ViewDeleteUser {
 		setupButtonUI(button_DeleteUser, "Dialog", 16, 150, Pos.CENTER, 460, 420);
 		ViewDeleteUser.button_DeleteUser.setOnAction((_) -> 
 			{
-				// Make sure the selected user is not the current user
-				if (theSelectedUser.equals(theUser.getUserName()))
-				{
-					// TODO: Show an alert saying "You cannot delete your own account."
-					ViewDeleteUser.alertUserDeletionError.setTitle("Delete User");
-					ViewDeleteUser.alertUserDeletionError.setContentText("You cannot delete your own account.");
-					ViewDeleteUser.alertUserDeletionError.show();
-					return;
-				}
-				// Make sure the selected user is not the last admin
-				if (theDatabase.getCurrentAdminRole() == true)
-				{
-					// Selected user has Admin role, therefore we need to make sure this is not the last user with admin role
-					try {
-						int currentNumAdmins = theDatabase.getNumAdmins();
-						if (currentNumAdmins - 1 <= 0) 
-						{
-							// Subtracting one admin would result in having zero admins. Don't remove the selected user
-							ViewDeleteUser.alertUserDeletionError.setTitle("Delete User");
-							ViewDeleteUser.alertUserDeletionError.setContentText("You cannot delete the last Administrator account.");
-							ViewDeleteUser.alertUserDeletionError.show();
-							return; 
-						}
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-				}
-				// Show delete user confirmation ("Are you sure?" -> "Yes" / "No")
-				ViewDeleteUser.alertConfirmUserDeletion.setTitle("Delete User");
-				ViewDeleteUser.alertConfirmUserDeletion.setHeaderText("Are you sure?");
-				ViewDeleteUser.alertConfirmUserDeletion.setContentText("This action is irreversible.");
-				Optional<ButtonType> result = ViewDeleteUser.alertConfirmUserDeletion.showAndWait();
-				if (result.isPresent() && result.get() == ButtonType.YES) {
-					// Deletion confirmed. Remove selected user from database then update the page
-					try {
-						theDatabase.remove(theSelectedUser);
-						
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					// Reset the delete user page
-					displayDeleteUser(theStage, theUser);
-				}
+				ControllerDeleteUser.deleteSelectedUser();
 			});
 			
 
