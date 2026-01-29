@@ -4,10 +4,8 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 import database.Database;
-import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 
 /*******
  * <p> Title: ControllerDeleteUser Class. </p>
