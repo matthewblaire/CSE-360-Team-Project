@@ -224,7 +224,7 @@ public class ControllerDeleteUser {
 		ViewDeleteUser.label_EmailAddress.setText("Email Address: " + theDatabase.getCurrentEmailAddress());
 		
 		ViewDeleteUser.setupButtonUI(ViewDeleteUser.button_DeleteUser, "Dialog", 16, 150, 
-				Pos.CENTER, 460, 255);
+				Pos.CENTER, 460, 420);
 
 		// Repaint the window showing this new values
 		repaintTheWindow();

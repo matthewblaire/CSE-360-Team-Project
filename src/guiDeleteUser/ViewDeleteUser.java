@@ -231,7 +231,7 @@ public class ViewDeleteUser {
 		setupLabelUI(label_EmailAddress, "Arial", 16, 300, Pos.BASELINE_LEFT, 50, 370);	
 		
 	
-		setupButtonUI(button_DeleteUser, "Dialog", 16, 150, Pos.CENTER, 460, 420);
+		setupButtonUI(button_DeleteUser, "Dialog", 16, 150, Pos.BASELINE_LEFT, 460, 420);
 		ViewDeleteUser.button_DeleteUser.setOnAction((_) -> 
 			{
 				ControllerDeleteUser.deleteSelectedUser();
