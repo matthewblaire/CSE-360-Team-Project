@@ -11,6 +11,9 @@ import java.util.UUID;
 
 import entityClasses.User;
 
+import java.time.LocalDateTime;
+import java.sql.Timestamp;
+
 /*******
  * <p> Title: Database Class. </p>
  * 
@@ -103,27 +106,44 @@ public class Database {
  * 
  */
 	private void createTables() throws SQLException {
-		// Create the user database
-		String userTable = "CREATE TABLE IF NOT EXISTS userDB ("
-				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
-				+ "userName VARCHAR(255) UNIQUE, "
-				+ "password VARCHAR(255), "
-				+ "firstName VARCHAR(255), "
-				+ "middleName VARCHAR(255), "
-				+ "lastName VARCHAR (255), "
-				+ "preferredFirstName VARCHAR(255), "
-				+ "emailAddress VARCHAR(255), "
-				+ "adminRole BOOL DEFAULT FALSE, "
-				+ "newRole1 BOOL DEFAULT FALSE, "
-				+ "newRole2 BOOL DEFAULT FALSE)";
-		statement.execute(userTable);
-		
-		// Create the invitation codes table
+	    // Create the user database
+	    String userTable = "CREATE TABLE IF NOT EXISTS userDB ("
+	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "userName VARCHAR(255) UNIQUE, "
+	            + "password VARCHAR(255), "
+	            + "firstName VARCHAR(255), "
+	            + "middleName VARCHAR(255), "
+	            + "lastName VARCHAR (255), "
+	            + "preferredFirstName VARCHAR(255), "
+	            + "emailAddress VARCHAR(255), "
+	            + "adminRole BOOL DEFAULT FALSE, "
+	            + "newRole1 BOOL DEFAULT FALSE, "
+	            + "newRole2 BOOL DEFAULT FALSE)";
+	    statement.execute(userTable);
+
+	    // Create the invitation codes table
+	    // PURPOSE: Stores invite codes that allow new users to create accounts.
+	    // We include a deadline (expiresAt) so codes do NOT work forever.
 	    String invitationCodesTable = "CREATE TABLE IF NOT EXISTS InvitationCodes ("
 	            + "code VARCHAR(10) PRIMARY KEY, "
-	    		+ "emailAddress VARCHAR(255), "
-	            + "role VARCHAR(10))";
+	            + "emailAddress VARCHAR(255), "
+	            + "role VARCHAR(255), "      // allow more text (future-proof)
+	            + "expiresAt TIMESTAMP)";    // NEW: invitation deadline
 	    statement.execute(invitationCodesTable);
+
+	    // SAFETY: Upgrade existing database schema if needed.
+	    // If the column already exists, these will fail — we ignore those failures.
+	    try {
+	        statement.execute("ALTER TABLE InvitationCodes ALTER COLUMN role VARCHAR(255)");
+	    } catch (SQLException e) {
+	        // Column probably already updated — safe to ignore
+	    }
+
+	    try {
+	        statement.execute("ALTER TABLE InvitationCodes ADD COLUMN expiresAt TIMESTAMP");
+	    } catch (SQLException e) {
+	        // Column probably already exists — safe to ignore
+	    }
 	}
 
 
@@ -169,47 +189,6 @@ public class Database {
 	    }
 		return 0;
 	}
-	
-
-	
-/*******
- * <p> Method: remove </p>
- * 
- * <p> Description: Removes the user with the matching userName. </p>
- * 
- * @return the number of user records in the database.
- * 
- */
-public void remove(String userName) throws SQLException 
-{
-	String removeUser = "DELETE FROM userDB WHERE userName = ?";
-	try (PreparedStatement pstmt = connection.prepareStatement(removeUser)){
-		pstmt.setString(1, userName);
-		pstmt.executeUpdate();
-	}
-}
-
-/*******
- * <p> Method: getNumAdmins </p>
- * 
- * <p> Description: Returns and integer of the number of admins currently in the user database. </p>
- * 
- * @return the number of admin records in the database (users with adminRole = TRUE).
- * 
- */
-public int getNumAdmins() throws SQLException 
-{
-	String query = "SELECT COUNT(*) AS count FROM userDB WHERE adminRole = TRUE";
-	try {
-		ResultSet resultSet = statement.executeQuery(query);
-		if (resultSet.next()) {
-			return resultSet.getInt("count");
-		}
-	} catch (SQLException e) {
-        return 0;
-    }
-	return 0;
-}
 
 /*******
  * <p> Method: register(User user) </p>
@@ -310,8 +289,6 @@ public int getNumAdmins() throws SQLException
 	    }
 		return false;
 	}
-	
-	
 	
 	
 /*******
@@ -432,19 +409,71 @@ public int getNumAdmins() throws SQLException
 	 * 
 	 */
 	// Generates a new invitation code and inserts it into the database.
+	// Default deadline = 24 hours 
 	public String generateInvitationCode(String emailAddress, String role) {
-	    String code = UUID.randomUUID().toString().substring(0, 6); // Generate a random 6-character code
-	    String query = "INSERT INTO InvitationCodes (code, emailaddress, role) VALUES (?, ?, ?)";
+	    // Default deadline: 24 hours from now (industry-standard invite lifetime)
+	   LocalDateTime defaultDeadline = LocalDateTime.now().plusHours(24);
+	    //The line below is to test the deadline(1 minute in past and about 5 second after creation)
+		//LocalDateTime defaultDeadline = LocalDateTime.now().minusMinutes(1);
+		//LocalDateTime defaultDeadline = LocalDateTime.now().plusSeconds(5);
+	    
+		return generateInvitationCode(emailAddress, role, defaultDeadline);
+	}
+
+	// PURPOSE: New method that stores the expiration deadline in the DB.
+	// AdminHome will call THIS once we add the DatePicker.
+	public String generateInvitationCode(String emailAddress, String role, LocalDateTime expiresAt) {
+	    String code = UUID.randomUUID().toString().substring(0, 6); // 6-char code
+
+	    // IMPORTANT: we now insert expiresAt so the invite has a deadline
+	    String query = "INSERT INTO InvitationCodes (code, emailaddress, role, expiresAt) VALUES (?, ?, ?, ?)";
 
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
 	        pstmt.setString(2, emailAddress);
 	        pstmt.setString(3, role);
+	        pstmt.setTimestamp(4, Timestamp.valueOf(expiresAt)); // LocalDateTime -> SQL timestamp
 	        pstmt.executeUpdate();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
 	    return code;
+	}
+
+
+	// PURPOSE: Returns the expiration deadline stored for this invitation code.
+	// If code doesn't exist or expiresAt wasn't stored, returns null.
+	public LocalDateTime getInvitationExpiry(String code) {
+	    String query = "SELECT expiresAt FROM InvitationCodes WHERE code = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, code);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            Timestamp ts = rs.getTimestamp("expiresAt");
+	            if (ts == null) return null;
+	            return ts.toLocalDateTime();
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+
+	// PURPOSE: True if invitation is expired. Also cleans up expired codes.
+	// This enforces: "one-time code + deadline" (deadline means it stops working).
+	public boolean isInvitationExpired(String code) {
+	    LocalDateTime expiry = getInvitationExpiry(code);
+
+	    // If expiry is missing (older records), treat as NOT expired (or decide to treat as expired).
+	    // For safety with legacy invites, we allow it.
+	    if (expiry == null) return false;
+
+	    boolean expired = expiry.isBefore(LocalDateTime.now());
+	    if (expired) {
+	        // Cleanup: remove expired invite so it can't be used later
+	        removeInvitationAfterUse(code);
+	    }
+	    return expired;
 	}
 
 	
@@ -457,17 +486,18 @@ public int getNumAdmins() throws SQLException
 	 * 
 	 */
 	// Number of invitations in the database
+	// PURPOSE: Count only invitations that are still valid (not expired).
 	public int getNumberOfInvitations() {
-		String query = "SELECT COUNT(*) AS count FROM InvitationCodes";
-		try {
-			ResultSet resultSet = statement.executeQuery(query);
-			if (resultSet.next()) {
-				return resultSet.getInt("count");
-			}
-		} catch  (SQLException e) {
+	    String query = "SELECT COUNT(*) AS count FROM InvitationCodes WHERE expiresAt > CURRENT_TIMESTAMP";
+	    try {
+	        ResultSet resultSet = statement.executeQuery(query);
+	        if (resultSet.next()) {
+	            return resultSet.getInt("count");
+	        }
+	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-		return 0;
+	    return 0;
 	}
 	
 	
