@@ -112,6 +112,7 @@ public class ViewNewAccount {
 	 * 
 	 */
 	public static void displayNewAccount(Stage ps, String ic) {
+		System.out.println("Entering displayNewAccount");
 		// This is the only way some component of the system can cause a New User Account page to
 		// appear.  The first time, the class is created and initialized.  Every subsequent call it
 		// is reused with only the elements that differ being initialized.

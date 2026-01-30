@@ -71,7 +71,8 @@ public class ControllerNewAccount {
 		
 		// PURPOSE: Enforce the invitation deadline at the moment of account creation.
 		// Even if the user opened the New Account page earlier, the code might expire while they type.
-		String code = ViewNewAccount.text_Invitation.getText();
+		String code = ViewNewAccount.theInvitationCode;
+		
 
 		if (theDatabase.isInvitationExpired(code)) {
 			ViewNewAccount.alertInvitationCodeIsInvalid.setTitle("Expired Invitation Code");
@@ -142,8 +143,7 @@ public class ControllerNewAccount {
             }
             
             // The account has been set, so remove the invitation from the system
-            theDatabase.removeInvitationAfterUse(
-            		ViewNewAccount.text_Invitation.getText());
+            theDatabase.removeInvitationAfterUse(code);
             
             // Set the database so it has this user and the current user
             theDatabase.getUserAccountDetails(username);

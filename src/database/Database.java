@@ -453,16 +453,6 @@ public int getNumAdmins() throws SQLException
 	 */
 	// Generates a new invitation code and inserts it into the database.
 	// Default deadline = 24 hours 
-	public String generateInvitationCode(String emailAddress, String role) {
-	    // Default deadline: 24 hours from now (industry-standard invite lifetime)
- 	    LocalDateTime defaultDeadline = LocalDateTime.now().plusHours(24);
-	    //The line below is to test the deadline(1 minute in past and about 5 second after creation)
-		//LocalDateTime defaultDeadline = LocalDateTime.now().minusMinutes(1);
-		//LocalDateTime defaultDeadline = LocalDateTime.now().plusSeconds(5);
-
-		return generateInvitationCode(emailAddress, role, defaultDeadline);
-	}
-
 	// PURPOSE: New method that stores the expiration deadline in the DB.
 	// AdminHome will call THIS once we add the DatePicker.
 	public String generateInvitationCode(String emailAddress, String role, LocalDateTime expiresAt) {
@@ -634,7 +624,7 @@ public int getNumAdmins() throws SQLException
 	        pstmt.setString(1, code);
 	        ResultSet rs = pstmt.executeQuery();
 	        if (rs.next()) {
-	        	int counter = rs.getInt(1);
+	        	int counter = rs.getInt("count");
 	            // Only do the remove if the code is still in the invitation table
 	        	if (counter > 0) {
         			query = "DELETE FROM InvitationCodes WHERE code = ?";
@@ -649,7 +639,8 @@ public int getNumAdmins() throws SQLException
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-		return;
+	    
+		
 	}
 	
 	
