@@ -134,6 +134,28 @@ public class ViewNewAccount {
 			return;					// acknowledged, return so the proper code can be entered
 		}
 		
+		// PURPOSE: Enforce invitation deadline BEFORE allowing account creation.
+		// Step 1: If the code is expired, block the user immediately.
+		if (theDatabase.isInvitationExpired(theInvitationCode)) {
+		    alertInvitationCodeIsInvalid.setTitle("Expired Invitation Code");
+		    alertInvitationCodeIsInvalid.setHeaderText("This invitation code has expired.");
+		    alertInvitationCodeIsInvalid.setContentText("Ask an admin to send a new invitation.");
+		    alertInvitationCodeIsInvalid.showAndWait();
+		    return;
+		}
+
+		// Step 2: If not expired, fetch the role tied to this invitation code.
+		theRole = theDatabase.getRoleGivenAnInvitationCode(theInvitationCode);
+
+		// Step 3: If no role is found, then the code doesn't exist (invalid) or was removed (used/expired).
+		if (theRole.length() == 0) {
+		    alertInvitationCodeIsInvalid.setTitle("Invalid Invitation Code");
+		    alertInvitationCodeIsInvalid.setHeaderText("The invitation code is not valid.");
+		    alertInvitationCodeIsInvalid.setContentText("Correct the code and try again.");
+		    alertInvitationCodeIsInvalid.showAndWait();
+		    return;
+		}	
+		
 		// Get the email address associated with the invitation code
 		emailAddress = theDatabase.getEmailAddressUsingCode(theInvitationCode);
 		

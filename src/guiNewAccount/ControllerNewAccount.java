@@ -68,6 +68,19 @@ public class ControllerNewAccount {
 		String username = ViewNewAccount.text_Username.getText();
 		String password = ViewNewAccount.text_Password1.getText();
 		
+		
+		// PURPOSE: Enforce the invitation deadline at the moment of account creation.
+		// Even if the user opened the New Account page earlier, the code might expire while they type.
+		String code = ViewNewAccount.text_Invitation.getText();
+
+		if (theDatabase.isInvitationExpired(code)) {
+			ViewNewAccount.alertInvitationCodeIsInvalid.setTitle("Expired Invitation Code");
+			ViewNewAccount.alertInvitationCodeIsInvalid.setHeaderText("This invitation code has expired.");
+			ViewNewAccount.alertInvitationCodeIsInvalid.setContentText("Ask an admin to send a new invitation.");
+			ViewNewAccount.alertInvitationCodeIsInvalid.showAndWait();
+		    return;
+		}
+		
 		// Make sure the username is valid
 		String usernameError = UserNameRecognizer.checkForValidUserName(username);
 		if (usernameError.isEmpty() == false) {
