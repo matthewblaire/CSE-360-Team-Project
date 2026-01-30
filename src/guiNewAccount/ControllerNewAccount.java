@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import database.Database;
 import entityClasses.User;
-import userNameRecognizer.UserNameRecognizer;
+import applicationMain.UserNameRecognizer;
 
 /*******
  * <p> Title: ControllerNewAccount Class. </p>
@@ -68,20 +68,28 @@ public class ControllerNewAccount {
 		String username = ViewNewAccount.text_Username.getText();
 		String password = ViewNewAccount.text_Password1.getText();
 		
-		// Make sure the username is valid
-		String usernameError = UserNameRecognizer.checkForValidUserName(username);
-		if (usernameError.isEmpty() == false) {
-			// username is not valid. clear the username, explain why it was invalid, and 
-			// clear the message as soon as the first character is typed
-			
-			ViewNewAccount.text_Username.setText("");
-			ViewNewAccount.alertUsernameError.setHeaderText(usernameError); // pass the error to the alert
-			ViewNewAccount.alertUsernameError.showAndWait();
-			
-			return; // exit early
-			
+		// PURPOSE: Enforce the invitation deadline at the moment of account creation.
+		// Even if the user opened the New Account page earlier, the code might expire while they type.
+		String code = ViewNewAccount.text_Invitation.getText();
+
+		if (theDatabase.isInvitationExpired(code)) {
+		    ViewNewAccount.alertInvitationCodeIsInvalid.setTitle("Expired Invitation Code");
+		    ViewNewAccount.alertInvitationCodeIsInvalid.setHeaderText("This invitation code has expired.");
+		    ViewNewAccount.alertInvitationCodeIsInvalid.setContentText("Ask an admin to send a new invitation.");
+		    ViewNewAccount.alertInvitationCodeIsInvalid.showAndWait();
+		    return;
 		}
 
+		
+		// Username Check
+		String errorMessage = UserNameRecognizer.checkForValidUserName(username);
+
+		if (!errorMessage.isEmpty()) {
+		    ViewNewAccount.alertUsernamePasswordError.setContentText(errorMessage);
+		    ViewNewAccount.alertUsernamePasswordError.showAndWait();
+		    return;
+		}
+		
 		// Display key information to the log
 		System.out.println("** Account for Username: " + username + "; theInvitationCode: "+
 				ViewNewAccount.theInvitationCode + "; email address: " + 
@@ -128,9 +136,9 @@ public class ControllerNewAccount {
                 System.exit(0);
             }
             
-            // The account has been set, so remove the invitation from the system
-            theDatabase.removeInvitationAfterUse(
-            		ViewNewAccount.text_Invitation.getText());
+         // PURPOSE: delete the invitation code that opened the sign-up session.
+         theDatabase.removeInvitationAfterUse(ViewNewAccount.theInvitationCode);
+
             
             // Set the database so it has this user and the current user
             theDatabase.getUserAccountDetails(username);
