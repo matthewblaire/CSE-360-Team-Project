@@ -1,6 +1,8 @@
 package guiAdminHome;
 
 import database.Database;
+import entityClasses.User;
+import javafx.stage.Stage;
 
 /*******
  * <p> Title: GUIAdminHomePage Class. </p>
@@ -26,7 +28,7 @@ import database.Database;
  */
 
 public class ControllerAdminHome {
-	
+
 	/*-*******************************************************************************************
 
 	User Interface Actions for this page
@@ -70,35 +72,20 @@ public class ControllerAdminHome {
 			return;
 		}
 		
-		// Get the role selected by the admin
+		// Inform the user that the invitation has been sent and display the invitation code
 		String theSelectedRole = (String) ViewAdminHome.combobox_SelectRole.getValue();
-
-		// Invite is active for 24 hours
-		java.time.LocalDateTime expiresAt = java.time.LocalDateTime.now().plusHours(24);
-
-		// Tests Expiration (1 minute in past and about 5 seconds)
-		//java.time.LocalDateTime expiresAt = java.time.LocalDateTime.now().minusMinutes(1);
-		//java.time.LocalDateTime expiresAt = java.time.LocalDateTime.now().plusSeconds(5);
-		
-		
-		// Generate the invitation code with expiration
-		String invitationCode = theDatabase.generateInvitationCode(emailAddress, theSelectedRole, expiresAt);
-		
-		
-		// Show admin what was sent
-		String msg = "Code: " + invitationCode
-		        + " for role " + theSelectedRole
-		        + " (expires in 24 hours) was sent to: " + emailAddress;
-
+		String invitationCode = theDatabase.generateInvitationCode(emailAddress,
+				theSelectedRole);
+		String msg = "Code: " + invitationCode + " for role " + theSelectedRole + 
+				" was sent to: " + emailAddress;
 		System.out.println(msg);
 		ViewAdminHome.alertEmailSent.setContentText(msg);
 		ViewAdminHome.alertEmailSent.showAndWait();
-
-		// UI REFRESH (update Home labels immediately without restart)
-	    ViewAdminHome.text_InvitationEmailAddress.setText(""); // clears the email field for the next invite
-	    ViewAdminHome.label_NumberOfInvitations.setText(
-	     "Number of outstanding invitations: " + theDatabase.getNumberOfInvitations()
-	     );
+		
+		// Update the Admin Home pages status
+		ViewAdminHome.text_InvitationEmailAddress.setText("");
+		ViewAdminHome.label_NumberOfInvitations.setText("Number of outstanding invitations: " + 
+				theDatabase.getNumberOfInvitations());
 	}
 	
 	/**********
@@ -141,12 +128,8 @@ public class ControllerAdminHome {
 	 * <p> Description: Protected method that is currently a stub informing the user that
 	 * this function has not yet been implemented. </p>
 	 */
-	protected static void deleteUser() {
-		System.out.println("\n*** WARNING ***: Delete User Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
-		ViewAdminHome.alertNotImplemented.setHeaderText("Delete User Issue");
-		ViewAdminHome.alertNotImplemented.setContentText("Delete User Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.showAndWait();
+	protected static void deleteUser() {		
+		guiDeleteUser.ViewDeleteUser.displayDeleteUser(ViewAdminHome.theStage, ViewAdminHome.theUser);
 	}
 	
 	/**********
@@ -157,12 +140,13 @@ public class ControllerAdminHome {
 	 * <p> Description: Protected method that is currently a stub informing the user that
 	 * this function has not yet been implemented. </p>
 	 */
-	protected static void listUsers() {
+	protected static void listUsers(Stage ps, User user) {
 		System.out.println("\n*** WARNING ***: List Users Not Yet Implemented");
 		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
 		ViewAdminHome.alertNotImplemented.setHeaderText("List User Issue");
 		ViewAdminHome.alertNotImplemented.setContentText("List Users Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.showAndWait();
+//		ViewAdminHome.alertNotImplemented.showAndWait();
+		ViewUserList.displayUserList(ps, user);
 	}
 	
 	/**********
