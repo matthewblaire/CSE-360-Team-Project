@@ -68,11 +68,8 @@ public class ControllerUserLogin {
 		String password = ViewUserLogin.text_Password.getText();
     	boolean loginResult = false;
     	
-    	
-    
-    	
-		// Check the length of the username input, then fetch the user and verify the username
-     	if (username.length() > 16 || theDatabase.getUserAccountDetails(username) == false) {
+		// Fetch the user and verify the username
+     	if (theDatabase.getUserAccountDetails(username) == false) {
      		// Don't provide too much information.  Don't say the username is invalid or the
      		// password is invalid.  Just say the pair is invalid.
     		ViewUserLogin.alertUsernamePasswordError.setContentText(
@@ -81,10 +78,22 @@ public class ControllerUserLogin {
     		return;
     	}
 		// System.out.println("*** Username is valid");
-		
+
+		// Check for one-time password login
+		String oneTimePassword = theDatabase.getCurrentOneTimePassword();
+		if (oneTimePassword != null && !oneTimePassword.isEmpty()) {
+			if (password.equals(oneTimePassword)) {
+				// OTP login successful - redirect to password reset screen
+				System.out.println("*** OTP login successful for user: " + username);
+				guiResetPassword.ViewResetPassword.displayResetPassword(theStage, username);
+				return;
+			}
+			// If OTP didn't match, fall through to try regular password
+		}
+
 		// Check to see that the login password matches the account password
     	String actualPassword = theDatabase.getCurrentPassword();
-    	
+
     	if (password.compareTo(actualPassword) != 0) {
     		ViewUserLogin.alertUsernamePasswordError.setContentText(
     				"Incorrect username/password. Try again!");
