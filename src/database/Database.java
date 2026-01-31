@@ -1,10 +1,6 @@
 package database;
 
 import java.sql.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -59,6 +55,7 @@ public class Database {
 	private boolean currentAdminRole;
 	private boolean currentNewRole1;
 	private boolean currentNewRole2;
+    private String currentOneTimePassword;
 
 	/*******
 	 * <p> Method: Database </p>
@@ -87,7 +84,7 @@ public class Database {
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
 			statement = connection.createStatement(); 
 			// You can use this command to clear the database and restart from fresh.
-			//statement.execute("DROP ALL OBJECTS");
+			statement.execute("DROP ALL OBJECTS");
 
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
@@ -108,6 +105,7 @@ public class Database {
 				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
 				+ "userName VARCHAR(255) UNIQUE, "
 				+ "password VARCHAR(255), "
+                + "oneTimePassword VARCHAR(255), "
 				+ "firstName VARCHAR(255), "
 				+ "middleName VARCHAR(255), "
 				+ "lastName VARCHAR (255), "
@@ -867,14 +865,15 @@ public int getNumAdmins() throws SQLException
 			rs.next();
 	    	currentUsername = rs.getString(2);
 	    	currentPassword = rs.getString(3);
-	    	currentFirstName = rs.getString(4);
-	    	currentMiddleName = rs.getString(5);
-	    	currentLastName = rs.getString(6);
-	    	currentPreferredFirstName = rs.getString(7);
-	    	currentEmailAddress = rs.getString(8);
-	    	currentAdminRole = rs.getBoolean(9);
-	    	currentNewRole1 = rs.getBoolean(10);
-	    	currentNewRole2 = rs.getBoolean(11);
+            currentOneTimePassword = rs.getString(4);
+	    	currentFirstName = rs.getString(5);
+	    	currentMiddleName = rs.getString(6);
+	    	currentLastName = rs.getString(7);
+	    	currentPreferredFirstName = rs.getString(8);
+	    	currentEmailAddress = rs.getString(9);
+	    	currentAdminRole = rs.getBoolean(10);
+	    	currentNewRole1 = rs.getBoolean(11);
+	    	currentNewRole2 = rs.getBoolean(12);
 			return true;
 	    } catch (SQLException e) {
 			return false;
@@ -1058,6 +1057,79 @@ public int getNumAdmins() throws SQLException
 	 */
 	public boolean getCurrentNewRole2() { return currentNewRole2;};
 
+	/*******
+	 * <p> Method: String getCurrentOneTimePassword() </p>
+	 *
+	 * <p> Description: Get the current user's one-time password.</p>
+	 *
+	 * @return the one-time password value is returned (may be null)
+	 *
+	 */
+	public String getCurrentOneTimePassword() { return currentOneTimePassword;};
+
+
+	/*******
+	 * <p> Method: void setOneTimePassword(String username, String otp) </p>
+	 *
+	 * <p> Description: Set a one-time password for a user. This allows an admin to reset
+	 * a user's password so they can log in and establish a new password.</p>
+	 *
+	 * @param username is the username of the user
+	 * @param otp is the one-time password to set
+	 *
+	 */
+	public void setOneTimePassword(String username, String otp) {
+	    String query = "UPDATE userDB SET oneTimePassword = ? WHERE username = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, otp);
+	        pstmt.setString(2, username);
+	        pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+
+	/*******
+	 * <p> Method: void clearOneTimePassword(String username) </p>
+	 *
+	 * <p> Description: Clear the one-time password for a user after it has been used.</p>
+	 *
+	 * @param username is the username of the user
+	 *
+	 */
+	public void clearOneTimePassword(String username) {
+	    String query = "UPDATE userDB SET oneTimePassword = NULL WHERE username = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, username);
+	        pstmt.executeUpdate();
+	        currentOneTimePassword = null;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+
+	/*******
+	 * <p> Method: void updatePassword(String username, String newPassword) </p>
+	 *
+	 * <p> Description: Update the password for a user.</p>
+	 *
+	 * @param username is the username of the user
+	 * @param newPassword is the new password for the user
+	 *
+	 */
+	public void updatePassword(String username, String newPassword) {
+	    String query = "UPDATE userDB SET password = ? WHERE username = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, newPassword);
+	        pstmt.setString(2, username);
+	        pstmt.executeUpdate();
+	        currentPassword = newPassword;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
 	
 	/*******
 	 * <p> Debugging method</p>
