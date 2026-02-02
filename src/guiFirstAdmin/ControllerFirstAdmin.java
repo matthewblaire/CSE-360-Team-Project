@@ -131,8 +131,8 @@ public class ControllerFirstAdmin {
                 System.exit(0);
             }
             
-            // User was established in the database, so navigate to the User Update Page
-        	guiUserUpdate.ViewUserUpdate.displayUserUpdate(ViewFirstAdmin.theStage, user);
+            // User was established in the database sucessfully, redirect them to the login page to ask them to log in
+            guiUserLogin.ViewUserLogin.displayUserLogin(ViewFirstAdmin.theStage);
 		}
 		else {
 			// The two passwords are NOT the same, so clear the passwords, explain the passwords

@@ -2,9 +2,9 @@ package guiStudent;
 
 
 /*******
- * <p> Title: ControllerRole1Home Class. </p>
+ * <p> Title: ControllerStudentHome Class. </p>
  * 
- * <p> Description: The Java/FX-based Role 1 Home Page.  This class provides the controller
+ * <p> Description: The Java/FX-based Student Home Page.  This class provides the controller
  * actions basic on the user's use of the JavaFX GUI widgets defined by the View class.
  * 
  * This page is a stub for establish future roles for the application.
@@ -47,7 +47,7 @@ public class ControllerStudentHome {
 	 * 
 	 */
 	protected static void performUpdate () {
-		guiUserUpdate.ViewUserUpdate.displayUserUpdate(ViewRole1Home.theStage, ViewRole1Home.theUser);
+		guiUserUpdate.ViewUserUpdate.displayUserUpdate(ViewStudentHome.theStage, ViewStudentHome.theUser);
 	}	
 
 	/**********
@@ -59,7 +59,7 @@ public class ControllerStudentHome {
 	 * 
 	 */
 	protected static void performLogout() {
-		guiUserLogin.ViewUserLogin.displayUserLogin(ViewRole1Home.theStage);
+		guiUserLogin.ViewUserLogin.displayUserLogin(ViewStudentHome.theStage);
 	}
 	
 	/**********

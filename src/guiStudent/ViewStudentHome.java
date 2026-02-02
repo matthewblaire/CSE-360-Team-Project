@@ -79,7 +79,7 @@ public class ViewStudentHome {
 	protected static User theUser;				// The current logged in User
 	
 
-	private static Scene theViewRole1HomeScene;	// The shared Scene each invocation populates
+	private static Scene theViewStudentHomeScene;	// The shared Scene each invocation populates
 	protected static final int theRole = 2;		// Admin: 1; Role1: 2; Role2: 3
 
 	/*-*******************************************************************************************
@@ -110,7 +110,7 @@ public class ViewStudentHome {
 	 * @param user specifies the User for this GUI and it's methods
 	 * 
 	 */
-	public static void displayRole1Home(Stage ps, User user) {
+	public static void displayStudentHome(Stage ps, User user) {
 		
 		// Establish the references to the GUI and the current user
 		theStage = ps;
@@ -127,13 +127,13 @@ public class ViewStudentHome {
 		label_UserDetails.setText("User: " + theUser.getUserName());
 				
 		// Set the title for the window, display the page, and wait for the Admin to do something
-		theStage.setTitle("CSE 360 Foundations: Role1 Home Page");
-		theStage.setScene(theViewRole1HomeScene);
+		theStage.setTitle("CSE 360 Foundations: Student Home Page");
+		theStage.setScene(theViewStudentHomeScene);
 		theStage.show();
 	}
 	
 	/**********
-	 * <p> Method: ViewRole1Home() </p>
+	 * <p> Method: ViewStudentHome() </p>
 	 * 
 	 * <p> Description: This method initializes all the elements of the graphical user interface.
 	 * This method determines the location, size, font, color, and change and event handlers for
@@ -147,14 +147,14 @@ public class ViewStudentHome {
 
 		// Create the Pane for the list of widgets and the Scene for the window
 		theRootPane = new Pane();
-		theViewRole1HomeScene = new Scene(theRootPane, width, height);	// Create the scene
+		theViewStudentHomeScene = new Scene(theRootPane, width, height);	// Create the scene
 		
 		// Set the title for the window
 		
 		// Populate the window with the title and other common widgets and set their static state
 		
 		// GUI Area 1
-		label_PageTitle.setText("Role1 Home Page");
+		label_PageTitle.setText("Student Home Page");
 		setupLabelUI(label_PageTitle, "Arial", 28, width, Pos.CENTER, 0, 5);
 
 		label_UserDetails.setText("User: " + theUser.getUserName());

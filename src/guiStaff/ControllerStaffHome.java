@@ -2,9 +2,9 @@ package guiStaff;
 
 
 /*******
- * <p> Title: ControllerRole2Home Class. </p>
+ * <p> Title: ControllerStaffClass. </p>
  * 
- * <p> Description: The Java/FX-based Role 2 Home Page.  This class provides the controller
+ * <p> Description: The Java/FX-based Staff Home Page.  This class provides the controller
  * actions basic on the user's use of the JavaFX GUI widgets defined by the View class.
  * 
  * This page is a stub for establish future roles for the application.

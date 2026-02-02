@@ -136,8 +136,8 @@ public class ViewUserList {
 	        // Create roles string
 	        String roles = "";
 	        if (theDatabase.getCurrentAdminRole()) roles += "Admin ";
-	        if (theDatabase.getCurrentNewRole1()) roles += "Role1 ";
-	        if (theDatabase.getCurrentNewRole2()) roles += "Role2 ";
+	        if (theDatabase.getCurrentNewStudentRole()) roles += "Student ";
+	        if (theDatabase.getCurrentNewStaffRole()) roles += "Staff ";
 	        if (roles.isEmpty()) roles = "No Roles";
 	        
 	        Label rolesLabel = new Label(roles.trim());

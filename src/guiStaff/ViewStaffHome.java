@@ -14,9 +14,9 @@ import entityClasses.User;
 
 
 /*******
- * <p> Title: ViewRole2Home Class. </p>
+ * <p> Title: ViewStaffHome Class. </p>
  * 
- * <p> Description: The Java/FX-based Role2 Home Page.  The page is a stub for some role needed for
+ * <p> Description: The Java/FX-based Staff Home Page.  The page is a stub for some role needed for
  * the application.  The widgets on this page are likely the minimum number and kind for other role
  * pages that may be needed.</p>
  * 
@@ -79,8 +79,8 @@ public class ViewStaffHome {
 	protected static Pane theRootPane;			// The Pane that holds all the GUI widgets
 	protected static User theUser;				// The current logged in User
 	
-	private static Scene theRole2HomeScene;		// The shared Scene each invocation populates
-	protected static final int theRole = 3;		// Admin: 1; Role1: 2; Role2: 3
+	private static Scene theStaffHomeScene;		// The shared Scene each invocation populates
+	protected static final int theRole = 3;		// Admin: 1; Student: 2; Staff: 3
 
 	/*-*******************************************************************************************
 
@@ -89,7 +89,7 @@ public class ViewStaffHome {
 	 */
 
 	/**********
-	 * <p> Method: displayRole2Home(Stage ps, User user) </p>
+	 * <p> Method: displayStaffHome(Stage ps, User user) </p>
 	 * 
 	 * <p> Description: This method is the single entry point from outside this package to cause
 	 * the Role2 Home page to be displayed.
@@ -109,7 +109,7 @@ public class ViewStaffHome {
 	 * @param user specifies the User for this GUI and it's methods
 	 * 
 	 */
-	public static void displayRole2Home(Stage ps, User user) {
+	public static void displayStaffHome(Stage ps, User user) {
 		
 		// Establish the references to the GUI and the current user
 		theStage = ps;
@@ -126,8 +126,8 @@ public class ViewStaffHome {
 		label_UserDetails.setText("User: " + theUser.getUserName());// Set the username
 
 		// Set the title for the window, display the page, and wait for the Admin to do something
-		theStage.setTitle("CSE 360 Foundations: Role2 Home Page");
-		theStage.setScene(theRole2HomeScene);						// Set this page onto the stage
+		theStage.setTitle("CSE 360 Foundations: Staff Home Page");
+		theStage.setScene(theStaffHomeScene);						// Set this page onto the stage
 		theStage.show();											// Display it to the user
 	}
 	
@@ -139,21 +139,21 @@ public class ViewStaffHome {
 	 * each GUI object. </p>
 	 * 
 	 * This is a singleton and is only performed once.  Subsequent uses fill in the changeable
-	 * fields using the displayRole2Home method.</p>
+	 * fields using the displayStaffHome method.</p>
 	 * 
 	 */
 	private ViewStaffHome() {
 		
 		// Create the Pane for the list of widgets and the Scene for the window
 		theRootPane = new Pane();
-		theRole2HomeScene = new Scene(theRootPane, width, height);	// Create the scene
+		theStaffHomeScene = new Scene(theRootPane, width, height);	// Create the scene
 		
 		// Set the title for the window
 		
 		// Populate the window with the title and other common widgets and set their static state
 		
 		// GUI Area 1
-		label_PageTitle.setText("Role2 Home Page");
+		label_PageTitle.setText("Staff Home Page");
 		setupLabelUI(label_PageTitle, "Arial", 28, width, Pos.CENTER, 0, 5);
 
 		label_UserDetails.setText("User: " + theUser.getUserName());
