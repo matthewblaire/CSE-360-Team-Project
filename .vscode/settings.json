@@ -1,0 +1,4 @@
+{
+    // Prevent eclipse and vscode from fighting when both are open
+    "java.autobuild.enabled": false
+}
