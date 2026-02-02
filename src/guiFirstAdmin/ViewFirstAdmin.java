@@ -62,6 +62,13 @@ public class ViewFirstAdmin {
 	protected static TextField text_AdminUsername = new TextField();
 	protected static PasswordField text_AdminPassword1 = new PasswordField();
 	protected static PasswordField text_AdminPassword2 = new PasswordField();
+	
+	protected static TextField text_AdminFirstName = new TextField();
+	protected static TextField text_AdminMiddleName = new TextField();
+	protected static TextField text_AdminLastName = new TextField();
+	protected static TextField text_AdminPreferredFirstName = new TextField();
+	protected static TextField text_AdminEmailAddress = new TextField();
+
 	private static Button button_AdminSetup = new Button("Setup Admin Account");
 
 	// This alert is used should the user enter two passwords that do not match
@@ -74,7 +81,7 @@ public class ViewFirstAdmin {
 	protected static Stage theStage;	
 	private static Pane theRootPane;
 	private static Scene theFirstAdminScene = null;
-	private static final int theRole = 1;		// Admin: 1; Role1: 2; Role2: 3
+	private static final int theRole = 1;		// Admin: 1; Student: 2; Staff: 3
 		
 	
 	/*-********************************************************************************************
@@ -105,7 +112,7 @@ public class ViewFirstAdmin {
 		
 		// Populate the dynamic aspects of the GUI with the data from the user and the current
 		// state of the system.
-		applicationMain.FoundationsMain.activeHomePage = theRole;	// 1: Admin; 2: Role1; 3 Roles2
+		applicationMain.FoundationsMain.activeHomePage = theRole;	// 1: Admin; 2: Student; 3: Staff
 
 		// Set the title for the window, display the page, and wait for the Admin to do something
 		theStage.setTitle("CSE 360 Foundation Code: First User Account Setup");	
@@ -176,6 +183,23 @@ public class ViewFirstAdmin {
 		text_AdminPassword2.textProperty().addListener((_, _, _) 
 				-> {ControllerFirstAdmin.setAdminPassword2(); });
 
+		// Establish the text input fields for Admin's Personal Information
+		setupTextUI(text_AdminFirstName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 310, true);
+		text_AdminFirstName.setPromptText("Enter AdminFirstName");
+		text_AdminFirstName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminFirstName(); });
+		setupTextUI(text_AdminMiddleName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 360, true);
+		text_AdminMiddleName.setPromptText("Enter AdminMiddleName");
+		text_AdminMiddleName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminMiddleName(); });
+		setupTextUI(text_AdminLastName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 410, true);
+		text_AdminLastName.setPromptText("Enter AdminLastName");
+		text_AdminLastName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminLastName(); });
+		setupTextUI(text_AdminPreferredFirstName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 460, true);
+		text_AdminPreferredFirstName.setPromptText("Enter AdminPreferredFirstName");
+		text_AdminPreferredFirstName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminPreferredFirstName(); });
+		setupTextUI(text_AdminEmailAddress, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 510, true);
+		text_AdminEmailAddress.setPromptText("Enter AdminEmailAddress");
+		text_AdminEmailAddress.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminEmailAddress(); });
+
 		// Set up the Log In button
 		setupButtonUI(button_AdminSetup, "Dialog", 18, 200, Pos.CENTER, 475, 210);
 		button_AdminSetup.setOnAction((_) -> {
@@ -192,8 +216,9 @@ public class ViewFirstAdmin {
 		// Place all of the just-initialized GUI elements into the pane
 		theRootPane.getChildren().addAll(label_ApplicationTitle, label_TitleLine1,
 				label_TitleLine2, text_AdminUsername, text_AdminPassword1, 
-				text_AdminPassword2, button_AdminSetup, label_PasswordsDoNotMatch, 
-				label_UsernameInvalid, button_Quit);
+				text_AdminPassword2, text_AdminFirstName, text_AdminMiddleName, 
+				text_AdminLastName, text_AdminPreferredFirstName, text_AdminEmailAddress,
+				 button_AdminSetup, label_PasswordsDoNotMatch, label_UsernameInvalid, button_Quit);
 	}
 	
 	

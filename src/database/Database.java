@@ -56,8 +56,8 @@ public class Database {
 	private String currentPreferredFirstName;
 	private String currentEmailAddress;
 	private boolean currentAdminRole;
-	private boolean currentNewRole1;
-	private boolean currentNewRole2;
+	private boolean currentStudentRole;
+	private boolean currentStaffRole;
     private String currentOneTimePassword;
 
 	/*******
@@ -115,8 +115,8 @@ public class Database {
 				+ "preferredFirstName VARCHAR(255), "
 				+ "emailAddress VARCHAR(255), "
 				+ "adminRole BOOL DEFAULT FALSE, "
-				+ "newRole1 BOOL DEFAULT FALSE, "
-				+ "newRole2 BOOL DEFAULT FALSE)";
+				+ "studentRole BOOL DEFAULT FALSE, "
+				+ "staffRole BOOL DEFAULT FALSE)";
 		statement.execute(userTable);
 	    
 	    // Create the invitation codes table
@@ -241,7 +241,7 @@ public int getNumAdmins() throws SQLException
  */
 	public void register(User user) throws SQLException {
 		String insertUser = "INSERT INTO userDB (userName, password, firstName, middleName, "
-				+ "lastName, preferredFirstName, emailAddress, adminRole, newRole1, newRole2) "
+				+ "lastName, preferredFirstName, emailAddress, adminRole, studentRole, staffRole) "
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			currentUsername = user.getUserName();
@@ -268,11 +268,11 @@ public int getNumAdmins() throws SQLException
 			currentAdminRole = user.getAdminRole();
 			pstmt.setBoolean(8, currentAdminRole);
 			
-			currentNewRole1 = user.getNewRole1();
-			pstmt.setBoolean(9, currentNewRole1);
+			currentStudentRole = user.getNewStudentRole();
+			pstmt.setBoolean(9, currentStudentRole);
 			
-			currentNewRole2 = user.getNewRole2();
-			pstmt.setBoolean(10, currentNewRole2);
+			currentStaffRole = user.getNewStaffRole();
+			pstmt.setBoolean(10, currentStaffRole);
 			
 			pstmt.executeUpdate();
 		}
@@ -343,10 +343,10 @@ public int getNumAdmins() throws SQLException
  * @return true if the specified user has been logged in as an Student else false.
  * 
  */
-	public boolean loginRole1(User user) {
+	public boolean loginStudentRole(User user) {
 		// Validates a student user's login credentials.
 		String query = "SELECT * FROM userDB WHERE userName = ? AND password = ? AND "
-				+ "newRole1 = TRUE";
+				+ "studentRole = TRUE";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
@@ -370,9 +370,9 @@ public int getNumAdmins() throws SQLException
 	 * 
 	 */
 	// Validates a reviewer user's login credentials.
-	public boolean loginRole2(User user) {
+	public boolean loginStaffRole(User user) {
 		String query = "SELECT * FROM userDB WHERE userName = ? AND password = ? AND "
-				+ "newRole2 = TRUE";
+				+ "staffRole = TRUE";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
@@ -428,8 +428,8 @@ public int getNumAdmins() throws SQLException
 	public int getNumberOfRoles (User user) {
 		int numberOfRoles = 0;
 		if (user.getAdminRole()) numberOfRoles++;
-		if (user.getNewRole1()) numberOfRoles++;
-		if (user.getNewRole2()) numberOfRoles++;
+		if (user.getNewStudentRole()) numberOfRoles++;
+		if (user.getNewStaffRole()) numberOfRoles++;
 		return numberOfRoles;
 	}	
 
@@ -931,8 +931,8 @@ public int getNumAdmins() throws SQLException
 	    	currentPreferredFirstName = rs.getString(8);
 	    	currentEmailAddress = rs.getString(9);
 	    	currentAdminRole = rs.getBoolean(10);
-	    	currentNewRole1 = rs.getBoolean(11);
-	    	currentNewRole2 = rs.getBoolean(12);
+	    	currentStudentRole = rs.getBoolean(11);
+	    	currentStaffRole = rs.getBoolean(12);
 			return true;
 	    } catch (SQLException e) {
 			return false;
@@ -972,31 +972,31 @@ public int getNumAdmins() throws SQLException
 				return false;
 			}
 		}
-		if (role.compareTo("Role1") == 0) {
-			String query = "UPDATE userDB SET newRole1 = ? WHERE username = ?";
+		if (role.compareTo("Student") == 0) {
+			String query = "UPDATE userDB SET studentRole = ? WHERE username = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 				pstmt.setString(1, value);
 				pstmt.setString(2, username);
 				pstmt.executeUpdate();
 				if (value.compareTo("true") == 0)
-					currentNewRole1 = true;
+					currentStudentRole = true;
 				else
-					currentNewRole1 = false;
+					currentStudentRole = false;
 				return true;
 			} catch (SQLException e) {
 				return false;
 			}
 		}
-		if (role.compareTo("Role2") == 0) {
-			String query = "UPDATE userDB SET newRole2 = ? WHERE username = ?";
+		if (role.compareTo("Staff") == 0) {
+			String query = "UPDATE userDB SET staffRole = ? WHERE username = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 				pstmt.setString(1, value);
 				pstmt.setString(2, username);
 				pstmt.executeUpdate();
 				if (value.compareTo("true") == 0)
-					currentNewRole2 = true;
+					currentStaffRole = true;
 				else
-					currentNewRole2 = false;
+					currentStaffRole = false;
 				return true;
 			} catch (SQLException e) {
 				return false;
@@ -1103,7 +1103,7 @@ public int getNumAdmins() throws SQLException
 	 * @return true if this user plays a Student role, else false
 	 *  
 	 */
-	public boolean getCurrentNewRole1() { return currentNewRole1;};
+	public boolean getCurrentNewStudentRole() { return currentStudentRole;};
 
 	
 	/*******
@@ -1114,7 +1114,7 @@ public int getNumAdmins() throws SQLException
 	 * @return true if this user plays a Reviewer role, else false
 	 *  
 	 */
-	public boolean getCurrentNewRole2() { return currentNewRole2;};
+	public boolean getCurrentNewStaffRole() { return currentStaffRole;};
 
 	/*******
 	 * <p> Method: String getCurrentOneTimePassword() </p>

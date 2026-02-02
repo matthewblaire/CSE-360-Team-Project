@@ -193,22 +193,22 @@ public class ControllerDeleteUser {
 			notTheFirst = true;
 		}
 		
-		// Roles 1 - It could be at the head of the list or later in the list
-		if (theDatabase.getCurrentNewRole1()) {
+		// Student role - It could be at the head of the list or later in the list
+		if (theDatabase.getCurrentNewStudentRole()) {
 			if (notTheFirst)
-				theCurrentRoles += ", Role1"; 
+				theCurrentRoles += ", Student"; 
 			else {
-				theCurrentRoles += "Role1";
+				theCurrentRoles += "Student";
 				notTheFirst = true;
 			}
 		}
 
-		// Roles 2 - It could be at the head of the list or later in the list
-		if (theDatabase.getCurrentNewRole2()) {
+		// Staff role - It could be at the head of the list or later in the list
+		if (theDatabase.getCurrentNewStaffRole()) {
 			if (notTheFirst)
-				theCurrentRoles += ", Role2"; 
+				theCurrentRoles += ", Staff"; 
 			else {
-				theCurrentRoles += "Role2";
+				theCurrentRoles += "Staff";
 				notTheFirst = true;
 			}
 		}
