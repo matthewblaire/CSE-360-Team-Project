@@ -92,7 +92,7 @@ public class ViewStaffHome {
 	 * <p> Method: displayStaffHome(Stage ps, User user) </p>
 	 * 
 	 * <p> Description: This method is the single entry point from outside this package to cause
-	 * the Role2 Home page to be displayed.
+	 * the Staff Home page to be displayed.
 	 * 
 	 * It first sets up every shared attributes so we don't have to pass parameters.
 	 * 
@@ -132,7 +132,7 @@ public class ViewStaffHome {
 	}
 	
 	/**********
-	 * <p> Method: ViewRole2Home() </p>
+	 * <p> Method: ViewStaffHome() </p>
 	 * 
 	 * <p> Description: This method initializes all the elements of the graphical user interface.
 	 * This method determines the location, size, font, color, and change and event handlers for

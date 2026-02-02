@@ -44,17 +44,20 @@ public class ViewFirstAdmin {
 
 	// These are the widget attributes for the GUI
 	
-	// The GUI informs the user about the purpose of this page, provides three text inputs fields
-	// for the user to specify a username for this account and two copies of the password to be
-	// used (they must match), a button to request that the account be established, and a quit
-	// but to abort the action and stop the application.
+	// The GUI informs the user about the purpose of this page, provides seven text inputs fields
+	// for the user to specify a username for this account, two copies of the password to be
+	// used (they must match), and the user's account information, a button to request that the 
+	// account be established, and a quit but to abort the action and stop the application.
 	private static Label label_ApplicationTitle = new Label("Foundation Application Startup Page");
 	private static Label label_TitleLine1 = 
 			new Label(" You are the first user.  You must be an administrator.");
 	
 	private static Label label_TitleLine2 = 
-			new Label("Enter the Admin's Username, the Password twice, and then click on " + 
-					"Setup Admin Account.");
+			new Label("Enter the Admin's Username, Password twice, User information, and then click on " + 
+					"Setup Admin");
+
+	private static Label label_TitleLine3 = 
+			new Label("Account to be sent to the login page to login with your chosen username and password.");				
 	
 	protected static Label label_PasswordsDoNotMatch = new Label();
 	protected static Label label_UsernameInvalid = new Label();
@@ -66,7 +69,6 @@ public class ViewFirstAdmin {
 	protected static TextField text_AdminFirstName = new TextField();
 	protected static TextField text_AdminMiddleName = new TextField();
 	protected static TextField text_AdminLastName = new TextField();
-	protected static TextField text_AdminPreferredFirstName = new TextField();
 	protected static TextField text_AdminEmailAddress = new TextField();
 
 	private static Button button_AdminSetup = new Button("Setup Admin Account");
@@ -157,10 +159,13 @@ public class ViewFirstAdmin {
 		setupLabelUI(label_ApplicationTitle, "Arial", 32, width, Pos.CENTER, 0, 10);
 
 		// Label to display the welcome message for the first user
-		setupLabelUI(label_TitleLine1, "Arial", 24, width, Pos.CENTER, 0, 70);
+		setupLabelUI(label_TitleLine1, "Arial", 24, width, Pos.CENTER, 0, 50);
 
 		// Label to display the welcome message for the first user
-		setupLabelUI(label_TitleLine2, "Arial", 18, width, Pos.CENTER, 0, 130);
+		setupLabelUI(label_TitleLine2, "Arial", 18, width, Pos.CENTER, 0, 90);
+
+		// Label to display the welcome message for the first user
+		setupLabelUI(label_TitleLine3, "Arial", 18, width, Pos.CENTER, 0, 120);
 
 		// Establish the text input operand field for the Admin username
 		setupTextUI(text_AdminUsername, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 160, 
@@ -185,19 +190,19 @@ public class ViewFirstAdmin {
 
 		// Establish the text input fields for Admin's Personal Information
 		setupTextUI(text_AdminFirstName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 310, true);
-		text_AdminFirstName.setPromptText("Enter AdminFirstName");
+		text_AdminFirstName.setPromptText("Enter Admin First Name");
 		text_AdminFirstName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminFirstName(); });
+		
 		setupTextUI(text_AdminMiddleName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 360, true);
-		text_AdminMiddleName.setPromptText("Enter AdminMiddleName");
+		text_AdminMiddleName.setPromptText("Enter Admin Middle Name");
 		text_AdminMiddleName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminMiddleName(); });
+		
 		setupTextUI(text_AdminLastName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 410, true);
-		text_AdminLastName.setPromptText("Enter AdminLastName");
+		text_AdminLastName.setPromptText("Enter Admin Last Name");
 		text_AdminLastName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminLastName(); });
-		setupTextUI(text_AdminPreferredFirstName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 460, true);
-		text_AdminPreferredFirstName.setPromptText("Enter AdminPreferredFirstName");
-		text_AdminPreferredFirstName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminPreferredFirstName(); });
-		setupTextUI(text_AdminEmailAddress, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 510, true);
-		text_AdminEmailAddress.setPromptText("Enter AdminEmailAddress");
+		
+		setupTextUI(text_AdminEmailAddress, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 460, true);
+		text_AdminEmailAddress.setPromptText("Enter Admin Email Address");
 		text_AdminEmailAddress.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminEmailAddress(); });
 
 		// Set up the Log In button
@@ -215,9 +220,9 @@ public class ViewFirstAdmin {
 
 		// Place all of the just-initialized GUI elements into the pane
 		theRootPane.getChildren().addAll(label_ApplicationTitle, label_TitleLine1,
-				label_TitleLine2, text_AdminUsername, text_AdminPassword1, 
+				label_TitleLine2, label_TitleLine3, text_AdminUsername, text_AdminPassword1, 
 				text_AdminPassword2, text_AdminFirstName, text_AdminMiddleName, 
-				text_AdminLastName, text_AdminPreferredFirstName, text_AdminEmailAddress,
+				text_AdminLastName, text_AdminEmailAddress,
 				 button_AdminSetup, label_PasswordsDoNotMatch, label_UsernameInvalid, button_Quit);
 	}
 	

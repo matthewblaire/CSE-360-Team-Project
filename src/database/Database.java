@@ -333,7 +333,7 @@ public int getNumAdmins() throws SQLException
 	
 	
 /*******
- * <p> Method: boolean loginRole1(User user) </p>
+ * <p> Method: boolean loginStudentRole(User user) </p>
  * 
  * <p> Description: Check to see that a user with the specified username, password, and role
  * 		is the same as a row in the table for the username, password, and role. </p>
@@ -359,7 +359,7 @@ public int getNumAdmins() throws SQLException
 	}
 
 	/*******
-	 * <p> Method: boolean loginRole2(User user) </p>
+	 * <p> Method: boolean loginStaff(User user) </p>
 	 * 
 	 * <p> Description: Check to see that a user with the specified username, password, and role
 	 * 		is the same as a row in the table for the username, password, and role. </p>
@@ -1096,7 +1096,7 @@ public int getNumAdmins() throws SQLException
 
 	
 	/*******
-	 * <p> Method: boolean getCurrentNewRole1() </p>
+	 * <p> Method: boolean getCurrentNewStudentRole() </p>
 	 * 
 	 * <p> Description: Get the current user's Student role attribute.</p>
 	 * 
@@ -1107,7 +1107,7 @@ public int getNumAdmins() throws SQLException
 
 	
 	/*******
-	 * <p> Method: boolean getCurrentNewRole2() </p>
+	 * <p> Method: boolean getCurrentNewStaffRole() </p>
 	 * 
 	 * <p> Description: Get the current user's Reviewer role attribute.</p>
 	 * 
