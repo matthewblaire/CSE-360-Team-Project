@@ -42,7 +42,12 @@ public class ControllerFirstAdmin {
 	
 	private static String adminUsername = "";
 	private static String adminPassword1 = "";
-	private static String adminPassword2 = "";		
+	private static String adminPassword2 = "";
+    private static String adminFirstName = "";
+    private static String adminMiddleName = "";
+    private static String adminLastName = "";
+    private static String adminPreferredFirstName = "";
+    private static String adminEmailAddress = "";		
 	protected static Database theDatabase = applicationMain.FoundationsMain.database;		
 
 	/*-********************************************************************************************
@@ -95,6 +100,15 @@ public class ControllerFirstAdmin {
 		ViewFirstAdmin.label_PasswordsDoNotMatch.setText("");
 	}
 	
+	/**********
+	 * <p> Setter Methods for Admin's Personal Information </p>
+	 * 
+	 */
+	protected static void setAdminFirstName() { adminFirstName = ViewFirstAdmin.text_AdminFirstName.getText(); }
+	protected static void setAdminMiddleName() {adminMiddleName = ViewFirstAdmin.text_AdminMiddleName.getText(); }
+	protected static void setAdminLastName() {adminLastName = ViewFirstAdmin.text_AdminLastName.getText(); }
+	protected static void setAdminPreferredFirstName() {adminPreferredFirstName = ViewFirstAdmin.text_AdminPreferredFirstName.getText(); }
+	protected static void setAdminEmailAddress() {adminEmailAddress = ViewFirstAdmin.text_AdminEmailAddress.getText(); }
 	
 	/**********
 	 * <p> Method: doSetupAdmin() </p>
@@ -118,7 +132,7 @@ public class ControllerFirstAdmin {
 		// Make sure the two passwords are the same
 		if (adminPassword1.compareTo(adminPassword2) == 0) {
         	// Create the passwords and proceed to the user home page
-        	User user = new User(adminUsername, adminPassword1, "", "", "", "", "", true, false, 
+        	User user = new User(adminUsername, adminPassword1, adminFirstName, adminMiddleName, adminLastName, adminPreferredFirstName, adminEmailAddress, true, false, 
         			false);
             try {
             	// Create a new User object with admin role and register in the database
