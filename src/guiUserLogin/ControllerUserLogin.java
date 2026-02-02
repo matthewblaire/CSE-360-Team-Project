@@ -124,12 +124,12 @@ public class ControllerUserLogin {
 			} else if (user.getNewRole1()) {
 				loginResult = theDatabase.loginRole1(user);
 				if (loginResult) {
-					guiRole1.ViewRole1Home.displayRole1Home(theStage, user);
+					guiStudent.ViewStudentHome.displayRole1Home(theStage, user);
 				}
 			} else if (user.getNewRole2()) {
 				loginResult = theDatabase.loginRole2(user);
 				if (loginResult) {
-					guiRole2.ViewRole2Home.displayRole2Home(theStage, user);
+					guiStaff.ViewStaffHome.displayRole2Home(theStage, user);
 				}
 				// Other roles
 			} else {
