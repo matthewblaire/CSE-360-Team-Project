@@ -57,7 +57,7 @@ public class ViewFirstAdmin {
 					"Setup Admin");
 
 	private static Label label_TitleLine3 = 
-			new Label("Account to be sent to the login page to login with your chosen username and password.");				
+			new Label("Account. You will then be asked to login.");				
 	
 	protected static Label label_PasswordsDoNotMatch = new Label();
 	protected static Label label_UsernameInvalid = new Label();
