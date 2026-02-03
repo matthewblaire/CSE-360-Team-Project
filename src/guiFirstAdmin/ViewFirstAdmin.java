@@ -67,9 +67,7 @@ public class ViewFirstAdmin {
 	protected static PasswordField text_AdminPassword2 = new PasswordField();
 	
 	protected static TextField text_AdminFirstName = new TextField();
-	protected static TextField text_AdminMiddleName = new TextField();
 	protected static TextField text_AdminLastName = new TextField();
-	protected static TextField text_AdminEmailAddress = new TextField();
 
 	private static Button button_AdminSetup = new Button("Setup Admin Account");
 
@@ -193,18 +191,10 @@ public class ViewFirstAdmin {
 		text_AdminFirstName.setPromptText("Enter Admin First Name");
 		text_AdminFirstName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminFirstName(); });
 		
-		setupTextUI(text_AdminMiddleName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 360, true);
-		text_AdminMiddleName.setPromptText("Enter Admin Middle Name");
-		text_AdminMiddleName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminMiddleName(); });
-		
-		setupTextUI(text_AdminLastName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 410, true);
+		setupTextUI(text_AdminLastName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 360, true);
 		text_AdminLastName.setPromptText("Enter Admin Last Name");
 		text_AdminLastName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminLastName(); });
 		
-		setupTextUI(text_AdminEmailAddress, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 460, true);
-		text_AdminEmailAddress.setPromptText("Enter Admin Email Address");
-		text_AdminEmailAddress.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminEmailAddress(); });
-
 		// Set up the Log In button
 		setupButtonUI(button_AdminSetup, "Dialog", 18, 200, Pos.CENTER, 475, 210);
 		button_AdminSetup.setOnAction((_) -> {
@@ -221,8 +211,8 @@ public class ViewFirstAdmin {
 		// Place all of the just-initialized GUI elements into the pane
 		theRootPane.getChildren().addAll(label_ApplicationTitle, label_TitleLine1,
 				label_TitleLine2, label_TitleLine3, text_AdminUsername, text_AdminPassword1, 
-				text_AdminPassword2, text_AdminFirstName, text_AdminMiddleName, 
-				text_AdminLastName, text_AdminEmailAddress,
+				text_AdminPassword2, text_AdminFirstName, 
+				text_AdminLastName,
 				 button_AdminSetup, label_PasswordsDoNotMatch, label_UsernameInvalid, button_Quit);
 	}
 	
