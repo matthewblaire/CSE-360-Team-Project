@@ -44,10 +44,7 @@ public class ControllerFirstAdmin {
 	private static String adminPassword1 = "";
 	private static String adminPassword2 = "";
     private static String adminFirstName = "";
-    private static String adminMiddleName = "";
     private static String adminLastName = "";
-    private static String adminPreferredFirstName = "";
-    private static String adminEmailAddress = "";		
 	protected static Database theDatabase = applicationMain.FoundationsMain.database;		
 
 	/*-********************************************************************************************
@@ -105,10 +102,7 @@ public class ControllerFirstAdmin {
 	 * 
 	 */
 	protected static void setAdminFirstName() { adminFirstName = ViewFirstAdmin.text_AdminFirstName.getText(); }
-	protected static void setAdminMiddleName() {adminMiddleName = ViewFirstAdmin.text_AdminMiddleName.getText(); }
 	protected static void setAdminLastName() {adminLastName = ViewFirstAdmin.text_AdminLastName.getText(); }
-	protected static void setAdminPreferredFirstName() {adminPreferredFirstName = ViewFirstAdmin.text_AdminPreferredFirstName.getText(); }
-	protected static void setAdminEmailAddress() {adminEmailAddress = ViewFirstAdmin.text_AdminEmailAddress.getText(); }
 	
 	/**********
 	 * <p> Method: doSetupAdmin() </p>

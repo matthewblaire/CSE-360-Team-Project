@@ -15,7 +15,7 @@ import entityClasses.User;
 /*******
  * <p> Title: GUIReviewerHomePage Class. </p>
  * 
- * <p> Description: The Java/FX-based Role1 Home Page.  The page is a stub for some role needed for
+ * <p> Description: The Java/FX-based student Home Page.  The page is a stub for some role needed for
  * the application.  The widgets on this page are likely the minimum number and kind for other role
  * pages that may be needed.</p>
  * 
@@ -80,7 +80,7 @@ public class ViewStudentHome {
 	
 
 	private static Scene theViewStudentHomeScene;	// The shared Scene each invocation populates
-	protected static final int theRole = 2;		// Admin: 1; Role1: 2; Role2: 3
+	protected static final int theRole = 2;		// Admin: 1; Student: 2; Staff: 3
 
 	/*-*******************************************************************************************
 
@@ -90,10 +90,10 @@ public class ViewStudentHome {
 
 
 	/**********
-	 * <p> Method: displayRole1Home(Stage ps, User user) </p>
+	 * <p> Method: displayStudentHome(Stage ps, User user) </p>
 	 * 
 	 * <p> Description: This method is the single entry point from outside this package to cause
-	 * the Role1 Home page to be displayed.
+	 * the Student Home page to be displayed.
 	 * 
 	 * It first sets up every shared attributes so we don't have to pass parameters.
 	 * 
@@ -140,7 +140,7 @@ public class ViewStudentHome {
 	 * each GUI object.</p>
 	 * 
 	 * This is a singleton and is only performed once.  Subsequent uses fill in the changeable
-	 * fields using the displayRole2Home method.</p>
+	 * fields using the displayStudentHome method.</p>
 	 * 
 	 */
 	private ViewStudentHome() {
