@@ -1,7 +1,7 @@
 package tester;
 
 import recognizers.PasswordRecognizer;
-import userNameRecognizer.UserNameRecognizer;
+import recognizers.UserNameRecognizer;
 
 
 
@@ -83,6 +83,8 @@ public class Tester {
 		System.out.println("---Beginning Name Validation Tests---");
 		printStats();
 		System.out.println("---End Name Validation Tests---");
+		
+		
 	}
 	
 	
@@ -97,6 +99,7 @@ public class Tester {
 		System.out.println("Failed: "+ numFailed + "/" + (numPassed + numFailed) );
 	
 	}
+	
 	
 	
 	
