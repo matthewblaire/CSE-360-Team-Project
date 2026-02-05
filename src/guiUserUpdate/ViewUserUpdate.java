@@ -100,7 +100,7 @@ public class ViewUserUpdate {
 	private static TextInputDialog dialogUpdateMiddleName;
 	private static TextInputDialog dialogUpdateLastName;
 	private static TextInputDialog dialogUpdatePreferredFirstName;
-	private static TextInputDialog dialogUpdateEmailAddresss;
+	private static TextInputDialog dialogUpdateEmailAddress;
 	
 	// These attributes are used to configure the page and populate it with this user's information
 	private static ViewUserUpdate theView;	// Used to determine if instantiation of the class
@@ -219,7 +219,7 @@ public class ViewUserUpdate {
 		dialogUpdateMiddleName = new TextInputDialog("");
 		dialogUpdateLastName = new TextInputDialog("");
 		dialogUpdatePreferredFirstName = new TextInputDialog("");
-		dialogUpdateEmailAddresss = new TextInputDialog("");
+		dialogUpdateEmailAddress = new TextInputDialog("");
 
 		// Establish the label for each of the dialogs.
 		dialogUpdateFirstName.setTitle("Update First Name");
@@ -234,8 +234,8 @@ public class ViewUserUpdate {
 		dialogUpdatePreferredFirstName.setTitle("Update Preferred First Name");
 		dialogUpdatePreferredFirstName.setHeaderText("Update your Preferred First Name");
 		
-		dialogUpdateEmailAddresss.setTitle("Update Email Address");
-		dialogUpdateEmailAddresss.setHeaderText("Update your Email Address");
+		dialogUpdateEmailAddress.setTitle("Update Email Address");
+		dialogUpdateEmailAddress.setHeaderText("Update your Email Address");
 
 		// Label theScene with the name of the startup screen, centered at the top of the pane
 		setupLabelUI(label_ApplicationTitle, "Arial", 28, width, Pos.CENTER, 0, 5);
@@ -316,7 +316,7 @@ public class ViewUserUpdate {
         setupLabelUI(label_EmailAddress, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 400);
         setupLabelUI(label_CurrentEmailAddress, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 400);
         setupButtonUI(button_UpdateEmailAddress, "Dialog", 18, 275, Pos.CENTER, 500, 393);
-        button_UpdateEmailAddress.setOnAction((_) -> {result = dialogUpdateEmailAddresss.showAndWait();
+        button_UpdateEmailAddress.setOnAction((_) -> {result = dialogUpdateEmailAddress.showAndWait();
     		result.ifPresent(_ -> theDatabase.updateEmailAddress(theUser.getUserName(), result.get()));
     		theDatabase.getUserAccountDetails(theUser.getUserName());
     		String newEmail = theDatabase.getCurrentEmailAddress();

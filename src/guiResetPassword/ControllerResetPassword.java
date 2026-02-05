@@ -1,6 +1,7 @@
 package guiResetPassword;
 
 import database.Database;
+import recognizers.PasswordRecognizer;
 
 /*******
  * <p> Title: ControllerResetPassword Class. </p>
@@ -21,6 +22,9 @@ public class ControllerResetPassword {
 
 	// Reference for the in-memory database
 	private static Database theDatabase = applicationMain.FoundationsMain.database;
+	
+	
+	
 
 
 	/**********
@@ -33,6 +37,10 @@ public class ControllerResetPassword {
 	protected static void doSetPassword() {
 		String password1 = ViewResetPassword.text_Password1.getText();
 		String password2 = ViewResetPassword.text_Password2.getText();
+		
+		String result = PasswordRecognizer.evaluatePassword(password1);
+		
+		System.out.println("Result: "+result);
 
 		// Validate password is not empty
 		if (password1 == null || password1.isEmpty()) {

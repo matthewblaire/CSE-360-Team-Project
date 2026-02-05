@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import database.Database;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import tester.Tester;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
@@ -76,6 +77,9 @@ public class FoundationsMain extends Application {
 	// system for other methods that need it can access it.
 	public static Database database = new Database();
     private Alert databaseInUse = new Alert(AlertType.INFORMATION);
+    
+    // This flag enables testing on application startup. Subject to change
+    private final static Boolean ENABLE_TESTING = true;
 
 	public static int activeHomePage = 0;		// Which role's home page is currently active?
 												// Role 0 is the admin role number
@@ -93,6 +97,12 @@ public class FoundationsMain extends Application {
 			databaseInUse.setContentText("Please stop the other instance and try again!");
 			databaseInUse.showAndWait();
 			System.exit(0);
+		}
+		
+		// Perform tests if enabled
+		if (ENABLE_TESTING)
+		{
+			Tester.runTests();
 		}
 		
 		// If the database is empty, no users have been established, so this user must be an admin
