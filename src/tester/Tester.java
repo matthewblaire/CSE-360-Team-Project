@@ -30,7 +30,9 @@ public class Tester {
 	/**********
 	 * <p> Method: runTests() </p>
 	 *
-	 * <p> Description: Runs through a sequence of test cases, printing statistics afterwards.</p>
+	 * <p> Description: Runs through a sequence of test cases, printing statistics afterwards.
+	 * 	Information about what these tests target can be found in "TP1 Test Cases.pdf"
+	 * </p>
 	 */
 	public static void runTests() {
 		
@@ -67,22 +69,22 @@ public class Tester {
 		System.out.println("---End Password Validation Tests---");
 		// Password Validation (Equality Comparison) Test Cases
 
-		// Invite Code (Length) Test Cases
-		System.out.println("---Beginning Invite Code (Length) Tests---");
-		printStats();
-		System.out.println("---End Invite Code (Length) Tests---");
-		// Invite Code (Generation and Invalidation) Test Cases
-		System.out.println("---Beginning Invite Code (Generation and Invalidation) Tests---");
-		printStats();
-		System.out.println("---End Invite Code (Generation and Invalidation) Tests---");
-		// Email Validation Test Cases
-		System.out.println("---Beginning Email Validation Tests---");
-		printStats();
-		System.out.println("---End Username Tests---");
-		// Name Validation Test Cases
-		System.out.println("---Beginning Name Validation Tests---");
-		printStats();
-		System.out.println("---End Name Validation Tests---");
+//		// Invite Code (Length) Test Cases
+//		System.out.println("---Beginning Invite Code (Length) Tests---");
+//		printStats();
+//		System.out.println("---End Invite Code (Length) Tests---");
+//		// Invite Code (Generation and Invalidation) Test Cases
+//		System.out.println("---Beginning Invite Code (Generation and Invalidation) Tests---");
+//		printStats();
+//		System.out.println("---End Invite Code (Generation and Invalidation) Tests---");
+//		// Email Validation Test Cases
+//		System.out.println("---Beginning Email Validation Tests---");
+//		printStats();
+//		System.out.println("---End Username Tests---");
+//		// Name Validation Test Cases
+//		System.out.println("---Beginning Name Validation Tests---");
+//		printStats();
+//		System.out.println("---End Name Validation Tests---");
 		
 		
 	}
