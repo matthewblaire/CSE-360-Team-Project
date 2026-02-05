@@ -3,7 +3,10 @@ package guiAddRemoveRoles;
 import database.Database;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+
+import java.sql.SQLException;
 
 /*******
  * <p> Title: ControllerAddRemoveRoles Class. </p>
@@ -139,8 +142,22 @@ public class ControllerAddRemoveRoles {
 		// not show a role to remove that the user does not have!)
 		ViewAddRemoveRoles.removeList.clear();
 		ViewAddRemoveRoles.removeList.add("<Select a role>");
-		if (theDatabase.getCurrentAdminRole())
-			ViewAddRemoveRoles.removeList.add("Admin");
+		if (theDatabase.getCurrentAdminRole()) {
+			// Check if we should allow removing the Admin role:
+			// 1. Cannot remove admin role from yourself
+			// 2. Cannot remove admin role if this is the last admin
+			boolean isSelf = ViewAddRemoveRoles.theSelectedUser.equals(
+					ViewAddRemoveRoles.theUser.getUserName());
+			boolean isLastAdmin = false;
+			try {
+				isLastAdmin = theDatabase.getNumAdmins() <= 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if (!isSelf && !isLastAdmin) {
+				ViewAddRemoveRoles.removeList.add("Admin");
+			}
+		}
 		if (theDatabase.getCurrentNewStudentRole())
 			ViewAddRemoveRoles.removeList.add("Student");
 		if (theDatabase.getCurrentNewStaffRole())
@@ -243,6 +260,34 @@ public class ControllerAddRemoveRoles {
 		
 		// If the selection is the list header (e.g., "<Select a role>") don't do anything
 		if (ViewAddRemoveRoles.theRemoveRole.compareTo("<Select a role>") != 0) {
+			
+			// Safety check for Admin role removal
+			if (ViewAddRemoveRoles.theRemoveRole.compareTo("Admin") == 0) {
+				// Check if trying to remove own admin role
+				if (ViewAddRemoveRoles.theSelectedUser.equals(
+						ViewAddRemoveRoles.theUser.getUserName())) {
+					Alert alert = new Alert(Alert.AlertType.ERROR);
+					alert.setTitle("Cannot Remove Role");
+					alert.setHeaderText("Action Not Allowed");
+					alert.setContentText("You cannot remove the Admin role from your own account.");
+					alert.showAndWait();
+					return;
+				}
+				// Check if this is the last admin
+				try {
+					if (theDatabase.getNumAdmins() <= 1) {
+						Alert alert = new Alert(Alert.AlertType.ERROR);
+						alert.setTitle("Cannot Remove Role");
+						alert.setHeaderText("Action Not Allowed");
+						alert.setContentText("Cannot remove Admin role. There must always be at least one admin.");
+						alert.showAndWait();
+						return;
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+					return;
+				}
+			}
 			
 			// If an actual role was selected, update the database entry for that user for the role
 			if (theDatabase.updateUserRole(ViewAddRemoveRoles.theSelectedUser, 
