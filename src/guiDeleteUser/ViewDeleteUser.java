@@ -162,6 +162,7 @@ public class ViewDeleteUser {
 		combobox_SelectUser.getSelectionModel().selectedItemProperty().removeListener(ViewDeleteUser.selectedUserChangeListener); 
 		// Refresh the list of users 
 		List<String> userList = theDatabase.getUserList();	
+		userList.remove(theUser.getUserName());
 		combobox_SelectUser.setItems(FXCollections.observableArrayList(userList));
 		
 		// Set the selection back to default
@@ -216,7 +217,8 @@ public class ViewDeleteUser {
 		setupLabelUI(label_SelectUser, "Arial", 20, 300, Pos.BASELINE_LEFT, 20, 130);
 		
 		setupComboBoxUI(combobox_SelectUser, "Dialog", 16, 250, 280, 125);
-		List<String> userList = theDatabase.getUserList();	
+		List<String> userList = theDatabase.getUserList();
+		userList.remove(theUser.getUserName());
 		combobox_SelectUser.setItems(FXCollections.observableArrayList(userList));
 		combobox_SelectUser.getSelectionModel().select(0);
 		combobox_SelectUser.getSelectionModel().selectedItemProperty()
