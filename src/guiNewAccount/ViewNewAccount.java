@@ -64,7 +64,10 @@ public class ViewNewAccount {
 	// This alert is used should the user enter an invalid UserName
 	protected static Alert alertUsernameError = new Alert(AlertType.INFORMATION);
 	
+	// This alert is used should the user enter an invalid password 
+	protected static Alert alertPasswordError = new Alert(AlertType.INFORMATION);
 
+	
     protected static Button button_Quit = new Button("Quit");
 
 	// These attributes are used to configure the page and populate it with this user's information
@@ -223,7 +226,10 @@ public class ViewNewAccount {
 		alertUsernameError.setHeaderText("Error"); // the header text is meant to be replaced with a real error before being shown
 		alertUsernameError.setContentText("Correct the Username and try again.");
 		
-
+		// If there's a password error
+		alertPasswordError.setTitle("Passwords Error");
+		alertPasswordError.setHeaderText("Passwords Error");
+		
         // Set up the account creation and login
         setupButtonUI(button_UserSetup, "Dialog", 18, 200, Pos.CENTER, 475, 210);
         button_UserSetup.setOnAction((_) -> {ControllerNewAccount.doCreateUser(); });

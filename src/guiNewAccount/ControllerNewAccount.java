@@ -109,6 +109,17 @@ public class ControllerNewAccount {
 		if (ViewNewAccount.text_Password1.getText().
 				compareTo(ViewNewAccount.text_Password2.getText()) == 0) {
 			
+			String passEval = passwordPopUpWindow.Model.evaluatePassword(ViewNewAccount.text_Password1.getText());
+			// Make sure password conditions are satisfied
+			if (passEval != "") {
+				ViewNewAccount.text_Password1.setText("");
+				ViewNewAccount.text_Password2.setText("");
+				ViewNewAccount.alertPasswordError.setContentText(passEval);
+				ViewNewAccount.alertPasswordError.showAndWait();
+				return;
+			}
+			
+			
 			// The passwords match so we will set up the role and the User object base on the 
 			// information provided in the invitation
 			if (ViewNewAccount.theRole.compareTo("Admin") == 0) {
