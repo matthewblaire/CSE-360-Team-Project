@@ -1,7 +1,7 @@
 package guiResetPassword;
 
 import database.Database;
-import recognizers.PasswordRecognizer;
+
 
 /*******
  * <p> Title: ControllerResetPassword Class. </p>
