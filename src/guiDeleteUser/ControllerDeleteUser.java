@@ -127,7 +127,6 @@ public class ControllerDeleteUser {
 		// Make sure the selected user is not the current user
 		if (ViewDeleteUser.theSelectedUser.equals(ViewDeleteUser.theUser.getUserName()))
 		{
-			// TODO: Show an alert saying "You cannot delete your own account."
 			ViewDeleteUser.alertUserDeletionError.setTitle("Delete User");
 			ViewDeleteUser.alertUserDeletionError.setContentText("You cannot delete your own account.");
 			ViewDeleteUser.alertUserDeletionError.show();
@@ -148,7 +147,6 @@ public class ControllerDeleteUser {
 					return; 
 				}
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
