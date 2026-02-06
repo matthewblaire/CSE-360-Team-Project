@@ -82,7 +82,9 @@ public class ViewFirstAdmin {
 	private static Pane theRootPane;
 	private static Scene theFirstAdminScene = null;
 	private static final int theRole = 1;		// Admin: 1; Student: 2; Staff: 3
-		
+
+	// This alert is used should the user enter an invalid password 
+	protected static Alert alertPasswordError = new Alert(AlertType.INFORMATION);
 	
 	/*-********************************************************************************************
 
@@ -208,6 +210,11 @@ public class ViewFirstAdmin {
 		setupButtonUI(button_Quit, "Dialog", 18, 250, Pos.CENTER, 300, 520);
 		button_Quit.setOnAction((_) -> {ControllerFirstAdmin.performQuit(); });
 
+		// If there's a password error
+		alertPasswordError.setTitle("Passwords Error");
+		alertPasswordError.setHeaderText("Passwords Error");
+
+		
 		// Place all of the just-initialized GUI elements into the pane
 		theRootPane.getChildren().addAll(label_ApplicationTitle, label_TitleLine1,
 				label_TitleLine2, label_TitleLine3, text_AdminUsername, text_AdminPassword1, 
@@ -216,6 +223,7 @@ public class ViewFirstAdmin {
 				 button_AdminSetup, label_PasswordsDoNotMatch, label_UsernameInvalid, button_Quit);
 	}
 	
+
 	
 	/*-********************************************************************************************
 
