@@ -121,25 +121,25 @@ public class PasswordRecognizer {
 		// Construct a String with a list of the requirement elements that were found.
 		String errMessage = "";
 		if (!foundUpperCase)
-			errMessage += "Upper case; ";
+			errMessage += "Missing upper case; ";
 		
 		if (!foundLowerCase)
-			errMessage += "Lower case; ";
+			errMessage += "Missing lower case; ";
 		
 		if (!foundNumericDigit)
-			errMessage += "Numeric digits; ";
+			errMessage += "Missing numeric digits; ";
 			
 		if (!foundSpecialChar)
-			errMessage += "Special character; ";
+			errMessage += "Missing special character; ";
 			
 		if (!foundLongEnough)
-			errMessage += "Long Enough; ";
+			errMessage += "Not long Enough (must have at least 8 characters); ";
 		
 		if (errMessage == "")
 			return "";
 		
 		// If it gets here, there something was not found, so return an appropriate message
 		passwordIndexofError = currentCharNdx;
-		return errMessage + "conditions were not satisfied";
+		return "conditions were not satisfied:\n"+ errMessage ;
 	}
 }

@@ -1,7 +1,7 @@
 package guiNewAccount;
 
 import java.sql.SQLException;
-
+import recognizers.PasswordRecognizer;
 import database.Database;
 import entityClasses.User;
 import recognizers.UserNameRecognizer;
@@ -109,7 +109,7 @@ public class ControllerNewAccount {
 		if (ViewNewAccount.text_Password1.getText().
 				compareTo(ViewNewAccount.text_Password2.getText()) == 0) {
 			
-			String passEval = passwordPopUpWindow.Model.evaluatePassword(ViewNewAccount.text_Password1.getText());
+			String passEval = PasswordRecognizer.evaluatePassword(ViewNewAccount.text_Password1.getText());
 			// Make sure password conditions are satisfied
 			if (passEval != "") {
 				ViewNewAccount.text_Password1.setText("");

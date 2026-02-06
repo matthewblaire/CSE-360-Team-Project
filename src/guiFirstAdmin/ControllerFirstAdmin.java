@@ -5,6 +5,7 @@ import database.Database;
 import entityClasses.User;
 import guiNewAccount.ViewNewAccount;
 import javafx.stage.Stage;
+import recognizers.PasswordRecognizer;
 import recognizers.UserNameRecognizer;
 
 /*******
@@ -127,7 +128,7 @@ public class ControllerFirstAdmin {
 		// Make sure the two passwords are the same
 		if (adminPassword1.compareTo(adminPassword2) == 0) {
 			
-			String passEval = passwordPopUpWindow.Model.evaluatePassword(ViewFirstAdmin.text_AdminPassword1.getText());
+			String passEval = PasswordRecognizer.evaluatePassword(ViewFirstAdmin.text_AdminPassword1.getText());
 			// Make sure password conditions are satisfied
 			if (passEval != "") {
 				ViewFirstAdmin.text_AdminPassword1.setText("");
