@@ -1,7 +1,7 @@
 package guiNewAccount;
 
 import java.sql.SQLException;
-
+import recognizers.PasswordRecognizer;
 import database.Database;
 import entityClasses.User;
 import recognizers.UserNameRecognizer;
@@ -108,6 +108,17 @@ public class ControllerNewAccount {
 		// Make sure the two passwords are the same.	
 		if (ViewNewAccount.text_Password1.getText().
 				compareTo(ViewNewAccount.text_Password2.getText()) == 0) {
+			
+			String passEval = PasswordRecognizer.evaluatePassword(ViewNewAccount.text_Password1.getText());
+			// Make sure password conditions are satisfied
+			if (passEval != "") {
+				ViewNewAccount.text_Password1.setText("");
+				ViewNewAccount.text_Password2.setText("");
+				ViewNewAccount.alertPasswordError.setContentText(passEval);
+				ViewNewAccount.alertPasswordError.showAndWait();
+				return;
+			}
+			
 			
 			// The passwords match so we will set up the role and the User object base on the 
 			// information provided in the invitation

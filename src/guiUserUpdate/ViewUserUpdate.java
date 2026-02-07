@@ -5,13 +5,16 @@ import java.util.Optional;
 import database.Database;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import recognizers.EmailAddressRecognizer;
+import recognizers.NameRecognizer;
 import entityClasses.User;
 import guiAdminHome.ViewAdminHome;
 import javafx.scene.control.Alert;
@@ -82,6 +85,8 @@ public class ViewUserUpdate {
 	private static Label label_CurrentPreferredFirstName = new Label();
 	private static Label label_CurrentEmailAddress = new Label();
 	
+	private static Label label_errorInfo = new Label();
+	
 	// These buttons enable the user to edit the various dynamic fields.  The username and the
 	// passwords for a user are currently not editable.
 	private static Button button_UpdateUsername = new Button("Update Username");
@@ -105,6 +110,9 @@ public class ViewUserUpdate {
 	private static TextInputDialog dialogUpdateLastName;
 	private static TextInputDialog dialogUpdatePreferredFirstName;
 	private static TextInputDialog dialogUpdateEmailAddress;
+	
+	// This alert is used for communicating input validation errors to the user
+	private static Alert alert_ErrorInfo = new Alert(Alert.AlertType.ERROR, "Message", ButtonType.OK);
 	
 	// These attributes are used to configure the page and populate it with this user's information
 	private static ViewUserUpdate theView;	// Used to determine if instantiation of the class
@@ -266,7 +274,24 @@ public class ViewUserUpdate {
         setupLabelUI(label_FirstName, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 200);
         setupLabelUI(label_CurrentFirstName, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 200);
         setupButtonUI(button_UpdateFirstName, "Dialog", 18, 275, Pos.CENTER, 500, 193);
-        button_UpdateFirstName.setOnAction((_) -> {result = dialogUpdateFirstName.showAndWait();
+        button_UpdateFirstName.setOnAction((_) -> {
+        	result = dialogUpdateFirstName.showAndWait();
+        	
+        	// Validate name
+        	try {
+        		String nameEval = NameRecognizer.evaluateName(result.get());
+        		if (nameEval != "")
+        		{
+        			// Name is invalid, let the user know and discard the input
+        			alert_ErrorInfo.setContentText(nameEval);
+        			alert_ErrorInfo.showAndWait();
+        			//dialogUpdateFirstName.
+        			return;
+        		}
+        	} catch (Error e){
+        		return;
+        	}
+        	
         	result.ifPresent(_ -> theDatabase.updateFirstName(theUser.getUserName(), result.get()));
         	theDatabase.getUserAccountDetails(theUser.getUserName());
          	String newName = theDatabase.getCurrentFirstName();
@@ -279,7 +304,26 @@ public class ViewUserUpdate {
         setupLabelUI(label_MiddleName, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 250);
         setupLabelUI(label_CurrentMiddleName, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 250);
         setupButtonUI(button_UpdateMiddleName, "Dialog", 18, 275, Pos.CENTER, 500, 243);
-        button_UpdateMiddleName.setOnAction((_) -> {result = dialogUpdateMiddleName.showAndWait();
+        button_UpdateMiddleName.setOnAction((_) -> {
+        	result = dialogUpdateMiddleName.showAndWait();
+        
+        	// Validate name
+        	try {
+        		String nameEval = NameRecognizer.evaluateName(result.get());
+        		if (nameEval != "")
+        		{
+        			// Name is invalid, let the user know and discard the input
+        			alert_ErrorInfo.setContentText(nameEval);
+        			alert_ErrorInfo.showAndWait();
+        			//dialogUpdateFirstName.
+        			return;
+        		}
+        	} catch (Error e){
+        		return;
+        	}
+        	
+        	// Name is valid, perform the update
+        	
     		result.ifPresent(_ -> theDatabase.updateMiddleName(theUser.getUserName(), result.get()));
     		theDatabase.getUserAccountDetails(theUser.getUserName());
     		String newName = theDatabase.getCurrentMiddleName();
@@ -292,7 +336,25 @@ public class ViewUserUpdate {
         setupLabelUI(label_LastName, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 300);
         setupLabelUI(label_CurrentLastName, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 300);
         setupButtonUI(button_UpdateLastName, "Dialog", 18, 275, Pos.CENTER, 500, 293);
-        button_UpdateLastName.setOnAction((_) -> {result = dialogUpdateLastName.showAndWait();
+        button_UpdateLastName.setOnAction((_) -> {
+        	result = dialogUpdateLastName.showAndWait();
+        	
+        	// Validate name
+        	try {
+        		String nameEval = NameRecognizer.evaluateName(result.get());
+        		if (nameEval != "")
+        		{
+        			// Name is invalid, let the user know and discard the input
+        			alert_ErrorInfo.setContentText(nameEval);
+        			alert_ErrorInfo.showAndWait();
+        			//dialogUpdateFirstName.
+        			return;
+        		}
+        	} catch (Error e){
+        		return;
+        	}
+        	
+        	// Name is valid, perform the update
     		result.ifPresent(_ -> theDatabase.updateLastName(theUser.getUserName(), result.get()));
     		theDatabase.getUserAccountDetails(theUser.getUserName());
     		String newName = theDatabase.getCurrentLastName();
@@ -308,14 +370,30 @@ public class ViewUserUpdate {
         		200, 350);
         setupButtonUI(button_UpdatePreferredFirstName, "Dialog", 18, 275, Pos.CENTER, 500, 343);
         button_UpdatePreferredFirstName.setOnAction((_) -> 
-        	{result = dialogUpdatePreferredFirstName.showAndWait();
-    		result.ifPresent(_ -> 
-    		theDatabase.updatePreferredFirstName(theUser.getUserName(), result.get()));
-    		theDatabase.getUserAccountDetails(theUser.getUserName());
-    		String newName = theDatabase.getCurrentPreferredFirstName();
-           	theUser.setPreferredFirstName(newName);
-         	if (newName == null || newName.length() < 1)label_CurrentPreferredFirstName.setText("<none>");
-        	else label_CurrentPreferredFirstName.setText(newName);
+        	{
+        		result = dialogUpdatePreferredFirstName.showAndWait();
+        		// Validate name
+            	try {
+            		String nameEval = NameRecognizer.evaluateName(result.get());
+            		if (nameEval != "")
+            		{
+            			// Name is invalid, let the user know and discard the input
+            			alert_ErrorInfo.setContentText(nameEval);
+            			alert_ErrorInfo.showAndWait();
+            			//dialogUpdateFirstName.
+            			return;
+            		}
+            	} catch (Error e){
+            		return;
+            	}
+            	
+            	// Name is valid, perform the update
+            	result.ifPresent(_ -> theDatabase.updatePreferredFirstName(theUser.getUserName(), result.get()));
+	    		theDatabase.getUserAccountDetails(theUser.getUserName());
+	    		String newName = theDatabase.getCurrentPreferredFirstName();
+	           	theUser.setPreferredFirstName(newName);
+	         	if (newName == null || newName.length() < 1)label_CurrentPreferredFirstName.setText("<none>");
+	        	else label_CurrentPreferredFirstName.setText(newName);
      		});
         
         // Email Address: get new email from the user and make sure it meets the formatting requirements. 
@@ -351,7 +429,7 @@ public class ViewUserUpdate {
         		label_ApplicationTitle, label_Purpose, label_Username,
         		label_CurrentUsername, 
         		label_Password, label_CurrentPassword, 
-        		button_UpdatePassword, 
+        		button_UpdatePassword, label_errorInfo,
         		label_FirstName, label_CurrentFirstName, button_UpdateFirstName,
         		label_MiddleName, label_CurrentMiddleName, button_UpdateMiddleName,
         		label_LastName, label_CurrentLastName, button_UpdateLastName,
