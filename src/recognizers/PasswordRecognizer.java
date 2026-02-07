@@ -140,6 +140,6 @@ public class PasswordRecognizer {
 		
 		// If it gets here, there something was not found, so return an appropriate message
 		passwordIndexofError = currentCharNdx;
-		return "conditions were not satisfied:\n"+ errMessage ;
+		return "Conditions were not satisfied:\n"+ errMessage ;
 	}
 }
