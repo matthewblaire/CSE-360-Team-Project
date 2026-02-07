@@ -135,7 +135,7 @@ public class PasswordRecognizer {
 		if (!foundLongEnough)
 			errMessage += "Long Enough; ";
 		
-		if (errMessage == "")
+		if (errMessage.equals(""))
 			return "";
 		
 		// If it gets here, there something was not found, so return an appropriate message

@@ -11,7 +11,11 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import recognizers.EmailAddressRecognizer;
 import entityClasses.User;
+import guiAdminHome.ViewAdminHome;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 /*******
  * <p> Title: ViewUserUpdate Class. </p>
@@ -116,6 +120,8 @@ public class ViewUserUpdate {
 	public static Scene theUserUpdateScene = null;	// The Scene each invocation populates
 
 	private static Optional<String> result;		// The result from a pop-up dialog
+
+	protected static Alert alertEmailError = new Alert(AlertType.INFORMATION);
 
 	/*-********************************************************************************************
 
@@ -312,19 +318,28 @@ public class ViewUserUpdate {
         	else label_CurrentPreferredFirstName.setText(newName);
      		});
         
-        // Email Address
+        // Email Address: get new email from the user and make sure it meets the formatting requirements. 
         setupLabelUI(label_EmailAddress, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 400);
-        setupLabelUI(label_CurrentEmailAddress, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 400);
-        setupButtonUI(button_UpdateEmailAddress, "Dialog", 18, 275, Pos.CENTER, 500, 393);
-        button_UpdateEmailAddress.setOnAction((_) -> {result = dialogUpdateEmailAddress.showAndWait();
-    		result.ifPresent(_ -> theDatabase.updateEmailAddress(theUser.getUserName(), result.get()));
-    		theDatabase.getUserAccountDetails(theUser.getUserName());
-    		String newEmail = theDatabase.getCurrentEmailAddress();
-           	theUser.setEmailAddress(newEmail);
-        	if (newEmail == null || newEmail.length() < 1)label_CurrentEmailAddress.setText("<none>");
-        	else label_CurrentEmailAddress.setText(newEmail);
- 			});
-        
+		setupLabelUI(label_CurrentEmailAddress, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 400);
+		setupButtonUI(button_UpdateEmailAddress, "Dialog", 18, 275, Pos.CENTER, 500, 393);
+		button_UpdateEmailAddress.setOnAction((_) -> {
+			result = dialogUpdateEmailAddress.showAndWait();
+			result.ifPresent(_ -> theDatabase.updateEmailAddress(theUser.getUserName(), result.get()));
+			theDatabase.getUserAccountDetails(theUser.getUserName());
+			String newEmail = theDatabase.getCurrentEmailAddress();
+			theUser.setEmailAddress(newEmail);
+			if (newEmail == null || newEmail.length() < 1) {
+				label_CurrentEmailAddress.setText("<none>");
+			} else if (!(EmailAddressRecognizer.checkEmailAddress(newEmail).equals(""))) {
+				ViewUserUpdate.alertEmailError.setContentText(EmailAddressRecognizer.checkEmailAddress(newEmail));
+				ViewUserUpdate.alertEmailError.showAndWait();
+				newEmail = "";
+				return;
+			} else {
+				label_CurrentEmailAddress.setText(newEmail);
+			}
+		});
+
         // Set up the button to proceed to this user's home page
         setupButtonUI(button_ProceedToUserHomePage, "Dialog", 18, 300, 
         		Pos.CENTER, width/2-150, 450);
