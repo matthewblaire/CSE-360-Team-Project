@@ -107,6 +107,11 @@ public class PasswordRecognizer {
 				System.out.println("At least 8 characters found");
 				foundLongEnough = true;
 			}
+			if (currentCharNdx >= 64) {
+				System.out.println(currentCharNdx);
+				passwordIndexofError = currentCharNdx;
+				return "*** Error *** Password is too long! Maximum password length is 64 characters.";
+			}
 			
 			// Go to the next character if there is one
 			currentCharNdx++;
