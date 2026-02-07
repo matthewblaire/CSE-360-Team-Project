@@ -110,9 +110,9 @@ public class FoundationsMain extends Application {
 
 		// Seed the DB - Added by Azeer Esmail
 		ArrayList<User> users = new ArrayList<User>();
-		users.add(new User("admin", "", "", "admin1", "", "", "admin@example.com", true, false, false));
-		users.add(new User("user1", "", "", "user1", "", "", "user1@example.com", false, true, false));
-		users.add(new User("user2", "", "", "user2", "", "", "user2@example.com", false, false, true));
+		users.add(new User("admin", "", "admin1", "", "", "", "admin@example.com", true, false, false));
+		users.add(new User("user1", "", "user1", "", "", "", "user1@example.com", false, true, false));
+		users.add(new User("user2", "", "user2", "", "", "", "user2@example.com", false, false, true));
         try {
 	        	// Create users
 	        	for (User user: users) {
