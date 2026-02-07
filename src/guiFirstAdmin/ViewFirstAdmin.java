@@ -1,5 +1,6 @@
 package guiFirstAdmin;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -7,26 +8,30 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 
 
 /*******
  * <p> Title: ViewFirstAdmin Class</p>
- * 
+ *
  * <p> Description: The FirstAdmin Page View.  This class is used to require the very first user of
  * the system to specify an Admin Username and Password when there is no database for the
- * application.  This avoids the common weakness practice of hard coding credentials into the 
+ * application.  This avoids the common weakness practice of hard coding credentials into the
  * application.</p>
- * 
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
- * 
+ *
  * @author Lynn Robert Carter
- * 
+ * @author Gerald Jones II
+ *
  * @version 1.00		2025-08-15 Initial version
- *  
+ * @version 2.00		2026-02-07 Front-end GUI overhaul
+ *
  */
 
 public class ViewFirstAdmin {
@@ -38,37 +43,27 @@ public class ViewFirstAdmin {
 	 */
 
 	// These are the application values required by the user interface
-	
+
 	private static double width = applicationMain.FoundationsMain.WINDOW_WIDTH;
 	private static double height = applicationMain.FoundationsMain.WINDOW_HEIGHT;
 
 	// These are the widget attributes for the GUI
-	
-	// The GUI informs the user about the purpose of this page, provides seven text inputs fields
-	// for the user to specify a username for this account, two copies of the password to be
-	// used (they must match), and the user's account information, a button to request that the 
-	// account be established, and a quit but to abort the action and stop the application.
-	private static Label label_ApplicationTitle = new Label("Foundation Application Startup Page");
-	private static Label label_TitleLine1 = 
-			new Label(" You are the first user.  You must be an administrator.");
-	
-	private static Label label_TitleLine2 = 
-			new Label("Enter the Admin's Username, Password twice, User information, and then click on " + 
-					"Setup Admin");
 
-	private static Label label_TitleLine3 = 
-			new Label("Account. You will then be asked to login.");				
-	
+	private static Label label_ApplicationTitle = new Label("Administrator Account Setup");
+	private static Label label_Subtitle =
+			new Label("Welcome! Since no accounts exist yet, please create the first "
+					+ "administrator account to get started.");
+
 	protected static Label label_ErrorInfo = new Label();
-	
+
 	protected static TextField text_AdminUsername = new TextField();
 	protected static PasswordField text_AdminPassword1 = new PasswordField();
 	protected static PasswordField text_AdminPassword2 = new PasswordField();
-	
+
 	protected static TextField text_AdminFirstName = new TextField();
 	protected static TextField text_AdminLastName = new TextField();
 
-	private static Button button_AdminSetup = new Button("Setup Admin Account");
+	private static Button button_AdminSetup = new Button("Create Account");
 
 	// This alert is used should the user enter two passwords that do not match
 	protected static Alert alertUsernamePasswordError = new Alert(AlertType.INFORMATION);
@@ -77,219 +72,212 @@ public class ViewFirstAdmin {
 	private static Button button_Quit = new Button("Quit");
 
 	// These attributes are used to configure the page and populate it with this user's information
-	protected static Stage theStage;	
-	private static Pane theRootPane;
+	protected static Stage theStage;
 	private static Scene theFirstAdminScene = null;
 	private static final int theRole = 1;		// Admin: 1; Student: 2; Staff: 3
 
-	// This alert is used should the user enter an invalid password 
+	// This alert is used should the user enter an invalid password
 	protected static Alert alertPasswordError = new Alert(AlertType.INFORMATION);
-	
+
 	/*-********************************************************************************************
 
 	Constructor
 
 	 */
-	
+
 	/**********
 	 * <p> Method: public displayFirstAdmin(Stage ps) </p>
-	 * 
+	 *
 	 * <p> Description: This method is called when the application first starts. It create an
-	 * an instance of the View class.  
-	 * 
+	 * an instance of the View class.
+	 *
 	 * NOTE: As described below, this code does not implement MVC using the singleton pattern used
 	 * by most of the pages as the code is written this way because we know with certainty that it
 	 * will only be called once.  For this reason, we directly call the private class constructor.
-	 * 
+	 *
 	 * @param ps specifies the JavaFX Stage to be used for this GUI and it's methods
 	 */
 	public static void displayFirstAdmin(Stage ps) {
-		
+
 		// Establish the references to the GUI.  There is no user yet.
 		theStage = ps;			// Establish a reference to the JavaFX Stage
-		
+
 		// This page is only called once so there is no need to save the reference to it
 		new ViewFirstAdmin();	// Create an instance of the class
-		
+
 		// Populate the dynamic aspects of the GUI with the data from the user and the current
 		// state of the system.
 		applicationMain.FoundationsMain.activeHomePage = theRole;	// 1: Admin; 2: Student; 3: Staff
 
 		// Set the title for the window, display the page, and wait for the Admin to do something
-		theStage.setTitle("CSE 360 Foundation Code: First User Account Setup");	
+		theStage.setTitle("CSE 360 Project: First User Account Setup");
 		theStage.setScene(theFirstAdminScene);
 		theStage.show();
 	}
 
 	/**********
 	 * <p> Method: private ViewFirstAdmin() </p>
-	 * 
-	 * <p> Description: This constructor is called when the application first starts. It must 
+	 *
+	 * <p> Description: This constructor is called when the application first starts. It must
 	 * handle when no user has been established.  It is never called again, either during the first
 	 * run of the program after reboot or during normal operations of the program.  (This page is
 	 * only used when there is no database for the application or there is a database, but there
 	 * no users in the database.
-	 * 
-	 * If there is no database or there is a database, but there are no users, it means that the
-	 * person starting the system is an administrator, so a special GUI is provided to allow this
-	 * Admin to create an account by setting a username and password.
-	 * 
-	 * If there is at least one user, this page is not called.  Since this is only used one when
+	 *
+	 * If there is no database or there are no users, it means that the person starting the system
+	 * is an administrator, so a special GUI is provided to allow this Admin to create an account
+	 * by setting a username and password.
+	 *
+	 * If there is at least one user, this page is not called.  Since this is only used once when
 	 * the system is being set up, this MVC code does not use a singleton protocol.  For this
 	 * reason, do not use this as a typical MVC pattern.</p>
-	 * 
-	 * This is the View of the Model, View, Controller architectural pattern.  Due to how it is
-	 * called, it does not follow the usual singleton implementation pattern as explained above.
-	 * 
-	 * The view sets up the window and all of the Graphical User Interface (GUI) widgets.  Once
-	 * they are all set, the window is displayed to the user, the View returns to the starting main
-	 * method, and that execution thread ends.  The JavaFX thread continues to "execute" waiting
-	 * for the user to interact with the GUI.  Based on which widget is used, changes to the
-	 * display are made and/or a Controller method is called to perform some action.
-	 * 
+	 *
 	 */
 	private ViewFirstAdmin() {
 
-		// Create the Pane for the list of widgets and the Scene for the window
-		theRootPane = new Pane();
-		theFirstAdminScene = new Scene(theRootPane, width, height);
+		// Main vertical container
+		VBox mainContainer = new VBox(18);
+		mainContainer.setAlignment(Pos.TOP_CENTER);
+		mainContainer.setPadding(new Insets(25, 50, 25, 50));
+		theFirstAdminScene = new Scene(mainContainer, width, height);
 
-		// Label theScene with the name of the system startup screen
-		setupLabelUI(label_ApplicationTitle, "Arial", 32, width, Pos.CENTER, 0, 10);
+		// --- Title Section ---
+		label_ApplicationTitle.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+		label_ApplicationTitle.setAlignment(Pos.CENTER);
 
-		// Label to display the welcome message for the first user
-		setupLabelUI(label_TitleLine1, "Arial", 24, width, Pos.CENTER, 0, 50);
+		label_Subtitle.setFont(Font.font("Arial", 14));
+		label_Subtitle.setAlignment(Pos.CENTER);
+		label_Subtitle.setWrapText(true);
+		label_Subtitle.setStyle("-fx-text-fill: #555555;");
 
-		// Label to display the welcome message for the first user
-		setupLabelUI(label_TitleLine2, "Arial", 18, width, Pos.CENTER, 0, 90);
+		// --- Login Credentials Section ---
+		VBox credentialsSection = createSection("Login Credentials");
 
-		// Label to display the welcome message for the first user
-		setupLabelUI(label_TitleLine3, "Arial", 18, width, Pos.CENTER, 0, 120);
-
-		// Establish the text input operand field for the Admin username
-		setupTextUI(text_AdminUsername, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 160, 
-				true);
-		text_AdminUsername.setPromptText("Enter Admin Username");
-		text_AdminUsername.textProperty().addListener((_, _, _) 
+		HBox usernameRow = createFieldRow("Username", text_AdminUsername, "Choose a username");
+		text_AdminUsername.textProperty().addListener((_, _, _)
 				-> {ControllerFirstAdmin.setAdminUsername(); });
 
-		// Establish the text input operand field for the password
-		setupTextUI(text_AdminPassword1, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 210, 
-				true);
-		text_AdminPassword1.setPromptText("Enter Admin Password");
+		HBox password1Row = createFieldRow("Password", text_AdminPassword1, "Enter a password");
 		text_AdminPassword1.textProperty().addListener((_, _, _)
 				-> {ControllerFirstAdmin.setAdminPassword1(); });
 
-		// Establish the text input operand field for the password
-		setupTextUI(text_AdminPassword2, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 260, 
-				true);
-		text_AdminPassword2.setPromptText("Enter Admin Password Again");
-		text_AdminPassword2.textProperty().addListener((_, _, _) 
+		HBox password2Row = createFieldRow("Confirm Password", text_AdminPassword2,
+				"Re-enter your password");
+		text_AdminPassword2.textProperty().addListener((_, _, _)
 				-> {ControllerFirstAdmin.setAdminPassword2(); });
 
-		// Establish the text input fields for Admin's Personal Information
-		setupTextUI(text_AdminFirstName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 310, true);
-		text_AdminFirstName.setPromptText("Enter Admin First Name");
-		text_AdminFirstName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminFirstName(); });
-		
-		setupTextUI(text_AdminLastName, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 360, true);
-		text_AdminLastName.setPromptText("Enter Admin Last Name");
-		text_AdminLastName.textProperty().addListener((_,_,_)-> {ControllerFirstAdmin.setAdminLastName(); });
-		
-		// Set up the Log In button
-		setupButtonUI(button_AdminSetup, "Dialog", 18, 200, Pos.CENTER, 475, 210);
+		credentialsSection.getChildren().addAll(usernameRow, password1Row, password2Row);
+
+		// --- Personal Information Section ---
+		VBox personalSection = createSection("Personal Information");
+
+		HBox firstNameRow = createFieldRow("First Name", text_AdminFirstName,
+				"Enter your first name");
+		text_AdminFirstName.textProperty().addListener((_, _, _)
+				-> {ControllerFirstAdmin.setAdminFirstName(); });
+
+		HBox lastNameRow = createFieldRow("Last Name", text_AdminLastName,
+				"Enter your last name");
+		text_AdminLastName.textProperty().addListener((_, _, _)
+				-> {ControllerFirstAdmin.setAdminLastName(); });
+
+		personalSection.getChildren().addAll(firstNameRow, lastNameRow);
+
+		// --- Error Label ---
+		label_ErrorInfo.setFont(Font.font("Arial", 14));
+		label_ErrorInfo.setStyle("-fx-text-fill: red;");
+		label_ErrorInfo.setAlignment(Pos.CENTER);
+		label_ErrorInfo.setMinWidth(width - 100);
+		label_ErrorInfo.setWrapText(true);
+
+		// --- Buttons ---
+		button_AdminSetup.setFont(Font.font("Dialog", 16));
+		button_AdminSetup.setMinWidth(160);
+		button_AdminSetup.setStyle(
+				"-fx-background-color: #4a90d9; -fx-text-fill: white; "
+				+ "-fx-background-radius: 5; -fx-cursor: hand;");
 		button_AdminSetup.setOnAction((_) -> {
-			ControllerFirstAdmin.doSetupAdmin(theStage,1); 
-			});
+			ControllerFirstAdmin.doSetupAdmin(theStage, 1);
+		});
 
-		// Label to display the Passwords do not match error message
-		setupLabelUI(label_ErrorInfo, "Arial", 18, width, Pos.CENTER, 0, 450);
-
-		setupButtonUI(button_Quit, "Dialog", 18, 250, Pos.CENTER, 300, 520);
+		button_Quit.setFont(Font.font("Dialog", 16));
+		button_Quit.setMinWidth(120);
+		button_Quit.setStyle("-fx-background-radius: 5; -fx-cursor: hand;");
 		button_Quit.setOnAction((_) -> {ControllerFirstAdmin.performQuit(); });
 
-		// If there's a password error
-		alertPasswordError.setTitle("Passwords Error");
-		alertPasswordError.setHeaderText("Passwords Error");
+		HBox buttonRow = new HBox(20);
+		buttonRow.setAlignment(Pos.CENTER);
+		buttonRow.setPadding(new Insets(5, 0, 0, 0));
+		buttonRow.getChildren().addAll(button_AdminSetup, button_Quit);
 
-		
-		// Place all of the just-initialized GUI elements into the pane
-		theRootPane.getChildren().addAll(label_ApplicationTitle, label_TitleLine1,
-				label_TitleLine2, label_TitleLine3, text_AdminUsername, text_AdminPassword1, 
-				text_AdminPassword2, text_AdminFirstName, 
-				text_AdminLastName,
-				 button_AdminSetup, label_ErrorInfo,  button_Quit);
+		// Password error alert setup
+		alertPasswordError.setTitle("Password Error");
+		alertPasswordError.setHeaderText("Password Error");
+
+		// Place all sections into the main container
+		mainContainer.getChildren().addAll(
+				label_ApplicationTitle,
+				label_Subtitle,
+				credentialsSection,
+				personalSection,
+				label_ErrorInfo,
+				buttonRow);
 	}
-	
 
-	
+
+
 	/*-********************************************************************************************
 
 	Helper methods to reduce code length
 
 	 */
-	
-	/**********
-	 * Private local method to initialize the standard fields for a label
-	 * 
-	 * @param l		The Label object to be initialized
-	 * @param ff	The font to be used
-	 * @param f		The size of the font to be used
-	 * @param w		The width of the Label
-	 * @param p		The alignment (e.g. left, centered, or right)
-	 * @param x		The location from the left edge (x axis)
-	 * @param y		The location from the top (y axis)
-	 */
 
-	private void setupLabelUI(Label l, String ff, double f, double w, Pos p, double x, double y){
-		l.setFont(Font.font(ff, f));
-		l.setMinWidth(w);
-		l.setAlignment(p);
-		l.setLayoutX(x);
-		l.setLayoutY(y);		
+	/**********
+	 * Creates a styled section box with a title label, a light background, and a rounded border.
+	 *
+	 * @param title		The section heading text
+	 * @return a VBox ready to have field rows added as children
+	 */
+	private VBox createSection(String title) {
+		VBox section = new VBox(10);
+		section.setPadding(new Insets(15, 20, 15, 20));
+		section.setStyle(
+				"-fx-border-color: #cccccc; "
+				+ "-fx-border-radius: 8; "
+				+ "-fx-background-radius: 8; "
+				+ "-fx-background-color: #f8f8f8;");
+
+		Label sectionTitle = new Label(title);
+		sectionTitle.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+		sectionTitle.setStyle("-fx-text-fill: #333333;");
+		section.getChildren().add(sectionTitle);
+
+		return section;
 	}
 
-
 	/**********
-	 * Private local method to initialize the standard fields for a button
-	 * 
-	 * @param b		The Button object to be initialized
-	 * @param ff	The font to be used
-	 * @param f		The size of the font to be used
-	 * @param w		The width of the Button
-	 * @param p		The alignment (e.g. left, centered, or right)
-	 * @param x		The location from the left edge (x axis)
-	 * @param y		The location from the top (y axis)
+	 * Creates a horizontal row containing a right-aligned label and a text field.
+	 *
+	 * @param labelText		The text for the label
+	 * @param field			The TextField or PasswordField to display
+	 * @param prompt		The placeholder prompt text for the field
+	 * @return an HBox containing the label and field
 	 */
-	private void setupButtonUI(Button b, String ff, double f, double w, Pos p, double x, double y){
-		b.setFont(Font.font(ff, f));
-		b.setMinWidth(w);
-		b.setAlignment(p);
-		b.setLayoutX(x);
-		b.setLayoutY(y);		
+	private HBox createFieldRow(String labelText, TextField field, String prompt) {
+		HBox row = new HBox(15);
+		row.setAlignment(Pos.CENTER_LEFT);
+
+		Label label = new Label(labelText);
+		label.setFont(Font.font("Arial", 14));
+		label.setMinWidth(140);
+		label.setAlignment(Pos.CENTER_RIGHT);
+
+		field.setFont(Font.font("Arial", 14));
+		field.setMinWidth(300);
+		field.setMaxWidth(300);
+		field.setPromptText(prompt);
+
+		row.getChildren().addAll(label, field);
+		return row;
 	}
-
-	
-	/**********
-	 * Private local method to initialize the standard fields for a text field
-	 * 
-	 * @param t		The TextField object to be initialized
-	 * @param ff	The font to be used
-	 * @param f		The size of the font to be used
-	 * @param w		The width of the Button
-	 * @param p		The alignment (e.g. left, centered, or right)
-	 * @param x		The location from the left edge (x axis)
-	 * @param y		The location from the top (y axis)
-	 * @param e		The flag (Boolean) that specifies if this field is editable
-	 */
-	private void setupTextUI(TextField t, String ff, double f, double w, Pos p, double x, double y, 
-			boolean e){
-		t.setFont(Font.font(ff, f));
-		t.setMinWidth(w);
-		t.setMaxWidth(w);
-		t.setAlignment(p);
-		t.setLayoutX(x);
-		t.setLayoutY(y);		
-		t.setEditable(e);
-	}	
 }
