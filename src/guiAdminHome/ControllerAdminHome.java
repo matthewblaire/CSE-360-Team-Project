@@ -3,6 +3,7 @@ package guiAdminHome;
 import database.Database;
 import entityClasses.User;
 import javafx.stage.Stage;
+import recognizers.EmailAddressRecognizer;
 
 /*******
  * <p> Title: GUIAdminHomePage Class. </p>
@@ -67,6 +68,12 @@ public class ControllerAdminHome {
 		if (theDatabase.emailaddressHasBeenUsed(emailAddress)) {
 			ViewAdminHome.alertEmailError.setContentText(
 					"An invitation has already been sent to this email address.");
+			ViewAdminHome.alertEmailError.showAndWait();
+			return;
+		}
+		// Check to ensure the input email address meets the formatting requirements. Sned an error if not. 
+		else if (!(EmailAddressRecognizer.checkEmailAddress(emailAddress).equals(""))){
+             ViewAdminHome.alertEmailError.setContentText(EmailAddressRecognizer.checkEmailAddress(emailAddress));
 			ViewAdminHome.alertEmailError.showAndWait();
 			return;
 		}

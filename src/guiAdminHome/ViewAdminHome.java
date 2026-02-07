@@ -209,7 +209,9 @@ public class ViewAdminHome {
 		
 		setupButtonUI(button_UpdateThisUser, "Dialog", 18, 170, Pos.CENTER, 610, 45);
 		button_UpdateThisUser.setOnAction((_) -> 
-				{ViewUserUpdate.displayUserUpdate(theStage, theUser);});
+				{
+					ViewUserUpdate.displayUserUpdate(theStage, theUser);
+					});
 			
 		// GUI Area 2
 		setupLabelUI(label_NumberOfInvitations, "Arial", 20, 200, Pos.BASELINE_LEFT, 20, 105);

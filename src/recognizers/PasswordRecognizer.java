@@ -135,7 +135,7 @@ public class PasswordRecognizer {
 		if (!foundLongEnough)
 			errMessage += "Not long Enough (must have at least 8 characters); ";
 		
-		if (errMessage == "")
+		if (errMessage.equals(""))
 			return "";
 		
 		// If it gets here, there something was not found, so return an appropriate message
