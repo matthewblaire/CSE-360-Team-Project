@@ -109,22 +109,22 @@ public class FoundationsMain extends Application {
 		}
 
 		// Seed the DB - Added by Azeer Esmail
-		ArrayList<User> users = new ArrayList<User>();
-		users.add(new User("admin", "", "admin1", "", "", "", "admin@example.com", true, false, false));
-		users.add(new User("user1", "", "user1", "", "", "", "user1@example.com", false, true, false));
-		users.add(new User("user2", "", "user2", "", "", "", "user2@example.com", false, false, true));
-        try {
-	        	// Create users
-	        	for (User user: users) {
-	        		database.register(user);
-	        	}
-        	}
-        catch (SQLException e) {
-            System.err.println("*** ERROR *** Database error trying to register a user: " + 
-            		e.getMessage());
-            e.printStackTrace();
-            System.exit(0);
-        }
+//		ArrayList<User> users = new ArrayList<User>();
+//		users.add(new User("admin", "", "admin1", "", "", "", "admin@example.com", true, false, false));
+//		users.add(new User("user1", "", "user1", "", "", "", "user1@example.com", false, true, false));
+//		users.add(new User("user2", "", "user2", "", "", "", "user2@example.com", false, false, true));
+//        try {
+//	        	// Create users
+//	        	for (User user: users) {
+//	        		database.register(user);
+//	        	}
+//        	}
+//        catch (SQLException e) {
+//            System.err.println("*** ERROR *** Database error trying to register a user: " + 
+//            		e.getMessage());
+//            e.printStackTrace();
+//            System.exit(0);
+//        }
 		
 		// If the database is empty, no users have been established, so this user must be an admin
 		// user doing initial system startup activities and we need to set that admin's username
