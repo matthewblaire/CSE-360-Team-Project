@@ -1,6 +1,7 @@
 package guiResetPassword;
 
 import database.Database;
+import recognizers.PasswordRecognizer;
 
 
 /*******
@@ -49,6 +50,19 @@ public class ControllerResetPassword {
 			ViewResetPassword.alertPasswordMismatch.showAndWait();
 			return;
 		}
+		
+		
+		// We do not need to evaluate password 2 because by this point we have 
+		// established that the passwords match. 
+		String password1Eval = PasswordRecognizer.evaluatePassword(password1);
+		if (password1Eval != "")
+		{
+			// Password invalid
+			ViewResetPassword.alertPasswordInvalid.setHeaderText(password1Eval);
+			ViewResetPassword.alertPasswordInvalid.showAndWait();
+			return;
+		}
+		
 
 		// Update the password in the database
 		theDatabase.updatePassword(ViewResetPassword.theUsername, password1);

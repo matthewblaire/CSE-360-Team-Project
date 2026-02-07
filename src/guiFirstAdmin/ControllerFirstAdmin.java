@@ -7,7 +7,7 @@ import guiNewAccount.ViewNewAccount;
 import javafx.stage.Stage;
 import recognizers.PasswordRecognizer;
 import recognizers.UserNameRecognizer;
-
+import recognizers.NameRecognizer;
 /*******
  * <p> Title: ControllerFirstAdmin Class. </p>
  * 
@@ -70,7 +70,7 @@ public class ControllerFirstAdmin {
 	 */
 	protected static void setAdminUsername() {
 		adminUsername = ViewFirstAdmin.text_AdminUsername.getText();
-		ViewFirstAdmin.label_UsernameInvalid.setText("");
+		ViewFirstAdmin.label_ErrorInfo.setText("");
 	}
 	
 	
@@ -83,7 +83,7 @@ public class ControllerFirstAdmin {
 	 */
 	protected static void setAdminPassword1() {
 		adminPassword1 = ViewFirstAdmin.text_AdminPassword1.getText();
-		ViewFirstAdmin.label_PasswordsDoNotMatch.setText("");
+		ViewFirstAdmin.label_ErrorInfo.setText("");
 	}
 	
 	
@@ -96,7 +96,7 @@ public class ControllerFirstAdmin {
 	 */
 	protected static void setAdminPassword2() {
 		adminPassword2 = ViewFirstAdmin.text_AdminPassword2.getText();		
-		ViewFirstAdmin.label_PasswordsDoNotMatch.setText("");
+		ViewFirstAdmin.label_ErrorInfo.setText("");
 	}
 	
 	/**********
@@ -121,51 +121,68 @@ public class ControllerFirstAdmin {
 		if (result.isEmpty() == false)
 		{
 			ViewFirstAdmin.text_AdminUsername.setText("");
-			ViewFirstAdmin.label_UsernameInvalid.setText(result);
+			ViewFirstAdmin.label_ErrorInfo.setText(result);
 			return;
 		}
 		
-		// Make sure the two passwords are the same
-		if (adminPassword1.compareTo(adminPassword2) == 0) {
-			
-			String passEval = PasswordRecognizer.evaluatePassword(ViewFirstAdmin.text_AdminPassword1.getText());
-			// Make sure password conditions are satisfied
-			if (passEval != "") {
-				ViewFirstAdmin.text_AdminPassword1.setText("");
-				ViewFirstAdmin.text_AdminPassword2.setText("");
-				ViewFirstAdmin.alertPasswordError.setContentText(passEval);
-				ViewFirstAdmin.alertPasswordError.showAndWait();
-				return;
-			}
-			
-			
-			
-			
-        	// Create the passwords and proceed to the user home page
-        	User user = new User(adminUsername, adminPassword1, adminFirstName, "", adminLastName, "", "", true, false, 
-        			false);
-            try {
-            	// Create a new User object with admin role and register in the database
-            	theDatabase.register(user);
-            	}
-            catch (SQLException e) {
-                System.err.println("*** ERROR *** Database error trying to register a user: " + 
-                		e.getMessage());
-                e.printStackTrace();
-                System.exit(0);
-            }
-            
-            // User was established in the database sucessfully, redirect them to the login page to ask them to log in
-            guiUserLogin.ViewUserLogin.displayUserLogin(ViewFirstAdmin.theStage);
-		}
-		else {
+		// Make sure the two passwords match
+		if (adminPassword1.compareTo(adminPassword2) != 0) {
 			// The two passwords are NOT the same, so clear the passwords, explain the passwords
 			// must be the same, and clear the message as soon as the first character is typed.
 			ViewFirstAdmin.text_AdminPassword1.setText("");
 			ViewFirstAdmin.text_AdminPassword2.setText("");
-			ViewFirstAdmin.label_PasswordsDoNotMatch.setText(
+			ViewFirstAdmin.label_ErrorInfo.setText(
 					"The two passwords must match. Please try again!");
+			return;
 		}
+		
+		
+		// Make sure password conditions are satisfied
+		String passEval = PasswordRecognizer.evaluatePassword(ViewFirstAdmin.text_AdminPassword1.getText());
+		if (passEval != "") {
+			ViewFirstAdmin.text_AdminPassword1.setText("");
+			ViewFirstAdmin.text_AdminPassword2.setText("");
+			ViewFirstAdmin.alertPasswordError.setContentText(passEval);
+			ViewFirstAdmin.alertPasswordError.showAndWait();
+			return;
+		}
+		
+		// Make sure first and last names are valid
+		String firstNameEval = NameRecognizer.evaluateName(ViewFirstAdmin.text_AdminFirstName.getText());
+		
+		if (firstNameEval != "")
+		{
+			ViewFirstAdmin.text_AdminFirstName.setText("");
+			ViewFirstAdmin.label_ErrorInfo.setText(firstNameEval);
+			return;
+		}
+		
+		String lastNameEval = NameRecognizer.evaluateName(ViewFirstAdmin.text_AdminLastName.getText());
+		if (lastNameEval != "")
+		{
+			ViewFirstAdmin.text_AdminLastName.setText("");
+			ViewFirstAdmin.label_ErrorInfo.setText(lastNameEval);
+			return;
+		}
+		
+		
+		// -- ALL FIELDS VALIDATED -- 
+		// Create the user and proceed to the user home page
+    	User user = new User(adminUsername, adminPassword1, adminFirstName, "", adminLastName, "", "", true, false, 
+    			false);
+        try {
+        	// Create a new User object with admin role and register in the database
+        	theDatabase.register(user);
+        	}
+        catch (SQLException e) {
+            System.err.println("*** ERROR *** Database error trying to register a user: " + 
+            		e.getMessage());
+            e.printStackTrace();
+            System.exit(0);
+        }
+		
+        // User was established in the database sucessfully, redirect them to the login page to ask them to log in
+        guiUserLogin.ViewUserLogin.displayUserLogin(ViewFirstAdmin.theStage);
 	}
 	
 	

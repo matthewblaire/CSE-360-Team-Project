@@ -11,6 +11,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import recognizers.InviteCodeRecognizer;
 
 
 /*******
@@ -159,6 +160,18 @@ public class ViewUserLogin {
 		// Set up the setup button
 		setupButtonUI(button_SetupAccount, "Dialog", 18, 200, Pos.CENTER, 475, 340);
 		button_SetupAccount.setOnAction((_) -> {
+			// Verify that the code is the correct format
+			String inviteEval = InviteCodeRecognizer.evaluateInviteCode(text_Invitation.getText());
+			
+			if (inviteEval != "")
+			{
+				// invite code is malformed
+				alertUsernamePasswordError.setTitle("Invalid invite code!");
+				alertUsernamePasswordError.setHeaderText(inviteEval);
+				alertUsernamePasswordError.showAndWait();
+				return;
+			}
+			
 			System.out.println("**** Calling doSetupAccount");
 			ControllerUserLogin.doSetupAccount(theStage, text_Invitation.getText());
 		});

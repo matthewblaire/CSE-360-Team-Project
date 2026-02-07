@@ -59,8 +59,7 @@ public class ViewFirstAdmin {
 	private static Label label_TitleLine3 = 
 			new Label("Account. You will then be asked to login.");				
 	
-	protected static Label label_PasswordsDoNotMatch = new Label();
-	protected static Label label_UsernameInvalid = new Label();
+	protected static Label label_ErrorInfo = new Label();
 	
 	protected static TextField text_AdminUsername = new TextField();
 	protected static PasswordField text_AdminPassword1 = new PasswordField();
@@ -204,8 +203,7 @@ public class ViewFirstAdmin {
 			});
 
 		// Label to display the Passwords do not match error message
-		setupLabelUI(label_PasswordsDoNotMatch, "Arial", 18, width, Pos.CENTER, 0, 300);
-		setupLabelUI(label_UsernameInvalid, "Arial", 18, width, Pos.CENTER, 0, 300);
+		setupLabelUI(label_ErrorInfo, "Arial", 18, width, Pos.CENTER, 0, 450);
 
 		setupButtonUI(button_Quit, "Dialog", 18, 250, Pos.CENTER, 300, 520);
 		button_Quit.setOnAction((_) -> {ControllerFirstAdmin.performQuit(); });
@@ -220,7 +218,7 @@ public class ViewFirstAdmin {
 				label_TitleLine2, label_TitleLine3, text_AdminUsername, text_AdminPassword1, 
 				text_AdminPassword2, text_AdminFirstName, 
 				text_AdminLastName,
-				 button_AdminSetup, label_PasswordsDoNotMatch, label_UsernameInvalid, button_Quit);
+				 button_AdminSetup, label_ErrorInfo,  button_Quit);
 	}
 	
 

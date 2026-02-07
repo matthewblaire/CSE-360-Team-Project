@@ -33,6 +33,10 @@ public class NameRecognizer {
 			if (("~`!@#$%^&*()_+={}[]|\\:;\"'<>,.?/".indexOf(name.charAt(i)) >= 0)) {
 				return "Name cannot contain any special characters. Please remove <" + name.charAt(i) + "> and try again.";
 			}
+			
+			if (("1234567890".indexOf(name.charAt(i)) >= 0)) {
+				return "Name cannot contain any numbers. Please remove <" + name.charAt(i) + "> and try again.";
+			}
 		}
 		return "";
 	}

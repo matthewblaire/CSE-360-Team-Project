@@ -41,6 +41,7 @@ public class ViewResetPassword {
 	// Alerts
 	protected static Alert alertPasswordMismatch = new Alert(AlertType.ERROR);
 	protected static Alert alertPasswordEmpty = new Alert(AlertType.ERROR);
+	protected static Alert alertPasswordInvalid = new Alert(AlertType.ERROR);
 	protected static Alert alertPasswordSet = new Alert(AlertType.INFORMATION);
 
 	// Class attributes
@@ -133,6 +134,10 @@ public class ViewResetPassword {
 		alertPasswordSet.setTitle("Password Updated");
 		alertPasswordSet.setHeaderText("Your password has been updated successfully.");
 		alertPasswordSet.setContentText("Please log in with your new password.");
+		
+		alertPasswordInvalid.setTitle("Password is Invalid");
+		alertPasswordInvalid.setHeaderText("");
+		alertPasswordInvalid.setContentText("Please enter a different password.");
 	}
 
 
