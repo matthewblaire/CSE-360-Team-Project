@@ -4,7 +4,7 @@ import recognizers.PasswordRecognizer;
 import recognizers.UserNameRecognizer;
 import recognizers.NameRecognizer;
 import recognizers.InviteCodeRecognizer;
-
+import recognizers.EmailAddressRecognizer;
 
 /**
  * Title: Tester class
@@ -85,10 +85,8 @@ public class Tester {
 		performUsernameTestCase(12, "", false);
 		performUsernameTestCase(13, "T-E_S.T", true);
 		performUsernameTestCase(14, "T-_E_.S.-T", false);
-		
 		printStats();
 		resetCurrentStats();
-		
 		System.out.println("---End Username Tests---");
 		
 		// Password Validation (Length) Test Cases
@@ -104,9 +102,9 @@ public class Tester {
 		printStats();
 		resetCurrentStats();
 		System.out.println("---End Password Validation Tests---");
-		// Password Validation (Equality Comparison) Test Cases
+		
 
-//		// Invite Code (Length) Test Cases
+		// Invite Code (Length) Test Cases
 		System.out.println("---Beginning Invite Code Tests---");
 		performInviteCodeTestCase(1,"abcd12",true);
 		performInviteCodeTestCase(2,"abcd",false);
@@ -117,23 +115,25 @@ public class Tester {
 		resetCurrentStats();
 		System.out.println("---End Invite Code Tests---");
 		
-//		// Invite Code (Generation and Invalidation) Test Cases
-//		System.out.println("---Beginning Invite Code (Generation and Invalidation) Tests---");
-//		printStats();
-//		resetCurrentStats();
-//		System.out.println("---End Invite Code (Generation and Invalidation) Tests---");
-		
 //		// Email Validation Test Cases
-//		System.out.println("---Beginning Email Validation Tests---");
-//		printStats();
-//		resetCurrentStats();
-//		System.out.println("---End Email Validation Tests---");
+		System.out.println("---Beginning Email Validation Tests---");
+		performEmailTestCase(1, "student@asu.edu", true);
+		performEmailTestCase(2, "student.asu.edu", false);
+		performEmailTestCase(3, "student@@asu.edu", false);
+		performEmailTestCase(4, "", false);
+		performEmailTestCase(5, "@asu.edu", false);
+		performEmailTestCase(6, "student@.edu", false);
+		performEmailTestCase(7, "student", false);
+		
+		printStats();
+		resetCurrentStats();
+		System.out.println("---End Email Validation Tests---");
 		
 		// Name Validation Test Cases
 		System.out.println("---Beginning Name Validation Tests---");
 		performNameTestCase(1, "", false);
-		performNameTestCase(2, "NameWith50CharsABCDEABCDEABCDEABCDEABCDEABCDEABCDE", true);
-		performNameTestCase(3, "NameWith51CharsABCDEABCDEABCDEABCDEABCDEABCDEABCDEA", false);
+		performNameTestCase(2, "NameWithFiftyCharsABCDEABCDEABCDEABCDEABCDEABCDEAB", true);
+		performNameTestCase(3, "NameWithFiftyOneCharsABCDEABCDEABCDEABCDEABCDEABCDE", false);
 		performNameTestCase(4, "A", true);
 		performNameTestCase(5, "A-B", true);
 		performNameTestCase(6, "A$B", false);
@@ -165,6 +165,65 @@ public class Tester {
 		System.out.println("Testing statistics (Overall):");
 		System.out.println("Passed: "+ totalPassed + "/" + (totalPassed + totalFailed));
 		System.out.println("Failed: "+ totalFailed + "/" + (totalPassed + totalFailed) );
+	}
+	
+	
+	/*
+	 * This method sets up the input value for the Email test from the input parameters,
+	 * displays test execution information, invokes precisely the same recognizer
+	 * that the interactive JavaFX mainline uses, interprets the returned value,
+	 * and displays the interpreted result.
+	 */
+	public static void performEmailTestCase(int testCase, String inputEmail, Boolean expectedPass) {
+		/************** Display an individual test case header **************/
+		System.out.println("____________________________________________________________________________\n\nTest case: " + testCase);
+		System.out.println("Input: \"" + inputEmail + "\"");
+		System.out.println("______________");
+		
+		/************** Display an individual test case header **************/
+		System.out.println("____________________________________________________________________________\n\nTest case: " + testCase);
+		System.out.println("Input: \"" + inputEmail + "\"");
+		System.out.println("______________");
+		
+		/************** Call the recognizer to process the input **************/
+		String result = EmailAddressRecognizer.checkEmailAddress(inputEmail);
+		
+		if (result.isEmpty())
+		{
+			// input is valid
+			if (expectedPass) {
+				// input is valid, as expected (PASS)
+				System.out.println("***Success*** The email <" + inputEmail + 
+						"> is valid, so this is a pass!");
+				numPassed++;
+			} else {
+				// input is valid, against expectations (FAIL)
+				System.out.println("***Failure*** The email <" + inputEmail + "> is valid." + 
+						"\nBut it was supposed to be invalid, so this is a failure!\n");
+				System.out.println("Error message: " + result);
+				numFailed++;
+			}
+		} else {
+			// input is invalid
+			if (expectedPass)
+			{
+				//
+				// input is invalid, against expectations (FAIL)
+				//
+				System.out.println("***Failure*** The email <" + inputEmail + "> is invalid." + 
+						"\nBut it was supposed to be valid, so this is a failure!\n");
+				System.out.println("Error message: " + result);
+				numFailed++;
+			} else {
+				//
+				// input is invalid, as expected (PASS) 
+				//
+				System.out.println("***Success*** The email <" + inputEmail + "> is invalid." + 
+						"\nBut it was supposed to be invalid, so this is a pass!\n");
+				System.out.println("Error message: " + result);
+				numPassed++;
+			}
+		}
 	}
 	
 	
@@ -234,10 +293,6 @@ public class Tester {
 		System.out.println("Input: \"" + inputCode + "\"");
 		System.out.println("______________");
 		
-		/************** Display an individual test case header **************/
-		System.out.println("____________________________________________________________________________\n\nTest case: " + testCase);
-		System.out.println("Input: \"" + inputCode + "\"");
-		System.out.println("______________");
 		
 		/************** Call the recognizer to process the input **************/
 		String result = InviteCodeRecognizer.evaluateInviteCode(inputCode);
