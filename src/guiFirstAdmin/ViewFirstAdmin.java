@@ -109,7 +109,7 @@ public class ViewFirstAdmin {
 		applicationMain.FoundationsMain.activeHomePage = theRole;	// 1: Admin; 2: Student; 3: Staff
 
 		// Set the title for the window, display the page, and wait for the Admin to do something
-		theStage.setTitle("CSE 360 Foundation Code: First User Account Setup");
+		theStage.setTitle("CSE 360 Project: First User Account Setup");
 		theStage.setScene(theFirstAdminScene);
 		theStage.show();
 	}

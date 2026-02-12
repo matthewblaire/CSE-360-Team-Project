@@ -87,7 +87,7 @@ public class ViewUserLogin {
 		text_Invitation.setText("");
 
 		// Set the title for the window, display the page, and wait for the user to do something
-		theStage.setTitle("CSE 360 Foundation Code: User Login Page");
+		theStage.setTitle("CSE 360 Project: User Login Page");
 		theStage.setScene(theUserLoginScene);
 		theStage.show();
 	}
