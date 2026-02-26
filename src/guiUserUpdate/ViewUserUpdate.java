@@ -16,8 +16,6 @@ import javafx.stage.Stage;
 import recognizers.EmailAddressRecognizer;
 import recognizers.NameRecognizer;
 import entityClasses.User;
-import guiAdminHome.ViewAdminHome;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 /*******
@@ -125,10 +123,12 @@ public class ViewUserUpdate {
 	private static Pane theRootPane;			// The Pane that holds all the GUI widgets
 	private static User theUser;				// The current user of the application
 
-	public static Scene theUserUpdateScene = null;	// The Scene each invocation populates
+	/** The Scene each invocation populates. */
+	public static Scene theUserUpdateScene = null;
 
 	private static Optional<String> result;		// The result from a pop-up dialog
 
+	/** The alert displayed when an email address validation error occurs. */
 	protected static Alert alertEmailError = new Alert(AlertType.INFORMATION);
 
 	/*-********************************************************************************************

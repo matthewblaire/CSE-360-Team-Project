@@ -1,7 +1,11 @@
 package recognizers;
 
-
+/** FSM-based recognizer for validating email addresses. */
 public class EmailAddressRecognizer {
+
+	/** Private constructor to prevent instantiation. */
+	private EmailAddressRecognizer() {}
+
 	/**
 	 * <p> Title: FSM-translated EmailAddressRecognizer. </p>
 	 * 
@@ -30,9 +34,12 @@ public class EmailAddressRecognizer {
 	 * 
 	 */
 
-	public static String emailAddressErrorMessage = "";	// The error message text
-	public static String emailAddressInput = "";		// The input being processed
-	public static int emailAddressIndexofError = -1;	// The index where the error was located
+	/** The error message text. */
+	public static String emailAddressErrorMessage = "";
+	/** The input being processed. */
+	public static String emailAddressInput = "";
+	/** The index where the error was located. */
+	public static int emailAddressIndexofError = -1;
 	private static int state = 0;						// The current state value
 	private static int nextState = 0;					// The next state value
 	private static boolean finalState = false;			// Is this state a final state?

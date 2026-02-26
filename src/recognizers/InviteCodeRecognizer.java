@@ -7,14 +7,17 @@ package recognizers;
  * This class contains the methods necessary to recognize valid invite code formatting. 
  */
 public class InviteCodeRecognizer {
-	
-	
+
+	/** Private constructor to prevent instantiation. */
+	private InviteCodeRecognizer() {}
+
+
 	/**
 	 * Method: evaluateInviteCode
 	 * Description: This method evaluates a string as a valid invite code. If the string follows the invite code format,
 	 * the method will return an empty string. If not, a specific error message will be returned.
-	 * @param code
-	 * @return errorMessage
+	 * @param code the invite code string to validate
+	 * @return errorMessage an empty string if valid, or a description of the error
 	 */
 	public static String evaluateInviteCode(String code) {
 		if (code.length() != 6)

@@ -14,9 +14,11 @@ package recognizers;
  * 
  */
 public class PasswordRecognizer {
-	
 
-	
+	/** Private constructor to prevent instantiation. */
+	private PasswordRecognizer() {}
+
+
 	/*-********************************************************************************************
 	 * 
 	 * Attributes used by the Finite State Machine to inform the user about what was and was not
@@ -24,13 +26,21 @@ public class PasswordRecognizer {
 	 * 
 	 */
 
-	public static String passwordErrorMessage = "";		// The error message text
-	public static String passwordInput = "";			// The input being processed
-	public static int passwordIndexofError = -1;		// The index where the error was located
+	/** The error message text. */
+	public static String passwordErrorMessage = "";
+	/** The input being processed. */
+	public static String passwordInput = "";
+	/** The index where the error was located. */
+	public static int passwordIndexofError = -1;
+	/** Whether an upper case letter was found. */
 	public static boolean foundUpperCase = false;
+	/** Whether a lower case letter was found. */
 	public static boolean foundLowerCase = false;
+	/** Whether a numeric digit was found. */
 	public static boolean foundNumericDigit = false;
+	/** Whether a special character was found. */
 	public static boolean foundSpecialChar = false;
+	/** Whether the password is long enough. */
 	public static boolean foundLongEnough = false;
 	private static String inputLine = "";				// The input line
 	private static char currentChar;					// The current character in the line

@@ -60,8 +60,9 @@ public class ControllerUserLogin {
 	 * 
 	 * The method reaches batch to the view page and to fetch the information needed rather than
 	 * passing that information as parameters.
-	 * 
-	 */	
+	 *
+	 * @param ts the primary Stage for the application
+	 */
 	protected static void doLogin(Stage ts) {
 		theStage = ts;
 		String username = ViewUserLogin.text_Username.getText();
@@ -149,7 +150,10 @@ public class ControllerUserLogin {
 	 * 
 	 * <p> Description: This method is called to reset the page and then populate it with new
 	 * content for the new user.</p>
-	 * 
+	 *
+	 * @param theStage the primary Stage for the application
+	 *
+	 * @param invitationCode the invitation code entered by the user
 	 */
 	protected static void doSetupAccount(Stage theStage, String invitationCode) {
 		guiNewAccount.ViewNewAccount.displayNewAccount(theStage, invitationCode);

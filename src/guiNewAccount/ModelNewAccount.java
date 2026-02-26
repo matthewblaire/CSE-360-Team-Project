@@ -16,4 +16,7 @@ package guiNewAccount;
  */
 public class ModelNewAccount {
 
+	/** Private constructor to prevent instantiation. */
+	private ModelNewAccount() {}
+
 }

@@ -17,4 +17,7 @@ package guiDeleteUser;
 
 public class ModelDeleteUser {
 
+	/** Private constructor to prevent instantiation. */
+	private ModelDeleteUser() {}
+
 }

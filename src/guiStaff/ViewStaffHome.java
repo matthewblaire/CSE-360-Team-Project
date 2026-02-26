@@ -46,11 +46,15 @@ public class ViewStaffHome {
 	
 	// GUI Area 1: It informs the user about the purpose of this page, whose account is being used,
 	// and a button to allow this user to update the account settings
+	/** The label displaying the page title. */
 	protected static Label label_PageTitle = new Label();
+	/** The label displaying the current user details. */
 	protected static Label label_UserDetails = new Label();
+	/** The button to navigate to the account update page. */
 	protected static Button button_UpdateThisUser = new Button("Account Update");
-		
+
 	// This is a separator and it is used to partition the GUI for various tasks
+	/** The line separator between the header area and the main content area. */
 	protected static Line line_Separator1 = new Line(20, 95, width-20, 95);
 
 	// GUI ARea 2: This is a stub, so there are no widgets here.  For an actual role page, this are
@@ -59,11 +63,14 @@ public class ViewStaffHome {
 	
 	
 	// This is a separator and it is used to partition the GUI for various tasks
+	/** The line separator between the main content area and the bottom button area. */
 	protected static Line line_Separator4 = new Line(20, 525, width-20,525);
-	
+
 	// GUI Area 3: This is last of the GUI areas.  It is used for quitting the application and for
 	// logging out.
+	/** The button to log out the current user. */
 	protected static Button button_Logout = new Button("Logout");
+	/** The button to quit the application. */
 	protected static Button button_Quit = new Button("Quit");
 
 	// This is the end of the GUI objects for the page.
@@ -75,11 +82,15 @@ public class ViewStaffHome {
 	// Reference for the in-memory database so this package has access
 	private static Database theDatabase = applicationMain.FoundationsMain.database;
 
-	protected static Stage theStage;			// The Stage that JavaFX has established for us	
+	/** The JavaFX Stage used to display this page. */
+	protected static Stage theStage;			// The Stage that JavaFX has established for us
+	/** The root Pane that holds all the GUI widgets. */
 	protected static Pane theRootPane;			// The Pane that holds all the GUI widgets
+	/** The current logged-in User. */
 	protected static User theUser;				// The current logged in User
-	
+
 	private static Scene theStaffHomeScene;		// The shared Scene each invocation populates
+	/** The role identifier for the staff role (Admin: 1; Student: 2; Staff: 3). */
 	protected static final int theRole = 3;		// Admin: 1; Student: 2; Staff: 3
 
 	/*-*******************************************************************************************

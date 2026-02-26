@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import entityClasses.DiscussionThread;
+import entityClasses.Post;
+import entityClasses.ReadStatus;
+import entityClasses.Reply;
 import entityClasses.User;
 
 import java.time.LocalDateTime;
@@ -142,6 +146,756 @@ public class Database {
 	    } catch (SQLException e) {
 	        // Column probably already exists — safe to ignore
 	    }
+
+	    // Phase 2: create discussion system tables
+	    createDiscussionTables();
+	}
+
+
+/*******
+ * <p> Method: createDiscussionTables </p>
+ *
+ * <p> Description: Creates the three tables required by the Phase 2 Student Discussion System:
+ * DiscussionThreads, Posts, and Replies.  These are created after the existing user and
+ * invitation tables so that foreign-key relationships can be expressed correctly.
+ *
+ * DiscussionThreads — one row per named thread (e.g., "General").  Students may not create
+ * or delete threads; that is a Phase 3 staff function.  Threads are seeded once at startup via
+ * {@link #seedDefaultThread()}.
+ *
+ * Posts — one row per student post.  The isDeleted column supports soft-delete: the row is
+ * never physically removed, but isDeleted = TRUE causes the UI to hide the content.
+ *
+ * Replies — one row per reply.  Replies reference a Post by postId.  The isDeleted column
+ * supports soft-delete so students can remove their own replies without breaking the thread.
+ * Replies are kept even when the parent post is soft-deleted. </p>
+ *
+ * @throws SQLException if any CREATE TABLE statement fails
+ */
+	private void createDiscussionTables() throws SQLException {
+
+		// DiscussionThreads — named containers that group related Posts
+		String threadTable = "CREATE TABLE IF NOT EXISTS DiscussionThreads ("
+				+ "threadId INT AUTO_INCREMENT PRIMARY KEY, "
+				+ "title    VARCHAR(255) UNIQUE NOT NULL)";
+		statement.execute(threadTable);
+
+		// Posts — student questions and statements
+		// isDeleted = FALSE by default; set to TRUE when a student deletes their own post
+		String postsTable = "CREATE TABLE IF NOT EXISTS Posts ("
+				+ "postId         INT AUTO_INCREMENT PRIMARY KEY, "
+				+ "threadId       INT NOT NULL, "
+				+ "authorUsername VARCHAR(255) NOT NULL, "
+				+ "content        VARCHAR(2000) NOT NULL, "
+				+ "timestamp      TIMESTAMP NOT NULL, "
+				+ "isDeleted      BOOL DEFAULT FALSE, "
+				+ "FOREIGN KEY (threadId) REFERENCES DiscussionThreads(threadId))";
+		statement.execute(postsTable);
+
+		// Replies — responses to Posts; support soft-delete via isDeleted flag
+		// isDeleted = FALSE by default; set to TRUE when a student deletes their own reply
+		String repliesTable = "CREATE TABLE IF NOT EXISTS Replies ("
+				+ "replyId        INT AUTO_INCREMENT PRIMARY KEY, "
+				+ "postId         INT NOT NULL, "
+				+ "authorUsername VARCHAR(255) NOT NULL, "
+				+ "content        VARCHAR(2000) NOT NULL, "
+				+ "timestamp      TIMESTAMP NOT NULL, "
+				+ "isDeleted      BOOL DEFAULT FALSE, "
+				+ "FOREIGN KEY (postId) REFERENCES Posts(postId))";
+		statement.execute(repliesTable);
+
+		// ReadStatus — tracks which posts/replies each user has already read.
+		// The UNIQUE constraint on (username, targetId, targetType) allows MERGE (upsert)
+		// so marking the same item as read multiple times is idempotent.
+		String readStatusTable = "CREATE TABLE IF NOT EXISTS ReadStatus ("
+				+ "id         INT AUTO_INCREMENT PRIMARY KEY, "
+				+ "username   VARCHAR(255) NOT NULL, "
+				+ "targetId   INT NOT NULL, "
+				+ "targetType VARCHAR(10)  NOT NULL, "   // 'post' or 'reply'
+				+ "readAt     TIMESTAMP NOT NULL, "
+				+ "UNIQUE(username, targetId, targetType))";
+		statement.execute(readStatusTable);
+	}
+
+
+/*******
+ * <p> Method: List<Post>; getPostsByThread(int threadId) </p>
+ *
+ * <p> Description: Returns ALL Posts belonging to the given thread (including soft-deleted
+ * ones), ordered by timestamp ascending so students read the conversation in chronological
+ * order.  Soft-deleted posts are included so their replies remain accessible; the caller
+ * should check {@link Post#isDeleted()} and display a placeholder instead of the content.
+ * </p>
+ *
+ * @param threadId  the threadId whose Posts should be retrieved
+ * @return a List of Post objects (active and deleted); empty if the thread has no posts
+ */
+	public List<Post> getPostsByThread(int threadId) {
+		List<Post> posts = new ArrayList<>();
+		String query = "SELECT postId, threadId, authorUsername, content, timestamp, isDeleted "
+				+ "FROM Posts WHERE threadId = ? "
+				+ "ORDER BY timestamp ASC";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, threadId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				posts.add(new Post(
+						rs.getInt("postId"),
+						rs.getInt("threadId"),
+						rs.getString("authorUsername"),
+						rs.getString("content"),
+						rs.getTimestamp("timestamp").toLocalDateTime(),
+						rs.getBoolean("isDeleted")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return posts;
+	}
+
+
+/*******
+ * <p> Method: List<Post>; getPostsByAuthor(String username) </p>
+ *
+ * <p> Description: Returns ALL Posts written by the given user (including soft-deleted ones),
+ * ordered by timestamp descending (newest first) so the student sees their most recent
+ * content at the top.  Soft-deleted posts are included so the student can see their full
+ * history; the caller should check {@link Post#isDeleted()} and mark them accordingly. </p>
+ *
+ * @param username  the authorUsername to filter on
+ * @return a List of Post objects (active and deleted); empty if the user has no posts
+ */
+	public List<Post> getPostsByAuthor(String username) {
+		List<Post> posts = new ArrayList<>();
+		String query = "SELECT postId, threadId, authorUsername, content, timestamp, isDeleted "
+				+ "FROM Posts WHERE authorUsername = ? "
+				+ "ORDER BY timestamp DESC";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, username);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				posts.add(new Post(
+						rs.getInt("postId"),
+						rs.getInt("threadId"),
+						rs.getString("authorUsername"),
+						rs.getString("content"),
+						rs.getTimestamp("timestamp").toLocalDateTime(),
+						rs.getBoolean("isDeleted")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return posts;
+	}
+
+
+/*******
+ * <p> Method: List<Post>; searchPosts(String keyword, int threadId) </p>
+ *
+ * <p> Description: Returns non-deleted Posts whose content contains the given keyword
+ * (case-insensitive substring match).  If {@code threadId} is -1, all threads are searched;
+ * otherwise only the specified thread is searched.  Results are ordered by timestamp
+ * descending so the most recent matches appear first. </p>
+ *
+ * @param keyword   the search term; the query uses {@code LOWER(content) LIKE ?} so the
+ *                  match is case-insensitive
+ * @param threadId  the thread to restrict the search to, or -1 to search all threads
+ * @return a List of matching Post objects; empty if no matches are found
+ */
+	public List<Post> searchPosts(String keyword, int threadId) {
+		List<Post> posts = new ArrayList<>();
+		String like = "%" + keyword.toLowerCase() + "%";
+		String query;
+		if (threadId == -1) {
+			query = "SELECT postId, threadId, authorUsername, content, timestamp, isDeleted "
+					+ "FROM Posts WHERE isDeleted = FALSE AND LOWER(content) LIKE ? "
+					+ "ORDER BY timestamp DESC";
+		} else {
+			query = "SELECT postId, threadId, authorUsername, content, timestamp, isDeleted "
+					+ "FROM Posts WHERE isDeleted = FALSE AND LOWER(content) LIKE ? "
+					+ "AND threadId = ? ORDER BY timestamp DESC";
+		}
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, like);
+			if (threadId != -1) pstmt.setInt(2, threadId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				posts.add(new Post(
+						rs.getInt("postId"),
+						rs.getInt("threadId"),
+						rs.getString("authorUsername"),
+						rs.getString("content"),
+						rs.getTimestamp("timestamp").toLocalDateTime(),
+						rs.getBoolean("isDeleted")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return posts;
+	}
+
+
+/*******
+ * <p> Method: List<Reply>; getRepliesForPost(int postId) </p>
+ *
+ * <p> Description: Returns all Replies for the given postId, ordered by timestamp ascending
+ * so the conversation thread reads in chronological order.  Soft-deleted replies are included
+ * so their position in the thread is preserved; the caller should check
+ * {@link Reply#isDeleted()} and display a placeholder instead of the content. </p>
+ *
+ * @param postId  the postId whose Replies should be retrieved
+ * @return a List of Reply objects (including soft-deleted); empty if the post has no replies
+ */
+	public List<Reply> getRepliesForPost(int postId) {
+		List<Reply> replies = new ArrayList<>();
+		String query = "SELECT replyId, postId, authorUsername, content, timestamp, isDeleted "
+				+ "FROM Replies WHERE postId = ? ORDER BY timestamp ASC";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, postId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				replies.add(new Reply(
+						rs.getInt("replyId"),
+						rs.getInt("postId"),
+						rs.getString("authorUsername"),
+						rs.getString("content"),
+						rs.getTimestamp("timestamp").toLocalDateTime(),
+						rs.getBoolean("isDeleted")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return replies;
+	}
+
+
+/*******
+ * <p> Method: int getReplyCount(int postId) </p>
+ *
+ * <p> Description: Returns the total number of replies for the given post, regardless of
+ * read status.  Used by the "My Posts" page to show how many people have responded. </p>
+ *
+ * @param postId  the postId to count replies for
+ * @return the number of Reply rows referencing this postId
+ */
+	public int getReplyCount(int postId) {
+		String query = "SELECT COUNT(*) FROM Replies WHERE postId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, postId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) return rs.getInt(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+/*******
+ * <p> Method: int getUnreadReplyCount(int postId, String username) </p>
+ *
+ * <p> Description: Returns the number of replies to the given post that the specified user
+ * has not yet read.  A reply is "unread" if there is no matching row in the ReadStatus table
+ * with {@code targetType = 'reply'} for this user. </p>
+ *
+ * @param postId    the postId whose replies are examined
+ * @param username  the viewer whose ReadStatus rows are checked
+ * @return the count of unread replies (0 if all have been read or there are no replies)
+ */
+	public int getUnreadReplyCount(int postId, String username) {
+		String query = "SELECT COUNT(*) FROM Replies r "
+				+ "WHERE r.postId = ? AND r.isDeleted = FALSE "
+				+ "AND r.replyId NOT IN ("
+				+ "  SELECT targetId FROM ReadStatus "
+				+ "  WHERE username = ? AND targetType = 'reply')";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, postId);
+			pstmt.setString(2, username);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) return rs.getInt(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+/*******
+ * <p> Method: void markPostAsRead(int postId, String username) </p>
+ *
+ * <p> Description: Records that the given user has read the given post.  The operation is
+ * idempotent: calling it multiple times does not create duplicate rows because the UNIQUE
+ * constraint on (username, targetId, targetType) turns the INSERT into a no-op via
+ * H2's MERGE statement. </p>
+ *
+ * @param postId    the postId to mark as read
+ * @param username  the user marking the post as read
+ */
+	public void markPostAsRead(int postId, String username) {
+		String merge = "MERGE INTO ReadStatus (username, targetId, targetType, readAt) "
+				+ "KEY(username, targetId, targetType) VALUES (?, ?, 'post', ?)";
+		try (PreparedStatement pstmt = connection.prepareStatement(merge)) {
+			pstmt.setString(1, username);
+			pstmt.setInt(2, postId);
+			pstmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+/*******
+ * <p> Method: void markReplyAsRead(int replyId, String username) </p>
+ *
+ * <p> Description: Records that the given user has read the given reply.  Idempotent — see
+ * {@link #markPostAsRead(int, String)} for details. </p>
+ *
+ * @param replyId   the replyId to mark as read
+ * @param username  the user marking the reply as read
+ */
+	public void markReplyAsRead(int replyId, String username) {
+		String merge = "MERGE INTO ReadStatus (username, targetId, targetType, readAt) "
+				+ "KEY(username, targetId, targetType) VALUES (?, ?, 'reply', ?)";
+		try (PreparedStatement pstmt = connection.prepareStatement(merge)) {
+			pstmt.setString(1, username);
+			pstmt.setInt(2, replyId);
+			pstmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+/*******
+ * <p> Method: boolean isPostRead(int postId, String username) </p>
+ *
+ * <p> Description: Returns true if the given user has already read the given post (i.e.,
+ * a row exists in ReadStatus with targetType = 'post'). </p>
+ *
+ * @param postId    the postId to check
+ * @param username  the user to check
+ * @return true if the post is already marked as read for this user; false otherwise
+ */
+	public boolean isPostRead(int postId, String username) {
+		String query = "SELECT COUNT(*) FROM ReadStatus "
+				+ "WHERE username = ? AND targetId = ? AND targetType = 'post'";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, username);
+			pstmt.setInt(2, postId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) return rs.getInt(1) > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+
+/*******
+ * <p> Method: boolean isReplyRead(int replyId, String username) </p>
+ *
+ * <p> Description: Returns true if the given user has already read the given reply (i.e.,
+ * a row exists in ReadStatus with targetType = 'reply'). </p>
+ *
+ * @param replyId   the replyId to check
+ * @param username  the user to check
+ * @return true if the reply is already marked as read for this user; false otherwise
+ */
+	public boolean isReplyRead(int replyId, String username) {
+		String query = "SELECT COUNT(*) FROM ReadStatus "
+				+ "WHERE username = ? AND targetId = ? AND targetType = 'reply'";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, username);
+			pstmt.setInt(2, replyId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) return rs.getInt(1) > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+
+/*******
+ * <p> Method: Post getPostById(int postId) </p>
+ *
+ * <p> Description: Returns the Post row with the given postId, or {@code null} if no such
+ * row exists.  Unlike {@link #getPostsByThread(int)}, this method returns soft-deleted posts
+ * too, so the caller can decide whether to show them (e.g., to display the deleted notice). </p>
+ *
+ * @param postId  the postId to look up
+ * @return the matching Post, or null if not found
+ */
+	public Post getPostById(int postId) {
+		String query = "SELECT postId, threadId, authorUsername, content, timestamp, isDeleted "
+				+ "FROM Posts WHERE postId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, postId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				return new Post(
+						rs.getInt("postId"),
+						rs.getInt("threadId"),
+						rs.getString("authorUsername"),
+						rs.getString("content"),
+						rs.getTimestamp("timestamp").toLocalDateTime(),
+						rs.getBoolean("isDeleted"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+/*******
+ * <p> Method: Reply getReplyById(int replyId) </p>
+ *
+ * <p> Description: Returns the Reply row with the given replyId, or {@code null} if no such
+ * row exists. </p>
+ *
+ * @param replyId  the replyId to look up
+ * @return the matching Reply, or null if not found
+ */
+	public Reply getReplyById(int replyId) {
+		String query = "SELECT replyId, postId, authorUsername, content, timestamp, isDeleted "
+				+ "FROM Replies WHERE replyId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, replyId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				return new Reply(
+						rs.getInt("replyId"),
+						rs.getInt("postId"),
+						rs.getString("authorUsername"),
+						rs.getString("content"),
+						rs.getTimestamp("timestamp").toLocalDateTime(),
+						rs.getBoolean("isDeleted"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+/*******
+ * <p> Method: int updatePost(int postId, String newContent, String authorUsername) </p>
+ *
+ * <p> Description: Updates the content of a non-deleted Post, but only if the row belongs
+ * to {@code authorUsername}.  The author check is performed inside the WHERE clause, so an
+ * unprivileged user who guesses a postId cannot overwrite someone else's post.
+ *
+ * Returns the number of rows updated (1 on success; 0 if the post does not exist, is
+ * soft-deleted, or the requester is not the author). </p>
+ *
+ * @param postId         the postId to update
+ * @param newContent     the replacement content; should be pre-validated by
+ *                       {@link recognizers.PostContentRecognizer}
+ * @param authorUsername the username of the student attempting the edit
+ * @return 1 if the update succeeded; 0 otherwise
+ */
+	public int updatePost(int postId, String newContent, String authorUsername) {
+		String update = "UPDATE Posts SET content = ? "
+				+ "WHERE postId = ? AND authorUsername = ? AND isDeleted = FALSE";
+		try (PreparedStatement pstmt = connection.prepareStatement(update)) {
+			pstmt.setString(1, newContent);
+			pstmt.setInt(2, postId);
+			pstmt.setString(3, authorUsername);
+			return pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+/*******
+ * <p> Method: int softDeletePost(int postId, String authorUsername) </p>
+ *
+ * <p> Description: Sets isDeleted = TRUE for the given Post, but only if the row belongs to
+ * {@code authorUsername}.  Replies attached to a soft-deleted post are kept intact; the UI
+ * should display a "(post deleted)" notice in place of the original content.
+ *
+ * Returns the number of rows updated (1 on success; 0 if not found or wrong author). </p>
+ *
+ * @param postId         the postId to soft-delete
+ * @param authorUsername the username of the student attempting the deletion
+ * @return 1 if the post was soft-deleted; 0 otherwise
+ */
+	public int softDeletePost(int postId, String authorUsername) {
+		String update = "UPDATE Posts SET isDeleted = TRUE "
+				+ "WHERE postId = ? AND authorUsername = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(update)) {
+			pstmt.setInt(1, postId);
+			pstmt.setString(2, authorUsername);
+			return pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+/*******
+ * <p> Method: int softDeleteReply(int replyId, String authorUsername) </p>
+ *
+ * <p> Description: Sets isDeleted = TRUE for the given Reply, but only if the row belongs to
+ * {@code authorUsername}.  The row is never physically removed; the UI should display a
+ * "[Reply deleted]" notice in place of the original content.
+ *
+ * Returns the number of rows updated (1 on success; 0 if not found or wrong author). </p>
+ *
+ * @param replyId        the replyId to soft-delete
+ * @param authorUsername the username of the student attempting the deletion
+ * @return 1 if the reply was soft-deleted; 0 otherwise
+ */
+	public int softDeleteReply(int replyId, String authorUsername) {
+		String update = "UPDATE Replies SET isDeleted = TRUE "
+				+ "WHERE replyId = ? AND authorUsername = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(update)) {
+			pstmt.setInt(1, replyId);
+			pstmt.setString(2, authorUsername);
+			return pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+/*******
+ * <p> Method: int updateReply(int replyId, String newContent, String authorUsername) </p>
+ *
+ * <p> Description: Updates the content of a non-deleted Reply, but only if the row belongs to
+ * {@code authorUsername}.  The author check and the isDeleted guard are both performed inside
+ * the WHERE clause, so an unprivileged user cannot overwrite someone else's reply and deleted
+ * replies cannot be edited.
+ *
+ * Returns the number of rows updated (1 on success; 0 if the reply does not exist, is
+ * soft-deleted, or the requester is not the author). </p>
+ *
+ * @param replyId        the replyId to update
+ * @param newContent     the replacement content; should be pre-validated by
+ *                       {@link recognizers.PostContentRecognizer}
+ * @param authorUsername the username of the student attempting the edit
+ * @return 1 if the update succeeded; 0 otherwise
+ */
+	public int updateReply(int replyId, String newContent, String authorUsername) {
+		String update = "UPDATE Replies SET content = ? "
+				+ "WHERE replyId = ? AND authorUsername = ? AND isDeleted = FALSE";
+		try (PreparedStatement pstmt = connection.prepareStatement(update)) {
+			pstmt.setString(1, newContent);
+			pstmt.setInt(2, replyId);
+			pstmt.setString(3, authorUsername);
+			return pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+/*******
+ * <p> Method: seedDefaultThread </p>
+ *
+ * <p> Description: Inserts the "General" discussion thread if it does not already exist.
+ * This method is called once from {@code FoundationsMain.start()} after the database tables
+ * have been created, ensuring that there is always at least one thread available for students
+ * to post into.  Using INSERT IGNORE (H2: INSERT INTO ... WHERE NOT EXISTS) means the call is
+ * safely idempotent — running it multiple times does not produce duplicate rows. </p>
+ *
+ * @throws SQLException if the INSERT statement fails for a reason other than the row already
+ *         existing
+ */
+	public void seedDefaultThread() throws SQLException {
+		String insertGeneral =
+				"MERGE INTO DiscussionThreads (title) KEY(title) VALUES (?)";
+		try (PreparedStatement pstmt = connection.prepareStatement(insertGeneral)) {
+			pstmt.setString(1, "General");
+			pstmt.executeUpdate();
+		}
+	}
+
+
+/*******
+ * <p> Method: int createPost(Post post) </p>
+ *
+ * <p> Description: Inserts a new Post row into the Posts table and returns the
+ * auto-generated postId.  The generated key is also written back into the Post object via
+ * {@code post.setPostId()} so the caller can reference it immediately (e.g., to display
+ * "Your post was created with ID: X" or to chain a reply).
+ *
+ * The method validates that the referenced threadId exists before attempting the INSERT.
+ * If the thread is not found a SQLException is thrown with a descriptive message rather than
+ * letting the foreign-key constraint produce a less readable error. </p>
+ *
+ * @param post  the Post object to persist; must have threadId, authorUsername, content, and
+ *              timestamp populated; postId may be 0 (it will be set by this method)
+ * @return the auto-generated postId assigned by the database
+ * @throws SQLException if the threadId does not exist, the INSERT fails, or no generated key
+ *         is returned
+ */
+	public int createPost(Post post) throws SQLException {
+
+		// Guard: reject posts aimed at a thread that does not exist
+		if (!doesThreadExist(post.getThreadId()))
+			throw new SQLException("createPost: threadId " + post.getThreadId()
+					+ " does not exist in DiscussionThreads.");
+
+		String insertPost =
+				"INSERT INTO Posts (threadId, authorUsername, content, timestamp, isDeleted) "
+				+ "VALUES (?, ?, ?, ?, FALSE)";
+
+		try (PreparedStatement pstmt = connection.prepareStatement(
+				insertPost, Statement.RETURN_GENERATED_KEYS)) {
+
+			pstmt.setInt(1,       post.getThreadId());
+			pstmt.setString(2,    post.getAuthorUsername());
+			pstmt.setString(3,    post.getContent());
+			pstmt.setTimestamp(4, Timestamp.valueOf(post.getTimestamp()));
+			pstmt.executeUpdate();
+
+			// Retrieve the auto-generated postId and write it back into the object
+			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+				if (generatedKeys.next()) {
+					int generatedPostId = generatedKeys.getInt(1);
+					post.setPostId(generatedPostId);
+					return generatedPostId;
+				} else {
+					throw new SQLException("createPost: INSERT succeeded but no generated key "
+							+ "was returned.");
+				}
+			}
+		}
+	}
+
+
+/*******
+ * <p> Method: int createReply(Reply reply) </p>
+ *
+ * <p> Description: Inserts a new Reply row into the Replies table and returns the
+ * auto-generated replyId.  The generated key is also written back into the Reply object via
+ * {@code reply.setReplyId()}.
+ *
+ * The method validates that the referenced postId exists before attempting the INSERT.
+ * If the post is not found a SQLException is thrown with a descriptive message.  Note that
+ * replies are allowed on soft-deleted posts (isDeleted = TRUE); the soft-delete flag only
+ * affects content visibility, not the ability to reply. </p>
+ *
+ * @param reply  the Reply object to persist; must have postId, authorUsername, content, and
+ *               timestamp populated; replyId may be 0 (it will be set by this method)
+ * @return the auto-generated replyId assigned by the database
+ * @throws SQLException if the postId does not exist, the INSERT fails, or no generated key
+ *         is returned
+ */
+	public int createReply(Reply reply) throws SQLException {
+
+		// Guard: reject replies aimed at a post that does not exist
+		if (!doesPostExist(reply.getPostId()))
+			throw new SQLException("createReply: postId " + reply.getPostId()
+					+ " does not exist in Posts.");
+
+		String insertReply =
+				"INSERT INTO Replies (postId, authorUsername, content, timestamp) "
+				+ "VALUES (?, ?, ?, ?)";
+
+		try (PreparedStatement pstmt = connection.prepareStatement(
+				insertReply, Statement.RETURN_GENERATED_KEYS)) {
+
+			pstmt.setInt(1,       reply.getPostId());
+			pstmt.setString(2,    reply.getAuthorUsername());
+			pstmt.setString(3,    reply.getContent());
+			pstmt.setTimestamp(4, Timestamp.valueOf(reply.getTimestamp()));
+			pstmt.executeUpdate();
+
+			// Retrieve the auto-generated replyId and write it back into the object
+			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+				if (generatedKeys.next()) {
+					int generatedReplyId = generatedKeys.getInt(1);
+					reply.setReplyId(generatedReplyId);
+					return generatedReplyId;
+				} else {
+					throw new SQLException("createReply: INSERT succeeded but no generated key "
+							+ "was returned.");
+				}
+			}
+		}
+	}
+
+
+/*******
+ * <p> Method: List<DiscussionThread>; getThreadList() </p>
+ *
+ * <p> Description: Returns a list of all DiscussionThread objects currently in the database,
+ * ordered by threadId ascending so that "General" (threadId = 1) always appears first.
+ * This list is used to populate the thread-selection ComboBox on the Create Post page. </p>
+ *
+ * @return a List of DiscussionThread objects; an empty list if no threads exist (should not
+ *         happen in normal operation after seedDefaultThread() has run)
+ */
+	public List<DiscussionThread> getThreadList() {
+		List<DiscussionThread> threads = new ArrayList<>();
+		String query = "SELECT threadId, title FROM DiscussionThreads ORDER BY threadId ASC";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				threads.add(new DiscussionThread(rs.getInt("threadId"),
+						rs.getString("title")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return threads;
+	}
+
+
+/*******
+ * <p> Method: boolean doesPostExist(int postId) </p>
+ *
+ * <p> Description: Returns true if a row with the given postId exists in the Posts table,
+ * regardless of its isDeleted flag.  Used by {@link #createReply(Reply)} to guard against
+ * replies to non-existent posts, and by the Controller to validate the Post ID the user
+ * types before attempting the INSERT. </p>
+ *
+ * @param postId  the postId to look up
+ * @return true if at least one row with that postId exists; false otherwise
+ */
+	public boolean doesPostExist(int postId) {
+		String query = "SELECT COUNT(*) FROM Posts WHERE postId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, postId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) return rs.getInt(1) > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+
+/*******
+ * <p> Method: boolean doesThreadExist(int threadId) </p>
+ *
+ * <p> Description: Returns true if a row with the given threadId exists in the
+ * DiscussionThreads table.  Used by {@link #createPost(Post)} to guard against posts aimed
+ * at non-existent threads before the foreign-key constraint fires. </p>
+ *
+ * @param threadId  the threadId to look up
+ * @return true if at least one row with that threadId exists; false otherwise
+ */
+	public boolean doesThreadExist(int threadId) {
+		String query = "SELECT COUNT(*) FROM DiscussionThreads WHERE threadId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, threadId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) return rs.getInt(1) > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 
@@ -150,7 +904,7 @@ public class Database {
  * 
  * <p> Description: If the user database has no rows, true is returned, else false.</p>
  * 
- * @return true if the database is empty, else it returns false
+ *  @return true if the database is empty, else it returns false
  * 
  */
 	public boolean isDatabaseEmpty() {
@@ -194,11 +948,13 @@ public class Database {
  * <p> Method: remove </p>
  * 
  * <p> Description: Removes the user with the matching userName. </p>
- * 
- * @return the number of user records in the database.
- * 
+ *
+ * @param userName the username of the user to remove
+ *
+ * @throws SQLException if there is an issue executing the SQL command
+ *
  */
-public void remove(String userName) throws SQLException 
+public void remove(String userName) throws SQLException
 {
 	String removeUser = "DELETE FROM userDB WHERE userName = ?";
 	try (PreparedStatement pstmt = connection.prepareStatement(removeUser)){
@@ -213,9 +969,11 @@ public void remove(String userName) throws SQLException
  * <p> Description: Returns and integer of the number of admins currently in the user database. </p>
  * 
  * @return the number of admin records in the database (users with adminRole = TRUE).
- * 
+ *
+ * @throws SQLException if there is an issue executing the SQL command
+ *
  */
-public int getNumAdmins() throws SQLException 
+public int getNumAdmins() throws SQLException
 {
 	String query = "SELECT COUNT(*) AS count FROM userDB WHERE adminRole = TRUE";
 	try {
@@ -233,10 +991,9 @@ public int getNumAdmins() throws SQLException
  * <p> Method: register(User user) </p>
  * 
  * <p> Description: Creates a new row in the database using the user parameter. </p>
+ * @param user registers a new user into the database.
  * 
  * @throws SQLException when there is an issue creating the SQL command or executing it.
- * 
- * @param user specifies a user object to be added to the database.
  * 
  */
 	public void register(User user) throws SQLException {
@@ -283,7 +1040,7 @@ public int getNumAdmins() throws SQLException
  *  <p> Method: List getUserList() </p>
  *  
  *  <P> Description: Generate an List of Strings, one for each user in the database,
- *  starting with "<Select User>" at the start of the list. </p>
+ *  starting with {@code <Select User>} at the start of the list. </p>
  *  
  *  @return a list of userNames found in the database.
  */
@@ -445,15 +1202,18 @@ public int getNumAdmins() throws SQLException
 	 * @param emailAddress specifies the email address for this new user.
 	 * 
 	 * @param role specified the role that this new user will play.
-	 * 
+	 *
+	 * @param expiresAt the expiration deadline for this invitation code
+	 *
 	 * @return the code of six characters so the new user can use it to securely setup an account.
-	 * 
+	 *
 	 */
 	// Generates a new invitation code and inserts it into the database.
 	// Default deadline = 24 hours 
 	// PURPOSE: New method that stores the expiration deadline in the DB.
 	// AdminHome will call THIS once we add the DatePicker.
-	public String generateInvitationCode(String emailAddress, String role, LocalDateTime expiresAt) {
+	public String generateInvitationCode(String emailAddress, String role,
+			LocalDateTime expiresAt) {
 	    String code = UUID.randomUUID().toString().substring(0, 6); // 6-char code
 
 	    // IMPORTANT: we now insert expiresAt so the invite has a deadline
@@ -471,8 +1231,12 @@ public int getNumAdmins() throws SQLException
 	    return code;
 	}
 	
-	// PURPOSE: Returns the expiration deadline stored for this invitation code.
-	// If code doesn't exist or expiresAt wasn't stored, returns null.
+	/**
+	 * Returns the expiration deadline for the given invitation code, or null if not found.
+	 *
+	 * @param code the invitation code to look up
+	 * @return the expiration time, or null if not found
+	 */
 	public LocalDateTime getInvitationExpiry(String code) {
 	    String query = "SELECT expiresAt FROM InvitationCodes WHERE code = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -488,8 +1252,12 @@ public int getNumAdmins() throws SQLException
 	    }
 	    return null;
 	}
-	// PURPOSE: True if invitation is expired. Also cleans up expired codes.
-	// This enforces: "one-time code + deadline" (deadline means it stops working).
+	/**
+	 * Returns true if the invitation code is expired, and removes it if so.
+	 *
+	 * @param code the invitation code to check
+	 * @return true if the code is expired, false otherwise
+	 */
 	public boolean isInvitationExpired(String code) {
 	    LocalDateTime expiry = getInvitationExpiry(code);
 	    // If expiry is missing (older records), treat as NOT expired (or decide to treat as expired).

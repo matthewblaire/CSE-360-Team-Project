@@ -147,6 +147,10 @@ public class ControllerAdminHome {
 	 * 
 	 * <p> Description: Protected method that is currently a stub informing the user that
 	 * this function has not yet been implemented. </p>
+	 *
+	 * @param ps the primary Stage for the application
+	 *
+	 * @param user the current logged-in User
 	 */
 	protected static void listUsers(Stage ps, User user) {
 //		System.out.println("\n*** WARNING ***: List Users Not Yet Implemented");
@@ -183,6 +187,8 @@ public class ControllerAdminHome {
 	 * if a properly email address is active.</p>
 	 * 
 	 * @param emailAddress	This String holds what is expected to be an email address
+	 *
+	 * @return true if the email address is invalid
 	 */
 	protected static boolean invalidEmailAddress(String emailAddress) {
 		if (emailAddress.length() == 0) {

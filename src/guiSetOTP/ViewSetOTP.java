@@ -34,49 +34,71 @@ public class ViewSetOTP {
 	private static double height = applicationMain.FoundationsMain.WINDOW_HEIGHT;
 
 	// GUI Area 1: Page title and user context
+	/** The label displaying the page title. */
 	protected static Label label_PageTitle = new Label();
+	/** The label displaying the current admin user details. */
 	protected static Label label_UserDetails = new Label();
+	/** The button to navigate to the account update page. */
 	protected static Button button_UpdateThisUser = new Button("Account Update");
 
 	// Separator
+	/** The horizontal line separating the header area from the main content. */
 	protected static Line line_Separator1 = new Line(20, 95, width-20, 95);
 
 	// GUI Area 2: Select user and generate OTP
+	/** The label prompting the admin to select a user. */
 	protected static Label label_SelectUser = new Label("Select a user to reset password:");
+	/** The combo box for selecting a user to reset password. */
 	protected static ComboBox<String> combobox_SelectUser = new ComboBox<String>();
 
+	/** The label displaying information about the selected user. */
 	protected static Label label_SelectedUserInfo = new Label();
+	/** The label for the one-time password field. */
 	protected static Label label_OTPLabel = new Label("One-Time Password:");
+	/** The text field displaying the generated one-time password. */
 	protected static TextField text_OTP = new TextField();
+	/** The button to generate a one-time password for the selected user. */
 	protected static Button button_GenerateOTP = new Button("Generate One-Time Password");
 
+	/** The label displaying instructions for sharing the one-time password. */
 	protected static Label label_Instructions = new Label(
 			"Share this one-time password with the user. They will use it to log in\n" +
 			"and will be prompted to set a new password.");
 
 	// Alert for success
+	/** The alert displayed when a one-time password is successfully generated. */
 	protected static Alert alertOTPGenerated = new Alert(AlertType.INFORMATION);
 
 	// Alert for no user selected
+	/** The alert displayed when no user is selected before generating an OTP. */
 	protected static Alert alertNoUserSelected = new Alert(AlertType.WARNING);
 
 	// Separator
+	/** The horizontal line separating the main content from the navigation buttons. */
 	protected static Line line_Separator2 = new Line(20, 525, width-20, 525);
 
 	// GUI Area 3: Navigation buttons
+	/** The button to return to the previous page. */
 	protected static Button button_Return = new Button("Return");
+	/** The button to log out of the application. */
 	protected static Button button_Logout = new Button("Logout");
+	/** The button to quit the application. */
 	protected static Button button_Quit = new Button("Quit");
 
 	// Class attributes
 	private static ViewSetOTP theView;
 	private static Database theDatabase = applicationMain.FoundationsMain.database;
 
+	/** The JavaFX Stage used to display this page. */
 	protected static Stage theStage;
+	/** The root pane that holds all GUI widgets. */
 	protected static Pane theRootPane;
+	/** The current user of the application. */
 	protected static User theUser;
 
+	/** The scene for the Set OTP page. */
 	public static Scene theSetOTPScene = null;
+	/** The username of the currently selected user. */
 	protected static String theSelectedUser = "";
 
 
@@ -84,6 +106,9 @@ public class ViewSetOTP {
 	 * <p> Method: displaySetOTP(Stage ps, User user) </p>
 	 *
 	 * <p> Description: Entry point to display the Set OTP page.</p>
+	 *
+	 * @param ps specifies the JavaFX Stage to be used for this GUI
+	 * @param user specifies the current User of the application
 	 */
 	public static void displaySetOTP(Stage ps, User user) {
 		theStage = ps;
@@ -192,6 +217,16 @@ public class ViewSetOTP {
 		l.setLayoutY(y);
 	}
 
+	/** Initializes the standard fields for a button.
+	 *
+	 * @param b		The Button object to be initialized
+	 * @param ff	The font to be used
+	 * @param f		The size of the font to be used
+	 * @param w		The width of the Button
+	 * @param p		The alignment (e.g. left, centered, or right)
+	 * @param x		The location from the left edge (x axis)
+	 * @param y		The location from the top (y axis)
+	 */
 	protected static void setupButtonUI(Button b, String ff, double f, double w, Pos p, double x, double y) {
 		b.setFont(Font.font(ff, f));
 		b.setMinWidth(w);
@@ -200,6 +235,15 @@ public class ViewSetOTP {
 		b.setLayoutY(y);
 	}
 
+	/** Initializes the standard fields for a combo box.
+	 *
+	 * @param c		The ComboBox object to be initialized
+	 * @param ff	The font to be used
+	 * @param f		The size of the font to be used
+	 * @param w		The width of the ComboBox
+	 * @param x		The location from the left edge (x axis)
+	 * @param y		The location from the top (y axis)
+	 */
 	protected static void setupComboBoxUI(ComboBox<String> c, String ff, double f, double w, double x, double y) {
 		c.setStyle("-fx-font: " + f + " " + ff + ";");
 		c.setMinWidth(w);
