@@ -17,4 +17,7 @@ package guiFirstAdmin;
 
 public class ModelFirstAdmin {
 
+	/** Private constructor to prevent instantiation. */
+	private ModelFirstAdmin() {}
+
 }

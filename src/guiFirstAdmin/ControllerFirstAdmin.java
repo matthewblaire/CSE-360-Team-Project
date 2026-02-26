@@ -3,7 +3,6 @@ package guiFirstAdmin;
 import java.sql.SQLException;
 import database.Database;
 import entityClasses.User;
-import guiNewAccount.ViewNewAccount;
 import javafx.stage.Stage;
 import recognizers.PasswordRecognizer;
 import recognizers.UserNameRecognizer;
@@ -47,7 +46,8 @@ public class ControllerFirstAdmin {
 	private static String adminPassword2 = "";
     private static String adminFirstName = "";
     private static String adminLastName = "";
-	protected static Database theDatabase = applicationMain.FoundationsMain.database;		
+	/** Reference for the in-memory database so this package has access. */
+	protected static Database theDatabase = applicationMain.FoundationsMain.database;
 
 	/*-********************************************************************************************
 
@@ -104,6 +104,7 @@ public class ControllerFirstAdmin {
 	 * 
 	 */
 	protected static void setAdminFirstName() { adminFirstName = ViewFirstAdmin.text_AdminFirstName.getText(); }
+	/** <p> Setter method for Admin's last name. </p> */
 	protected static void setAdminLastName() {adminLastName = ViewFirstAdmin.text_AdminLastName.getText(); }
 	
 	/**********
@@ -112,7 +113,10 @@ public class ControllerFirstAdmin {
 	 * <p> Description: This method is called when the user presses the button to set up the Admin
 	 * account.  It start by trying to establish a new user and placing that user into the
 	 * database.  If that is successful, we proceed to the UserUpdate page.</p>
-	 * 
+	 *
+	 * @param ps the primary Stage for the application
+	 *
+	 * @param r an integer value used for routing purposes
 	 */
 	protected static void doSetupAdmin(Stage ps, int r) {
 		

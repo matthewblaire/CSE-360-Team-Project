@@ -55,10 +55,20 @@ public class User {
      * @param r2 specifies the the Student attribute (TRUE or FALSE) for this user
      * 
      * @param r3 specifies the the Reviewer attribute (TRUE or FALSE) for this user
-     * 
+     *
+     * @param fn specifies the first name of this user
+     *
+     * @param mn specifies the middle name of this user
+     *
+     * @param ln specifies the last name of this user
+     *
+     * @param pfn specifies the preferred first name of this user
+     *
+     * @param ea specifies the email address of this user
+     *
      */
     // Constructor to initialize a new User object with userName, password, and role.
-    public User(String userName, String password, String fn, String mn, String ln, String pfn, 
+    public User(String userName, String password, String fn, String mn, String ln, String pfn,
     		String ea, boolean r1, boolean r2, boolean r3) {
         this.userName = userName;
         this.password = password;
@@ -198,12 +208,40 @@ public class User {
     // Gets the current value of the Student role attribute.
     public String getEmailAddress() { return emailAddress; }
 
+    /**
+     * Sets the userName for this user.
+     * @param s the new userName
+     */
     public void setUserName(String s) { userName = s; }
+    /**
+     * Sets the password for this user.
+     * @param s the new password
+     */
     public void setPassword(String s) { password = s; }
+    /**
+     * Sets the first name for this user.
+     * @param s the new first name
+     */
     public void setFirstName(String s) { firstName = s; }
+    /**
+     * Sets the middle name for this user.
+     * @param s the new middle name
+     */
     public void setMiddleName(String s) { middleName = s; }
+    /**
+     * Sets the last name for this user.
+     * @param s the new last name
+     */
     public void setLastName(String s) { lastName = s; }
+    /**
+     * Sets the preferred first name for this user.
+     * @param s the new preferred first name
+     */
     public void setPreferredFirstName(String s) { preferredFirstName = s; }
+    /**
+     * Sets the email address for this user.
+     * @param s the new email address
+     */
     public void setEmailAddress(String s) { emailAddress = s; }
 
     

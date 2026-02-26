@@ -17,4 +17,7 @@ package guiMultipleRoleDispatch;
 
 public class ModelMultipleRoleDispatch {
 
+	/** Private constructor to prevent instantiation. */
+	private ModelMultipleRoleDispatch() {}
+
 }

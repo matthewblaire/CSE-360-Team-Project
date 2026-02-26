@@ -53,45 +53,61 @@ public class ViewDeleteUser {
 	
 	// GUI Area 1: It informs the user about the purpose of this page, whose account is being used,
 	// and a button to allow this user to update the account settings.
+	/** The label displaying the page title. */
 	protected static Label label_PageTitle = new Label();
+	/** The label displaying the current user details. */
 	protected static Label label_UserDetails = new Label();
+	/** The button to navigate to the account update page. */
 	protected static Button button_UpdateThisUser = new Button("Account Update");
 	
 	// This is a separator and it is used to partition the GUI for various tasks
+	/** The horizontal line separating the header area from the main content. */
 	protected static Line line_Separator1 = new Line(20, 95, width-20, 95);
-	
+
 	// When no user has been selected, only Area 2a is shown.  If a user in the ComboBox in Area 1a
 	// has been specified, then Area 2b is made visible.
-	
+
 	// Area 2a: This allows the admin to select a user of the system as the first step in adding or
 	// removing a role.  The act of selecting a user causes the change is the GUI.  The Admin does
 	// not need to push a button to make this happen.
+	/** The label prompting the admin to select a user to delete. */
 	protected static Label label_SelectUser = new Label("Select a user to be deleted:");
+	/** The combo box for selecting a user to be deleted. */
 	protected static ComboBox <String> combobox_SelectUser = new ComboBox <String>();
 	
 	// Area 2b: When a user has been selected these widgets are shown and can be used
+	/** The label displaying the selected user's current roles. */
 	protected static Label label_CurrentRoles = new Label("Roles:");
+	/** The label displaying the selected user's name. */
 	protected static Label label_Name = new Label("Name:");
+	/** The label displaying the selected user's preferred first name. */
 	protected static Label label_PreferredFirstName = new Label("Preferred First Name:");
+	/** The label displaying the selected user's email address. */
 	protected static Label label_EmailAddress = new Label("Email Address:");
+	/** The label displaying the selected user's username. */
 	protected static Label label_Username = new Label("Username");
-	
+
+	/** The button to delete the selected user. */
 	protected static Button button_DeleteUser = new Button("Delete User");
 	
-	// this alert is used to confirm user deletion, shown after button_DeleteUser is clicked
+	/** The alert used to confirm user deletion after the delete button is clicked. */
 	protected static Alert alertConfirmUserDeletion = new Alert(AlertType.CONFIRMATION, "Content Text 1", ButtonType.YES, ButtonType.NO);
-	// This alert is used to tell the user why they cannot delete a given user account
+	/** The alert displayed when a user account cannot be deleted. */
 	protected static Alert alertUserDeletionError = new Alert(AlertType.ERROR);
 		
 	// This is a separator and it is used to partition the GUI for various tasks
+	/** The horizontal line separating the main content from the navigation buttons. */
 	protected static Line line_Separator4 = new Line(20, 525, width-20,525);
-	
+
 	// GUI Area 3: This is last of the GUI areas.  It is used for quitting the application, logging
 	// out, and on other pages a return is provided so the user can return to a previous page when
-	// the actions on that page are complete.  Be advised that in most cases in this code, the 
+	// the actions on that page are complete.  Be advised that in most cases in this code, the
 	// return is to a fixed page as opposed to the actual page that invoked the pages.
+	/** The button to return to the previous page. */
 	protected static Button button_Return = new Button("Return");
+	/** The button to log out of the application. */
 	protected static Button button_Logout = new Button("Logout");
+	/** The button to quit the application. */
 	protected static Button button_Quit = new Button("Quit");
 
 	// This is the end of the GUI objects for the page.
@@ -102,18 +118,25 @@ public class ViewDeleteUser {
 	// Reference for the in-memory database so this package has access
 	private static Database theDatabase = applicationMain.FoundationsMain.database;		
 
-	protected static Stage theStage;			// The Stage that JavaFX has established for us
-	protected static Pane theRootPane;			// The Pane that holds all the GUI widgets 
-	protected static User theUser;				// The current user of the application
+	/** The JavaFX Stage used to display this page. */
+	protected static Stage theStage;
+	/** The root pane that holds all GUI widgets. */
+	protected static Pane theRootPane;
+	/** The current user of the application. */
+	protected static User theUser;
+
+	/** The scene for the delete user page. */
+	public static Scene theAddRemoveRolesScene = null;
+	/** The username of the currently selected user to be deleted. */
+	protected static String theSelectedUser = "";
+	/** The role being added. */
+	protected static String theAddRole = "";
+	/** The role being removed. */
+	protected static String theRemoveRole = "";
 	
-	public static Scene theAddRemoveRolesScene = null;	// The Scene each invocation populates
-	protected static String theSelectedUser = "";	// The user whose roles are being updated
-	protected static String theAddRole = "";		// The role being added
-	protected static String theRemoveRole = "";		// The roles being removed
-	
-	// Reference to the change listener for the selected user
-	protected static ChangeListener<String> selectedUserChangeListener = (@SuppressWarnings("unused") ObservableValue<? extends String> observable, 
-    		@SuppressWarnings("unused") String oldvalue, 
+	/** The change listener that triggers when a different user is selected in the combo box. */
+	protected static ChangeListener<String> selectedUserChangeListener = (@SuppressWarnings("unused") ObservableValue<? extends String> observable,
+    		@SuppressWarnings("unused") String oldvalue,
     		@SuppressWarnings("unused") String newValue) -> {ControllerDeleteUser.doSelectUser();};
 
 
@@ -188,7 +211,7 @@ public class ViewDeleteUser {
 	 * This method determines the location, size, font, color, and change and event handlers for
 	 * each GUI object. </p>
 	 * 
-	 * This is a singleton, so this is performed just one.  Subsequent uses fill in the changeable
+	 * <p> This is a singleton, so this is performed just one.  Subsequent uses fill in the changeable
 	 * fields using the displayAddRempoveRoles method.</p>
 	 * 
 	 */

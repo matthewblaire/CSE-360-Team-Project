@@ -33,15 +33,23 @@ public class ViewUserList {
 	// These are the application values required by the user interface
 	private static double width = applicationMain.FoundationsMain.WINDOW_WIDTH;
 	private static double height = applicationMain.FoundationsMain.WINDOW_HEIGHT;
+	/** The label displaying the page title. */
 	protected static Label label_PageTitle = new Label();
+	/** The line separator between the header area and the main content area. */
 	protected static Line line_Separator1 = new Line(20, 95, width-20, 95);
+	/** The line separator between the main content area and the bottom button area. */
 	protected static Line line_Separator4 = new Line(20, 525, width-20,525);
+	/** The button to return to the admin home page. */
 	protected static Button button_Return = new Button("Return");
 	// Reference for the in-memory database so this package has access
 	private static Database theDatabase = applicationMain.FoundationsMain.database;
+	/** The JavaFX Stage used to display this page. */
 	protected static Stage theStage;			// The Stage that JavaFX has established for us
-	protected static Pane theRootPane;			// The Pane that holds all the GUI widgets 
+	/** The root Pane that holds all the GUI widgets. */
+	protected static Pane theRootPane;			// The Pane that holds all the GUI widgets
+	/** The current user of the application. */
 	protected static User theUser;				// The current user of the application
+	/** The Scene used to display the user list page. */
 	public static Scene theUserListScene = null;	// The Scene each invocation populates
 
 
@@ -50,6 +58,7 @@ public class ViewUserList {
 	Constructors
 	
 	*/
+	/** Creates a new ViewUserList and initializes the GUI layout. */
 	public ViewUserList() {
 		// Create the Pane for the list of widgets and the Scene for the window
 		theRootPane = new Pane();
@@ -82,9 +91,6 @@ public class ViewUserList {
 		theUser = user;
 		theStage = ps;
 
-		// Create an instance to initialize static attributes
-		ViewUserList theView = new ViewUserList();
-		
 		// Clear the view
 		ViewUserList.theRootPane.getChildren().clear();
 		

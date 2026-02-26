@@ -26,30 +26,42 @@ public class ViewResetPassword {
 	private static double width = applicationMain.FoundationsMain.WINDOW_WIDTH;
 	private static double height = applicationMain.FoundationsMain.WINDOW_HEIGHT;
 
-	// GUI Elements
+	/** The label for the page title. */
 	protected static Label label_PageTitle = new Label("Set New Password");
+	/** The label displaying instructions for resetting the password. */
 	protected static Label label_Instructions = new Label(
 			"Your password has been reset by an administrator.\n" +
 			"Please enter a new password below.");
+	/** The label displaying the current username. */
 	protected static Label label_Username = new Label();
 
+	/** The password field for entering the new password. */
 	protected static PasswordField text_Password1 = new PasswordField();
+	/** The password field for confirming the new password. */
 	protected static PasswordField text_Password2 = new PasswordField();
+	/** The button to submit the new password. */
 	protected static Button button_SetPassword = new Button("Set Password");
+	/** The button to quit the application. */
 	protected static Button button_Quit = new Button("Quit");
 
-	// Alerts
+	/** The alert displayed when the two passwords do not match. */
 	protected static Alert alertPasswordMismatch = new Alert(AlertType.ERROR);
+	/** The alert displayed when the password field is empty. */
 	protected static Alert alertPasswordEmpty = new Alert(AlertType.ERROR);
+	/** The alert displayed when the password does not meet validity requirements. */
 	protected static Alert alertPasswordInvalid = new Alert(AlertType.ERROR);
+	/** The alert displayed when the password has been successfully updated. */
 	protected static Alert alertPasswordSet = new Alert(AlertType.INFORMATION);
 
 	// Class attributes
 	private static ViewResetPassword theView;
+	/** The Stage that JavaFX has established for this view. */
 	protected static Stage theStage;
 	private static Pane theRootPane;
+	/** The username of the user resetting their password. */
 	protected static String theUsername;
 
+	/** The Scene for the reset password page. */
 	public static Scene theResetPasswordScene = null;
 
 
