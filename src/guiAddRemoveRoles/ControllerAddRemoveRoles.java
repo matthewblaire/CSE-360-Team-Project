@@ -78,7 +78,6 @@ public class ControllerAddRemoveRoles {
 		// Clear what had been displayed
 		ViewAddRemoveRoles.theRootPane.getChildren().clear();
 		
-		// Defermine which of the two views to show to the user
 		if (ViewAddRemoveRoles.theSelectedUser.compareTo("<Select a User>") == 0) {
 			// Only show the request to select a user to be updated and the ComboBox
 			ViewAddRemoveRoles.theRootPane.getChildren().addAll(

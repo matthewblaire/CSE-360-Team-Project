@@ -167,7 +167,6 @@ public class ControllerFirstAdmin {
 		
 		
 		// -- ALL FIELDS VALIDATED -- 
-		// Create the user and proceed to the user home page
     	User user = new User(adminUsername, adminPassword1, adminFirstName, "", adminLastName, "", "", true, false, 
     			false);
         try {
