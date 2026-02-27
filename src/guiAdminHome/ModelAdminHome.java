@@ -17,4 +17,7 @@ package guiAdminHome;
 
 public class ModelAdminHome {
 
+	/** Private constructor to prevent instantiation. */
+	private ModelAdminHome() {}
+
 }

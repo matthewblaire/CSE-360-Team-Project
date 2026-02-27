@@ -55,8 +55,9 @@ public class ViewMultipleRoleDispatch {
 	// GUI Area 2: This area consists of a label to ask the user what roles to place, a ComboBox 
 	// so the user can select the role, and a button to perform that role.
 	private static Label label_WhichRole = new Label("Which role do you wish to play:");
+	/** The combo box for selecting which role to play. */
 	protected static ComboBox <String> combobox_SelectRole = new ComboBox <String>();
-	private static Button button_PerformRole = new Button("Perform Role");		
+	private static Button button_PerformRole = new Button("Perform Role");
 	
 	// This is a separator and it is used to partition the GUI for various tasks
 	private static Line line_Separator4 = new Line(20, 525, width-20,525);
@@ -77,9 +78,11 @@ public class ViewMultipleRoleDispatch {
 	// Reference for the in-memory database so this package has access
 	private static Database theDatabase = applicationMain.FoundationsMain.database;
 
-	protected static Stage theStage;			// The Stage that JavaFX has established for us
-	private static Pane theRootPane;			// The Pane that holds all the GUI widgets 
-	protected static User theUser;				// The current user of the application
+	/** The Stage that JavaFX has established for us. */
+	protected static Stage theStage;
+	private static Pane theRootPane;			// The Pane that holds all the GUI widgets
+	/** The current user of the application. */
+	protected static User theUser;
 
 	private static Scene theMultipleRoleDispatchScene = null;	
 
@@ -90,6 +93,12 @@ public class ViewMultipleRoleDispatch {
 
 	 */
 
+	/**
+	 * Displays the multiple role dispatch page for the given user.
+	 *
+	 * @param ps the primary Stage for this application
+	 * @param user the currently logged-in User
+	 */
 	public static void displayMultipleRoleDispatch(Stage ps, User user) {
 		
 		// Establish the references to the GUI and the current user

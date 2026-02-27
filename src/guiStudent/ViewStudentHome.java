@@ -45,24 +45,40 @@ public class ViewStudentHome {
 	
 	// GUI Area 1: It informs the user about the purpose of this page, whose account is being used,
 	// and a button to allow this user to update the account settings
+	/** The label displaying the page title. */
 	protected static Label label_PageTitle = new Label();
+	/** The label displaying the current user details. */
 	protected static Label label_UserDetails = new Label();
+	/** The button to navigate to the account update page. */
 	protected static Button button_UpdateThisUser = new Button("Account Update");
-	
+
 	// This is a separator and it is used to partition the GUI for various tasks
+	/** The line separator between the header area and the main content area. */
 	protected static Line line_Separator1 = new Line(20, 95, width-20, 95);
 
-	// GUI ARea 2: This is a stub, so there are no widgets here.  For an actual role page, this are
-	// would contain the widgets needed for the user to play the assigned role.
+	// GUI Area 2: Discussion system entry points — Phase 2 functionality.
+	// These four buttons let students create posts/replies and use the READ operations:
+	// Browse Posts (by thread), My Posts (own posts with unread counts), Search Posts.
+	/** The button that navigates to the Create Post / Reply page. */
+	protected static Button button_CreatePost  = new Button("Create Post / Reply");
+	/** The button that navigates to the Browse Posts page. */
+	protected static Button button_BrowsePosts = new Button("Browse Posts");
+	/** The button that navigates to the My Posts page. */
+	protected static Button button_MyPosts     = new Button("My Posts");
+	/** The button that navigates to the Search Posts page. */
+	protected static Button button_SearchPosts = new Button("Search Posts");
 	
 	
 	
 	// This is a separator and it is used to partition the GUI for various tasks
+	/** The line separator between the main content area and the bottom button area. */
 	protected static Line line_Separator4 = new Line(20, 525, width-20,525);
-	
+
 	// GUI Area 3: This is last of the GUI areas.  It is used for quitting the application and for
 	// logging out.
+	/** The button to log out the current user. */
 	protected static Button button_Logout = new Button("Logout");
+	/** The button to quit the application. */
 	protected static Button button_Quit = new Button("Quit");
 
 	// This is the end of the GUI objects for the page.
@@ -74,12 +90,16 @@ public class ViewStudentHome {
 	// Reference for the in-memory database so this package has access
 	private static Database theDatabase = applicationMain.FoundationsMain.database;
 
-	protected static Stage theStage;			// The Stage that JavaFX has established for us	
+	/** The JavaFX Stage used to display this page. */
+	protected static Stage theStage;			// The Stage that JavaFX has established for us
+	/** The root Pane that holds all the GUI widgets. */
 	protected static Pane theRootPane;			// The Pane that holds all the GUI widgets
+	/** The current logged-in User. */
 	protected static User theUser;				// The current logged in User
-	
+
 
 	private static Scene theViewStudentHomeScene;	// The shared Scene each invocation populates
+	/** The role identifier for the student role (Admin: 1; Student: 2; Staff: 3). */
 	protected static final int theRole = 2;		// Admin: 1; Student: 2; Staff: 3
 
 	/*-*******************************************************************************************
@@ -163,9 +183,18 @@ public class ViewStudentHome {
 		setupButtonUI(button_UpdateThisUser, "Dialog", 18, 170, Pos.CENTER, 610, 45);
 		button_UpdateThisUser.setOnAction((_) -> {ControllerStudentHome.performUpdate(); });
 		
-		// GUI Area 2
-		
-			// This is a stub, so this area is empty
+		// GUI Area 2 — Discussion system navigation buttons (Phase 2)
+		setupButtonUI(button_CreatePost,  "Dialog", 18, 300, Pos.CENTER, 250, 160);
+		button_CreatePost.setOnAction((_) -> { ControllerStudentHome.goToCreatePost(); });
+
+		setupButtonUI(button_BrowsePosts, "Dialog", 18, 300, Pos.CENTER, 250, 220);
+		button_BrowsePosts.setOnAction((_) -> { ControllerStudentHome.goToBrowsePosts(); });
+
+		setupButtonUI(button_MyPosts,     "Dialog", 18, 300, Pos.CENTER, 250, 280);
+		button_MyPosts.setOnAction((_) -> { ControllerStudentHome.goToMyPosts(); });
+
+		setupButtonUI(button_SearchPosts, "Dialog", 18, 300, Pos.CENTER, 250, 340);
+		button_SearchPosts.setOnAction((_) -> { ControllerStudentHome.goToSearchPosts(); });
 		
 		
 		// GUI Area 3
@@ -180,6 +209,7 @@ public class ViewStudentHome {
 		// Place all of the widget items into the Root Pane's list of children
          theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
+			button_CreatePost, button_BrowsePosts, button_MyPosts, button_SearchPosts,
 	        line_Separator4, button_Logout, button_Quit);
 }
 	

@@ -48,10 +48,13 @@ public class ViewUserLogin {
 	private static Label label_Subtitle = new Label(
 			"Sign in to your account or use an invitation code to create a new one.");
 
+	/** The alert displayed when the username or password is invalid. */
 	protected static Alert alertUsernamePasswordError = new Alert(AlertType.INFORMATION);
 
 	// Login fields
+	/** The text field for entering the username. */
 	protected static TextField text_Username = new TextField();
+	/** The password field for entering the user password. */
 	protected static PasswordField text_Password = new PasswordField();
 	private static Button button_Login = new Button("Log In");
 
@@ -61,7 +64,9 @@ public class ViewUserLogin {
 
 	private static Button button_Quit = new Button("Quit");
 
+	/** The JavaFX Stage used to display this page. */
 	private static Stage theStage;
+	/** The Scene used to display the user login page. */
 	public static Scene theUserLoginScene = null;
 
 	private static ViewUserLogin theView = null;
@@ -73,6 +78,14 @@ public class ViewUserLogin {
 
 	 *********************************************************************************************/
 
+	/**
+	 * <p> Method: displayUserLogin(Stage ps) </p>
+	 *
+	 * <p> Description: This method is the single entry point from outside this package to cause
+	 * the User Login page to be displayed. </p>
+	 *
+	 * @param ps specifies the JavaFX Stage to be used for this GUI and its methods
+	 */
 	public static void displayUserLogin(Stage ps) {
 
 		// Establish the references to the GUI. There is no current user yet.

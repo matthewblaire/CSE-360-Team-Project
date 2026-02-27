@@ -53,29 +53,38 @@ public class ViewFirstAdmin {
 			new Label("Welcome! Since no accounts exist yet, please create the first "
 					+ "administrator account to get started.");
 
+	/** The label displaying error information to the user. */
 	protected static Label label_ErrorInfo = new Label();
 
+	/** The text field for entering the admin username. */
 	protected static TextField text_AdminUsername = new TextField();
+	/** The password field for entering the admin password. */
 	protected static PasswordField text_AdminPassword1 = new PasswordField();
+	/** The password field for confirming the admin password. */
 	protected static PasswordField text_AdminPassword2 = new PasswordField();
 
+	/** The text field for entering the admin first name. */
 	protected static TextField text_AdminFirstName = new TextField();
+	/** The text field for entering the admin last name. */
 	protected static TextField text_AdminLastName = new TextField();
 
 	private static Button button_AdminSetup = new Button("Create Account");
 
 	// This alert is used should the user enter two passwords that do not match
+	/** The alert displayed when the username or password is invalid. */
 	protected static Alert alertUsernamePasswordError = new Alert(AlertType.INFORMATION);
 
 	// This button allow the user to abort creating the first admin account and terminate
 	private static Button button_Quit = new Button("Quit");
 
 	// These attributes are used to configure the page and populate it with this user's information
+	/** The JavaFX Stage used to display this page. */
 	protected static Stage theStage;
 	private static Scene theFirstAdminScene = null;
 	private static final int theRole = 1;		// Admin: 1; Student: 2; Staff: 3
 
 	// This alert is used should the user enter an invalid password
+	/** The alert displayed when the password does not meet requirements. */
 	protected static Alert alertPasswordError = new Alert(AlertType.INFORMATION);
 
 	/*-********************************************************************************************

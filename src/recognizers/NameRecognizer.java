@@ -4,7 +4,11 @@ package recognizers;
  * This class contains the methods necessary to recognize a valid first, middle, or last name.
  */
 public class NameRecognizer {
-	
+
+	/** Private constructor to prevent instantiation. */
+	private NameRecognizer() {}
+
+	/** The maximum allowed length for a name. */
 	public static int MAX_NAME_LENGTH = 50;
 
 	/**
@@ -12,8 +16,8 @@ public class NameRecognizer {
 	 * Description: This method evaluates a string as a valid name. If the string is not empty, has an appropriate
 	 * length, and does not contain any special characters except hyphens, the method will return an empty string.
 	 * If not, a specific error message will be returned.
-	 * @param name
-	 * @return errorMessage
+	 * @param name the name string to validate
+	 * @return errorMessage an empty string if valid, or a description of the error
 	 */
 	public static String evaluateName(String name) {
 		

@@ -40,6 +40,63 @@ public class ControllerStudentHome {
 	}
 
 	/**********
+	 * <p> Method: goToCreatePost() </p>
+	 *
+	 * <p> Description: Navigates the student to the Create Post / Reply page (guiCreatePost)
+	 * where they can submit a new post to a discussion thread or reply to an existing post.
+	 * This satisfies the Phase 2 user story: "As a student, I can post statements and questions
+	 * and receive replies so I can benefit from the insights and ideas of others." </p>
+	 */
+	protected static void goToCreatePost() {
+		guiCreatePost.ViewCreatePost.displayCreatePost(ViewStudentHome.theStage,
+				ViewStudentHome.theUser);
+	}
+
+
+	/**********
+	 * <p> Method: goToBrowsePosts() </p>
+	 *
+	 * <p> Description: Navigates the student to the Browse Posts page (guiViewPosts) where
+	 * they can read all non-deleted posts in any discussion thread, see reply counts and unread
+	 * indicators, and view the full reply list for any selected post.
+	 * This satisfies the Phase 2 user story: "As a student, I can browse posts others have
+	 * made so I can learn from and contribute to ongoing discussions." </p>
+	 */
+	protected static void goToBrowsePosts() {
+		guiViewPosts.ViewViewPosts.displayViewPosts(ViewStudentHome.theStage,
+				ViewStudentHome.theUser);
+	}
+
+
+	/**********
+	 * <p> Method: goToMyPosts() </p>
+	 *
+	 * <p> Description: Navigates the student to the My Posts page (guiMyPosts) where they
+	 * can see all of their own posts with per-post reply counts and unread reply counts.
+	 * This satisfies the Phase 2 user story: "As a student, I can see which posts have been
+	 * replied to and which replies have not been read by me." </p>
+	 */
+	protected static void goToMyPosts() {
+		guiMyPosts.ViewMyPosts.displayMyPosts(ViewStudentHome.theStage,
+				ViewStudentHome.theUser);
+	}
+
+
+	/**********
+	 * <p> Method: goToSearchPosts() </p>
+	 *
+	 * <p> Description: Navigates the student to the Search Posts page (guiSearchPosts) where
+	 * they can search all posts by keyword with an optional thread filter.
+	 * This satisfies the Phase 2 user story: "As a student, I can search for posts to quickly
+	 * find help on a specific topic." </p>
+	 */
+	protected static void goToSearchPosts() {
+		guiSearchPosts.ViewSearchPosts.displaySearchPosts(ViewStudentHome.theStage,
+				ViewStudentHome.theUser);
+	}
+
+
+	/**********
 	 * <p> Method: performUpdate() </p>
 	 * 
 	 * <p> Description: This method directs the user to the User Update Page so the user can change

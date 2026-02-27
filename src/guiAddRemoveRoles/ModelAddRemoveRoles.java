@@ -17,4 +17,7 @@ package guiAddRemoveRoles;
 
 public class ModelAddRemoveRoles {
 
+	/** Private constructor to prevent instantiation. */
+	private ModelAddRemoveRoles() {}
+
 }

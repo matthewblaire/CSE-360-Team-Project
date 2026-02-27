@@ -47,27 +47,35 @@ public class ViewNewAccount {
 	// invitation to the potential user.
 	private static Label label_ApplicationTitle = 
 			new Label("Foundation Application Account Setup Page");
+    /** The label for the user account creation heading. */
     protected static Label label_NewUserCreation = new Label(" User Account Creation.");
+    /** The label prompting the user to enter a username and password. */
     protected static Label label_NewUserLine = new Label("Please enter a username and a password.");
+    /** The text field for entering the username. */
     protected static TextField text_Username = new TextField();
+    /** The password field for entering the password. */
     protected static PasswordField text_Password1 = new PasswordField();
+    /** The password field for confirming the password. */
     protected static PasswordField text_Password2 = new PasswordField();
+    /** The button to submit the new account setup. */
     protected static Button button_UserSetup = new Button("User Setup");
+    /** The text field for the invitation code. */
     protected static TextField text_Invitation = new TextField();
 
-	// This alert is used should the invitation code be invalid
+	/** The alert displayed when an invitation code is invalid. */
     protected static Alert alertInvitationCodeIsInvalid = new Alert(AlertType.INFORMATION);
 
-	// This alert is used should the user enter two passwords that do not match
+	/** The alert displayed when the two entered passwords do not match. */
 	protected static Alert alertUsernamePasswordError = new Alert(AlertType.INFORMATION);
 	
-	// This alert is used should the user enter an invalid UserName
+	/** The alert displayed when the user enters an invalid username. */
 	protected static Alert alertUsernameError = new Alert(AlertType.INFORMATION);
 	
-	// This alert is used should the user enter an invalid password 
+	/** The alert displayed when the user enters an invalid password. */
 	protected static Alert alertPasswordError = new Alert(AlertType.INFORMATION);
 
 	
+    /** The button to quit the application. */
     protected static Button button_Quit = new Button("Quit");
 
 	// These attributes are used to configure the page and populate it with this user's information
@@ -76,14 +84,20 @@ public class ViewNewAccount {
 	// Reference for the in-memory database so this package has access
 	private static Database theDatabase = applicationMain.FoundationsMain.database;		
 
+	/** The Stage that JavaFX has established for this view. */
 	protected static Stage theStage;			// The Stage that JavaFX has established for us
-	private static Pane theRootPane;			// The Pane that holds all the GUI widgets 
+	private static Pane theRootPane;			// The Pane that holds all the GUI widgets
+	/** The current logged-in user. */
 	protected static User theUser;				// The current logged in User
-   
+
+	/** The invitation code that links to an email address and role. */
     protected static String theInvitationCode;	// The invitation code links to an email address
     											// and a role for this user
+    /** The email address associated with the invitation code. */
     protected static String emailAddress;		// Established here for use by the controller
+    /** The role assigned to the new user via the invitation code. */
     protected static String theRole;			// Established here for use by the controller
+	/** The Scene for the new account setup page. */
 	public static Scene theNewAccountScene = null;	// Access to the User Update page's GUI Widgets
 	
 
