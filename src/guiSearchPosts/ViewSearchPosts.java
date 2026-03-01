@@ -6,6 +6,7 @@ import java.util.List;
 import database.Database;
 import entityClasses.DiscussionThread;
 import entityClasses.User;
+import guiMyPosts.ControllerMyPosts;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -220,6 +221,15 @@ public class ViewSearchPosts {
 		listview_Results.setPrefWidth(760);
 		listview_Results.setPrefHeight(296);
 
+		
+	    // Double click handler for Posts
+		listview_Results.setOnMouseClicked(event -> {
+	        if (event.getClickCount() == 2 && !listview_Results.getSelectionModel().isEmpty()) {
+	            Object selectedItem = listview_Results.getSelectionModel().getSelectedItem();
+	            ControllerSearchPosts.doHandlePostDoubleClick(selectedItem, theStage, theUser);
+	            event.consume();
+	        }
+	    });
 
 		// ============================ Area 3: Footer ============================
 

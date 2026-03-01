@@ -89,6 +89,10 @@ public class ViewCreatePost {
 	protected static TextArea textarea_PostContent = new TextArea();
 	/** Live character counter; turns red when the limit is exceeded. */
 	protected static Label label_CharCount    = new Label("0 / 2000");
+
+    protected static Label label_Title = new Label("Title:");
+    protected static TextField textField_Title = new TextField();
+	
 	/** Validates content and submits the post to the database. */
 	protected static Button button_SubmitPost = new Button("Submit Post");
 
@@ -239,15 +243,25 @@ public class ViewCreatePost {
 		combobox_Thread.setOnAction((_) -> { ControllerCreatePost.doSelectThread(); });
 
 		// Post content area
-		setupLabelUI(label_PostContent, "Arial", 14, 400, Pos.BASELINE_LEFT, 20, 148);
+		
+//	    setupLabelUI(label_Title, "Arial", 14, 400, Pos.BASELINE_LEFT, 20, 148);
+	    textField_Title.setFont(Font.font("Dialog", 13));
+	    textField_Title.setLayoutX(20);
+	    textField_Title.setLayoutY(150);
+	    textField_Title.setPrefWidth(760);
+	    textField_Title.setPrefHeight(20);
+	    textField_Title.setPromptText("Title");
+	    
+	    
+//		setupLabelUI(label_PostContent, "Arial", 14, 400, Pos.BASELINE_LEFT, 20, 148);
 
 		textarea_PostContent.setFont(Font.font("Dialog", 13));
 		textarea_PostContent.setLayoutX(20);
-		textarea_PostContent.setLayoutY(170);
+		textarea_PostContent.setLayoutY(180);
 		textarea_PostContent.setPrefWidth(760);
-		textarea_PostContent.setPrefHeight(108);
+		textarea_PostContent.setPrefHeight(120);
 		textarea_PostContent.setWrapText(true);
-		textarea_PostContent.setPromptText("Type your question or statement here…");
+		textarea_PostContent.setPromptText("Type your question or statement here (max 2000 characters)");
 		// Live char-count update on every keystroke
 		textarea_PostContent.textProperty().addListener((_, _, newVal) ->
 			ControllerCreatePost.doUpdateCharCount(newVal));
@@ -272,7 +286,7 @@ public class ViewCreatePost {
 		text_PostId.setLayoutX(100);
 		text_PostId.setLayoutY(384);
 		text_PostId.setPromptText("e.g. 3");
-
+				
 		// Reply content area
 		setupLabelUI(label_ReplyContent, "Arial", 14, 200, Pos.BASELINE_LEFT, 20, 420);
 
@@ -318,6 +332,8 @@ public class ViewCreatePost {
 				label_ReplyContent, textarea_ReplyContent,
 				label_ErrorFeedback, button_SubmitReply,
 				line_Separator4,
+//				label_Title,
+				textField_Title,
 				button_Logout, button_Quit);
 	}
 

@@ -207,6 +207,17 @@ public class ViewViewPosts {
 		listview_Posts.getSelectionModel().selectedIndexProperty()
 				.addListener((_, _, _) -> ControllerViewPosts.doSelectPost());
 
+		
+	    // Double click handler for Posts
+	    listview_Posts.setOnMouseClicked(event -> {
+	        if (event.getClickCount() == 2 && !listview_Posts.getSelectionModel().isEmpty()) {
+	            Object selectedItem = listview_Posts.getSelectionModel().getSelectedItem();
+	            ControllerViewPosts.doHandlePostDoubleClick(selectedItem, theStage, theUser);
+	            event.consume();
+	        }
+	    });
+		
+		
 		// Replies section
 		setupLabelUI(label_RepliesTitle, "Arial", 14, width, Pos.BASELINE_LEFT, 20, 342);
 

@@ -6,7 +6,11 @@ import java.util.List;
 import database.Database;
 import entityClasses.DiscussionThread;
 import entityClasses.Post;
+import entityClasses.User;
+import guiMyPosts.ViewMyPosts;
+import guiPost.ViewPost;
 import javafx.collections.FXCollections;
+import javafx.stage.Stage;
 
 /*******
  * <p> Title: ControllerSearchPosts Class. </p>
@@ -99,6 +103,13 @@ public class ControllerSearchPosts {
 	}
 
 
+	public static void doHandlePostDoubleClick(Object selectedItem, Stage ps, User user) {
+		int idx = ViewSearchPosts.listview_Results.getSelectionModel().getSelectedIndex();
+		if (idx < 0 || idx >= resultPostIds.size()) return;
+		int postId = resultPostIds.get(idx);
+		ViewPost.displayPost(ps, user, postId);// displayPost(Stage ps, User user, Post post)
+	}
+	
 	/**********
 	 * <p> Method: performReturn() </p>
 	 *
