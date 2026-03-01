@@ -72,6 +72,7 @@ public class ControllerCreatePost {
 	protected static void doCreatePost() {
 
 		// Step 1: read the content the student has typed
+		String title = ViewCreatePost.textField_Title.getText();
 		String content = ViewCreatePost.textarea_PostContent.getText();
 
 		// Step 2: validate the content using the recognizer
@@ -93,6 +94,7 @@ public class ControllerCreatePost {
 		Post post = new Post(
 				selectedThread.getThreadId(),
 				ViewCreatePost.theUser.getUserName(),
+				title,
 				content,
 				LocalDateTime.now());
 
