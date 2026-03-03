@@ -17,6 +17,9 @@ import javafx.stage.Stage;
 import entityClasses.Post;
 import entityClasses.Reply;
 import entityClasses.User;
+import guiReply.ControllerReply;
+import guiReply.ViewNewReply;
+import guiReply.ViewReply;
 import guiViewPosts.ViewViewPosts;
 
 import java.time.LocalDateTime;
@@ -110,7 +113,7 @@ public class ViewPost {
         populatePostDetails();
         
         // Load and display replies
-//        loadReplies();
+        loadReplies();
         
         label_UserDetails.setText("User: " + theUser.getUserName());
         
@@ -179,34 +182,33 @@ public class ViewPost {
 
         // Action buttons at the bottom of post
         setupButtonUI(button_Reply, "Dialog", 18, 100, Pos.CENTER, 20, 750);
-//        button_Reply.setOnAction(_ -> {
-//            // Check if reply input is already showing
-//            boolean alreadyShowing = false;
-//            for (javafx.scene.Node node : repliesContainer.getChildren()) {
-//                if (node instanceof ViewNewReply) {
-//                    alreadyShowing = true;
-//                    break;
-//                }
-//            }
-//            
-//            if (!alreadyShowing) {
-//                // Create and add the new reply input at the top of replies section
-//                ViewNewReply newReplyView = new ViewNewReply(theStage, theUser, currentPost, repliesContainer);
-//                repliesContainer.getChildren().add(newReplyView);
-//                // Wait for the layout to complete before scrolling
-//                try { Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();} 
-//                javafx.application.Platform.runLater(() -> {
-//                    javafx.application.Platform.runLater(() -> {
-//                        scrollPane_Replies.setVvalue(1.0); // Scroll to bottom to show the new reply input
-//                    });
-//                });
-//            }
-//        });
+        button_Reply.setOnAction(_ -> {
+            // Check if reply input is already showing
+            boolean alreadyShowing = false;
+            for (javafx.scene.Node node : repliesContainer.getChildren()) {
+                if (node instanceof ViewNewReply) {
+                    alreadyShowing = true;
+                    break;
+                }
+            }
+            
+            if (!alreadyShowing) {
+                // Create and add the new reply input at the top of replies section
+                ViewNewReply newReplyView = new ViewNewReply(theStage, theUser, currentPost, repliesContainer);
+                repliesContainer.getChildren().add(newReplyView);
+                // Wait for the layout to complete before scrolling
+                try { Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();} 
+                javafx.application.Platform.runLater(() -> {
+                    javafx.application.Platform.runLater(() -> {
+                        scrollPane_Replies.setVvalue(1.0); // Scroll to bottom to show the new reply input
+                    });
+                });
+            }
+        });
         
         // Action buttons at the bottom of post
-        if ((theUser.getUserName() == currentPost.getAuthorUsername() || 
-        		theUser.getNewStaffRole() || theUser.getAdminRole())
-        		&&((boolean)currentPost.isDeleted() != true)) {
+        if ((theUser.getUserName().equals(currentPost.getAuthorUsername()) || theUser.getNewStaffRole() || theUser.getAdminRole())
+        		&& !currentPost.isDeleted()) {
             setupButtonUI(button_Delete, "Dialog", 18, 100, Pos.CENTER, 620, 750);
             button_Delete.setOnAction(_ -> {
                 alert.setTitle("Confirmation Dialog");
@@ -222,8 +224,8 @@ public class ViewPost {
         
         
         
-        if (theUser.getUserName() == currentPost.getAuthorUsername()
-        		&&((boolean)currentPost.isDeleted() != true)) {
+        if (theUser.getUserName().equals(currentPost.getAuthorUsername())
+        		&&(currentPost.isDeleted() != true)) {
 
             button_Edit.setVisible(true);
             setupButtonUI(button_Edit, "Dialog", 18, 100, Pos.CENTER, 320, 750);
@@ -233,16 +235,16 @@ public class ViewPost {
                 button_Save_Edit.setVisible(true);
             });
             
-//            setupButtonUI(button_Delete, "Dialog", 18, 100, Pos.CENTER, 620, 750);
-//            button_Delete.setOnAction(_ -> {
-//                alert.setTitle("Confirmation Dialog");
-//                alert.setHeaderText("Please Confirm Deletion");
-//                alert.setContentText("Are you sure you want to delete this post?");
-//                Optional<ButtonType> result = alert.showAndWait();
-//                if (result.isPresent() && result.get() == ButtonType.OK) {
-//                    ControllerPost.performMarkPostDeleted(theStage, theUser, currentPost);
-//                }
-//            });
+            setupButtonUI(button_Delete, "Dialog", 18, 100, Pos.CENTER, 620, 750);
+            button_Delete.setOnAction(_ -> {
+                alert.setTitle("Confirmation Dialog");
+                alert.setHeaderText("Please Confirm Deletion");
+                alert.setContentText("Are you sure you want to delete this post?");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    ControllerPost.performMarkPostDeleted(theStage, theUser, currentPost);
+                }
+            });
             
             button_Save_Edit.setVisible(false);
             button_Save_Edit.setOnAction(_ -> {
@@ -315,33 +317,33 @@ public class ViewPost {
     }
     
     
-//	/**********
-//	 * Private local method to populate/load and reload post's replies details and GUI 
-//	 * 
-//	 */
-//    private static void loadReplies() {
-//        // Clear existing replies
-//        vbox_Replies.getChildren().clear();
-//        
-//        // Get replies from database
-//        List<Reply> replies = ControllerReply.performGetReplies(currentPost);
-//        
-//        if (replies != null && !replies.isEmpty()) {
-//            for (Reply reply : replies) {
-//                // Create a ReplyView for each reply and add to the VBox
-//            	ViewReply replyView = new ViewReply(reply, theUser, theStage, currentPost);
-//                vbox_Replies.getChildren().add(replyView);
-//            }
-//        } else {
-//            // Show a message when there are no replies
-//            Label noRepliesLabel = new Label("No replies yet. Click 'Reply' to be the first!");
-//            noRepliesLabel.setFont(Font.font("Arial", 14));
-//            noRepliesLabel.setStyle("-fx-text-fill: #7f8d8c; -fx-padding: 20px; -fx-alignment: center;");
-//            noRepliesLabel.setMaxWidth(Double.MAX_VALUE);
-//            noRepliesLabel.setAlignment(Pos.CENTER);
-//            vbox_Replies.getChildren().add(noRepliesLabel);
-//        }
-//    }
+	/**********
+	 * Private local method to populate/load and reload post's replies details and GUI 
+	 * 
+	 */
+    private static void loadReplies() {
+        // Clear existing replies
+        vbox_Replies.getChildren().clear();
+        
+        // Get replies from database
+        List<Reply> replies = ControllerReply.performGetReplies(currentPost);
+        
+        if (replies != null && !replies.isEmpty()) {
+            for (Reply reply : replies) {
+                // Create a ReplyView for each reply and add to the VBox
+            	ViewReply replyView = new ViewReply(reply, theUser, theStage, currentPost);
+                vbox_Replies.getChildren().add(replyView);
+            }
+        } else {
+            // Show a message when there are no replies
+            Label noRepliesLabel = new Label("No replies yet. Click 'Reply' to be the first!");
+            noRepliesLabel.setFont(Font.font("Arial", 14));
+            noRepliesLabel.setStyle("-fx-text-fill: #7f8d8c; -fx-padding: 20px; -fx-alignment: center;");
+            noRepliesLabel.setMaxWidth(Double.MAX_VALUE);
+            noRepliesLabel.setAlignment(Pos.CENTER);
+            vbox_Replies.getChildren().add(noRepliesLabel);
+        }
+    }
     
 	/**********
 	 * Private local method to initialize the standard fields for a label
