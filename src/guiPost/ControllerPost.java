@@ -154,16 +154,16 @@ public class ControllerPost {
 //    }
 //    
     
-//	/**********
-//	 * <p> Method: performLogout() </p>
-//	 * 
-//	 * <p> Description: Logs out the current user and returns to login screen
-//	 * 
-//	 */	
-//    public static void performLogout() {
-//        guiUserLogin.ViewUserLogin.displayUserLogin(ViewPosts.theStage);
-//    }
-//    
+	/**********
+	 * <p> Method: performLogout() </p>
+	 * 
+	 * <p> Description: Logs out the current user and returns to login screen
+	 * 
+	 */	
+    public static void performLogout(Stage stage) {
+        guiUserLogin.ViewUserLogin.displayUserLogin(stage);
+    }
+    
     
 	/**********
 	 * <p> Method: performQuit() </p>

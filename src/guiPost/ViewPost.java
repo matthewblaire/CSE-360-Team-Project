@@ -266,7 +266,7 @@ public class ViewPost {
         
         setupButtonUI(button_Logout, "Dialog", 18, 150, Pos.CENTER, 320, 810);
         button_Logout.setOnAction(_ -> { 
-//            ControllerPost.performLogout();
+            ControllerPost.performLogout(theStage);
         });
         
         setupButtonUI(button_Quit, "Dialog", 18, 150, Pos.CENTER, 620, 810);
