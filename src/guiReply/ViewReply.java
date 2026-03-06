@@ -76,12 +76,12 @@ public class ViewReply extends VBox {
 	 */	
     private void setupReplyView(Reply reply, User theUser) {
         // Reply author
-        Label label_Author = new Label("Replied by: " + reply.getAuthorUsername());
+        Label label_Author = new Label("Replied by: " + (reply.isDeleted() ? "[deleted]" : reply.getAuthorUsername()));
         label_Author.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         label_Author.setStyle("-fx-text-fill: #2c3e50;");
         
         // Reply content
-        Label label_Content = new Label((String) reply.getContent());
+        Label label_Content = new Label(reply.isDeleted() ? "This reply was deleted." : reply.getContent());
         label_Content.setFont(Font.font("Arial", 14));
         label_Content.setWrapText(true);
         label_Content.setMaxWidth(width - 40);

@@ -99,31 +99,36 @@ public class ControllerReply {
 	 * 
 	 */		
     public static void performUpdateReply(Reply reply, User user, String newContent, Stage stage, Post post) {
-//        // Verify ownership
-//        int replyUserId = (int) reply.getAttributes().get("userId");
-//        
-//        if (user.getUserId() != replyUserId) {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setTitle("Error");
-//            alert.setHeaderText("Authorization Error");
-//            alert.setContentText("You can only edit your own replies.");
-//            alert.showAndWait();
-//            return;
-//        }
-//        
-//        // Update in database
-//        Reply updatedReply = theDatabase.updateReply(reply, newContent);
-//        
-//        if (updatedReply != null) {
-//            // Refresh the post view to show updated reply
-//            ViewPost.displayPost(stage, user, post);
-//        } else {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setTitle("Error");
-//            alert.setHeaderText("Update Failed");
-//            alert.setContentText("Failed to update reply. Please try again.");
-//            alert.showAndWait();
-//        }
+    	
+    	
+    	// Verify ownership
+    	  boolean currentUserCanEditThisReply = reply.getAuthorUsername().equals(user.getUserName());
+    	  if (!currentUserCanEditThisReply)
+    	  {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Authorization Error");
+            alert.setContentText("You can only edit your own replies.");
+            alert.showAndWait();
+            return;
+    	  }
+    	  // try to update the reply in the database
+    	  boolean success = theDatabase.updateReply(reply.getReplyId(), newContent, user.getUserName()) == 1;
+    	  
+    	  // refresh the page on success or show an error on fail
+    	  if (success)
+    	  {
+    		  ViewPost.displayPost(stage, user, post.getPostId());
+    	  }
+    	  else
+    	  {
+	          Alert alert = new Alert(Alert.AlertType.ERROR);
+	          alert.setTitle("Error");
+	          alert.setHeaderText("Update Failed");
+	          alert.setContentText("Failed to update reply. Please try again.");
+	          alert.showAndWait();
+    	  }
+
     }
     
 	/**********
@@ -142,31 +147,29 @@ public class ControllerReply {
 	 */
     public static void performMarkReplyDeleted(Reply reply, User user, Stage stage, Post post) {
 //        // Verify ownership
-//        int replyUserId = (int) reply.getAttributes().get("userId");
-//        int replyId = (int) reply.getAttributes().get("id");
-//        
-//        if (user.getUserId() != replyUserId && !user.getAdminRole() && !user.getNewStaffRole()) {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setTitle("Error");
-//            alert.setHeaderText("Authorization Error");
-//            alert.setContentText("You can only delete your own replies.");
-//            alert.showAndWait();
-//            return;
-//        }
-//        
-//        // Mark as deleted in database
-//        boolean success = theDatabase.markReplyDeleted(replyId);
-//        
-//        if (success) {
-//            // Refresh the post view to show updated reply list
-//        	ViewPost.displayPost(stage, user, post);
-//        } else {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setTitle("Error");
-//            alert.setHeaderText("Delete Failed");
-//            alert.setContentText("Failed to delete reply. Please try again.");
-//            alert.showAndWait();
-//        }
+    	 boolean currentUserCanDeleteThisReply = reply.getAuthorUsername().equals(user.getUserName());
+    	 currentUserCanDeleteThisReply = (currentUserCanDeleteThisReply || (user.getAdminRole() || user.getNewStaffRole()));
+    	 if (!currentUserCanDeleteThisReply)
+    	 {
+    		 Alert alert = new Alert(Alert.AlertType.ERROR);
+	         alert.setTitle("Error");
+	         alert.setHeaderText("Authorization Error");
+	         alert.setContentText("You can only delete your own replies.");
+	         alert.showAndWait();
+	         return;
+    	 }
+    	 // Mark as deleted in database
+    	 boolean success = theDatabase.softDeleteReply(reply.getReplyId(), user.getUserName()) == 1;
+    	 if (success) {
+            // Refresh the post view to show updated reply list
+        	ViewPost.displayPost(stage, user, post.getPostId());
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Delete Failed");
+            alert.setContentText("Failed to delete reply. Please try again.");
+            alert.showAndWait();
+        }
     }
     
 }
