@@ -159,7 +159,7 @@ public class ViewReply extends VBox {
             }
             
             // Call controller to update reply
-//            ControllerReply.performUpdateReply(reply, theUser, newContent.trim(), theStage, post);
+            ControllerReply.performUpdateReply(reply, theUser, newContent.trim(), theStage, post);
         });
 
         button_Delete.setFont(Font.font("Arial", 12));
@@ -172,12 +172,12 @@ public class ViewReply extends VBox {
             alert.setContentText("Are you sure you want to delete this reply?");
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-//                ControllerReply.performMarkReplyDeleted(reply, theUser, theStage, post);
+                ControllerReply.performMarkReplyDeleted(reply, theUser, theStage, post);
             }
         });
 
         // Show buttons if user is the author and reply is not deleted
-        if (theUser.getUserName() == this.authorUsername && !this.isDeleted) {
+        if (theUser.getUserName().equals(this.authorUsername) && !this.isDeleted) {
             button_Edit.setVisible(true);
             buttonContainer.getChildren().addAll(button_Edit, button_Save_Edit);
         } else {
@@ -185,7 +185,7 @@ public class ViewReply extends VBox {
         }
         
         // Show deleted button if user is staff or admin and reply is not not deleted
-        if ((theUser.getUserName() == this.authorUsername || theUser.getAdminRole()|| theUser.getNewStaffRole()) && !this.isDeleted) {
+        if ((theUser.getUserName().equals(this.authorUsername) || theUser.getAdminRole()|| theUser.getNewStaffRole()) && !this.isDeleted) {
         	button_Delete.setVisible(true);
             buttonContainer.getChildren().addAll(button_Delete);
         } else {
