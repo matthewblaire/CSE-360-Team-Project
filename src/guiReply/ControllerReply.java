@@ -82,23 +82,23 @@ public class ControllerReply {
     }
     
     
-//	/**********
-//	 * <p> Method: performUpdateReply(Reply reply, User user, String newContent, Stage stage, Post post) </p>
-//	 * 
-//	 * <p> Description: Updates a reply after verifying ownership
-//	 * 
-//	 * @param reply object of the Reply to be updated
-//	 * 
-//	 * @param content string of the new reply content
-//	 * 
-//	 * @param user current user object
-//	 * 
-//	 * @param stage the gui stage to pass to view
-//	 * 
-//	 * @param post object that the reply is associated with
-//	 * 
-//	 */		
-//    public static void performUpdateReply(Reply reply, User user, String newContent, Stage stage, Post post) {
+	/**********
+	 * <p> Method: performUpdateReply(Reply reply, User user, String newContent, Stage stage, Post post) </p>
+	 * 
+	 * <p> Description: Updates a reply after verifying ownership
+	 * 
+	 * @param reply object of the Reply to be updated
+	 * 
+	 * @param content string of the new reply content
+	 * 
+	 * @param user current user object
+	 * 
+	 * @param stage the gui stage to pass to view
+	 * 
+	 * @param post object that the reply is associated with
+	 * 
+	 */		
+    public static void performUpdateReply(Reply reply, User user, String newContent, Stage stage, Post post) {
 //        // Verify ownership
 //        int replyUserId = (int) reply.getAttributes().get("userId");
 //        
@@ -124,23 +124,23 @@ public class ControllerReply {
 //            alert.setContentText("Failed to update reply. Please try again.");
 //            alert.showAndWait();
 //        }
-//    }
+    }
     
-//	/**********
-//	 * <p> Method: performMarkReplyDeleted(Reply reply, User user, Stage stage, Post post) </p>
-//	 * 
-//	 * <p> Description: Marks a reply as deleted after verifying ownership
-//	 * 
-//	 * @param reply object of the Reply to be marked
-//	 * 
-//	 * @param user current user object
-//	 * 
-//	 * @param stage the gui stage to pass to view
-//	 * 
-//	 * @param post object that the reply is associated with
-//	 * 
-//	 */
-//    public static void performMarkReplyDeleted(Reply reply, User user, Stage stage, Post post) {
+	/**********
+	 * <p> Method: performMarkReplyDeleted(Reply reply, User user, Stage stage, Post post) </p>
+	 * 
+	 * <p> Description: Marks a reply as deleted after verifying ownership
+	 * 
+	 * @param reply object of the Reply to be marked
+	 * 
+	 * @param user current user object
+	 * 
+	 * @param stage the gui stage to pass to view
+	 * 
+	 * @param post object that the reply is associated with
+	 * 
+	 */
+    public static void performMarkReplyDeleted(Reply reply, User user, Stage stage, Post post) {
 //        // Verify ownership
 //        int replyUserId = (int) reply.getAttributes().get("userId");
 //        int replyId = (int) reply.getAttributes().get("id");
@@ -167,6 +167,6 @@ public class ControllerReply {
 //            alert.setContentText("Failed to delete reply. Please try again.");
 //            alert.showAndWait();
 //        }
-//    }
+    }
     
 }
