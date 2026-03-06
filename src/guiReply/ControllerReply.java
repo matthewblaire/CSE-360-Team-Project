@@ -8,6 +8,8 @@ import entityClasses.User;
 import guiPost.ViewPost;
 import database.Database;
 
+import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import applicationMain.FoundationsMain;
@@ -26,44 +28,44 @@ public class ControllerReply {
     
     private static Database theDatabase = FoundationsMain.database;
     
-//	/**********
-//	 * <p> Method: performCreateReply(Stage stage, User user, Post post, String content) </p>
-//	 * 
-//	 * <p> Description: Creates a new reply and refreshes the post view
-//	 * 
-//	 * @param stage the gui stage to pass to view
-//	 * 
-//	 * @param user current user object
-//	 * 
-//	 * @param post object that the reply is associated with
-//	 * 
-//	 * @param content string of the new reply content
-//	 * 
-//	 */	
-//    public static void performCreateReply(Stage stage, User user, Post post, String content) {
-//        // Create new reply object
-//        Reply newReply = new Reply();
-//        newReply.setPostId((int) post.getAttributes().get("id"));
-//        newReply.setUserId(user.getUserId());
-//        newReply.setUserName(user.getUserName());
-//        newReply.setContent(content.trim());
-//        
-//        // Save to database
-//        Reply createdReply = theDatabase.createReply(newReply);
-//        
-//        if (createdReply != null) {
-//            System.out.println("Reply created successfully");
-//            // Refresh the post view to show the new reply
-//            ViewPost.displayPost(stage, user, post);
-//        } else {
-//            System.out.println("Error: Failed to create reply");
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setTitle("Error");
-//            alert.setHeaderText("Error");
-//            alert.setContentText("Failed to create reply. Please try again.");
-//            alert.showAndWait();
-//        }
-//    }
+	/**********
+	 * <p> Method: performCreateReply(Stage stage, User user, Post post, String content) </p>
+	 * 
+	 * <p> Description: Creates a new reply and refreshes the post view
+	 * 
+	 * @param stage the gui stage to pass to view
+	 * 
+	 * @param user current user object
+	 * 
+	 * @param post object that the reply is associated with
+	 * 
+	 * @param content string of the new reply content
+	 * @throws SQLException 
+	 * 
+	 */	
+    public static void performCreateReply(Stage stage, User user, Post post, String content) throws SQLException {
+        // Create new reply object
+        Reply newReply = new Reply();
+        newReply.setPostId(post.getPostId());
+        newReply.setContent(content);
+        newReply.getAuthorUsername(user.getUserName());
+        newReply.setTimestamp(LocalDateTime.now());
+        
+        // Save to database
+        int ret = theDatabase.createReply(newReply);
+        if (ret > 0) {
+            System.out.println("Reply created successfully");
+            // Refresh the post view to show the new reply
+            ViewPost.displayPost(stage, user, post.getPostId());
+        } else {
+            System.out.println("Error: Failed to create reply");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error");
+            alert.setContentText("Failed to create reply. Please try again.");
+            alert.showAndWait();
+        }
+    }
     
 	/**********
 	 * <p> Method: List<Reply> performGetReplies(Post post) </p>

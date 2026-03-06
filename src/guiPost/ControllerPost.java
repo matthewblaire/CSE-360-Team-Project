@@ -6,6 +6,7 @@ import entityClasses.Post;
 import entityClasses.Reply;
 import entityClasses.User;
 import guiStudent.ViewStudentHome;
+import guiViewPosts.ViewViewPosts;
 import database.Database;
 
 import java.util.ArrayList;
@@ -107,12 +108,12 @@ public class ControllerPost {
 	 */	
     
     public static void performUpdatePost(Stage stage, User user, Post post, String content) {
-//    	int postUserId = (int) post.getAttributes().get("userId");
-//        if (user.getUserId() == postUserId) {
-//        	Post updatedPost = theDatabase.updatePost(post, content);
-//        	if (updatedPost != null) System.out.println("Update successful");
-//        	ViewPost.displayPost(stage, user, updatedPost);
-//        } 
+        if (user.getUserName().equals(post.getAuthorUsername())) {
+        	int res = theDatabase.updatePost(post.getPostId(), content, post.getAuthorUsername());
+        	if (res == 0) System.out.println("Update successful");
+        	post.setContent(content);
+        	ViewPost.displayPost(stage, user, post.getPostId());
+        } 
     }
     
     
@@ -129,13 +130,12 @@ public class ControllerPost {
 	 * 
 	 */	
     public static void performMarkPostDeleted(Stage stage, User user, Post post) {
-//    	int postId = (int) post.getAttributes().get("id");
-//    	int postUserId = (int) post.getAttributes().get("userId");
-//        if (user.getUserId() == postUserId || user.getNewStaffRole() || user.getAdminRole()) {
-//        	boolean res = theDatabase.markPostDeleted(postId);
-//        	System.out.println("Deletion successful: " + res);
-//        	ViewPosts.displayPosts(stage, user);
-//        } 
+    	int postId = post.getPostId();
+    	String postUserUsername = user.getUserName();
+        if (post.getAuthorUsername().equals(postUserUsername) || user.getNewStaffRole() || user.getAdminRole()) {
+        	theDatabase.softDeletePost(postId, postUserUsername);
+        	ViewViewPosts.displayViewPosts(stage, user);
+        } 
     }
     
    
