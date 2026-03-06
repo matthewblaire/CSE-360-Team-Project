@@ -10,6 +10,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+
+import java.sql.SQLException;
+
 import entityClasses.Post;
 import entityClasses.User;
 import guiReply.ControllerReply;
@@ -93,7 +96,13 @@ public class ViewNewReply extends VBox {
                 alert.showAndWait();
                 return;
             }
-//            ControllerReply.performCreateReply(currentStage, currentUser, currentPost, replyContent);
+            try {
+				ControllerReply.performCreateReply(currentStage, currentUser, currentPost, replyContent);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
         });
         
         button_Cancel = new Button("Cancel");

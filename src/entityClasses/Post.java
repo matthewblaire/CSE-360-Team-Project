@@ -148,6 +148,13 @@ public class Post {
 	 * @return the content string
 	 */
 	public String getContent() { return content; }
+	
+	/*****
+	 * <p> Method: void setContent() </p>
+	 * <p> Description: Sets the body text of this post. </p>
+	 * @param the content string
+	 */
+	public void setContent(String newContent) { this.content = newContent; }
 
 
 	/*****
