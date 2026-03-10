@@ -156,16 +156,16 @@ public class Tester {
 		
 		// ---- Phase 2: Post Content Recognizer Tests ----
 		System.out.println("---Beginning Post Content Validation Tests---");
-		performPostContentTestCase(1,  "Hello, I have a question about the homework.", true);
-		performPostContentTestCase(2,  "A",                                             true);
-		performPostContentTestCase(3,  "",                                              false);
-		performPostContentTestCase(4,  "   ",                                           false);
-		performPostContentTestCase(5,  null,                                            false);
-		performPostContentTestCase(6,  "\n\n\n",                                        false);
-		performPostContentTestCase(7,  "\t   \t",                                       false);
-		performPostContentTestCase(8,  generateString(2000),                            true);
-		performPostContentTestCase(9,  generateString(2001),                            false);
-		performPostContentTestCase(10, "What is due this week? #homework",              true);
+		performPostContentTestCase(1, "Test Title",  "Hello, I have a question about the homework.", true);
+		performPostContentTestCase(2, "Test Title",  "A",                                             true);
+		performPostContentTestCase(3, "Test Title",  "",                                              false);
+		performPostContentTestCase(4, "Test Title",  "   ",                                           false);
+		performPostContentTestCase(5, "Test Title",  null,                                            false);
+		performPostContentTestCase(6, "Test Title",  "\n\n\n",                                        false);
+		performPostContentTestCase(7, "Test Title",  "\t   \t",                                       false);
+		performPostContentTestCase(8, "Test Title",  generateString(2000),                            true);
+		performPostContentTestCase(9, "Test Title",  generateString(2001),                            false);
+		performPostContentTestCase(10, "Test Title", "What is due this week? #homework",              true);
 		printStats();
 		resetCurrentStats();
 		System.out.println("---End Post Content Validation Tests---");
@@ -234,7 +234,7 @@ public class Tester {
 	 * @param content      the post/reply body text to validate (may be null)
 	 * @param expectedPass true if the content is expected to be valid
 	 */
-	public static void performPostContentTestCase(int testCase, String content,
+	public static void performPostContentTestCase(int testCase, String title, String content,
 			boolean expectedPass) {
 
 		/*** Display the individual test case header ***/
@@ -305,7 +305,7 @@ public class Tester {
 				+ "\n\nTest case: 1 (DB CREATE — valid post in General thread)");
 		int savedPostId = -1;
 		try {
-			Post post1 = new Post(1, "student1",
+			Post post1 = new Post(1, "student1", "Test Title",
 					"What topics are covered on the midterm?", LocalDateTime.now());
 			savedPostId = db.createPost(post1);
 
@@ -329,7 +329,7 @@ public class Tester {
 				"____________________________________________________________________________"
 				+ "\n\nTest case: 2 (DB CREATE — post to non-existent threadId 9999)");
 		try {
-			Post badPost = new Post(9999, "student1",
+			Post badPost = new Post(9999, "student1", "Test Title",
 					"This should fail because thread 9999 does not exist.",
 					LocalDateTime.now());
 			db.createPost(badPost);
@@ -434,7 +434,7 @@ public class Tester {
 				"____________________________________________________________________________"
 				+ "\n\nTest case: 7 (DB CREATE — second post by different author)");
 		try {
-			Post post2 = new Post(1, "student2",
+			Post post2 = new Post(1, "student2", "Test Title",
 					"I also have a question — will the exam be open-book?",
 					LocalDateTime.now());
 			int postId2 = db.createPost(post2);
@@ -493,7 +493,7 @@ public class Tester {
 		int readTestReply2  = -1;
 
 		try {
-			Post setup = new Post(1, "student1",
+			Post setup = new Post(1, "student1", "Test Title",
 					"READ-TEST: This post is used by the READ unit tests.",
 					LocalDateTime.now());
 			readTestPostId = db.createPost(setup);
@@ -698,7 +698,7 @@ public class Tester {
 		int updateReplyId = -1;
 
 		try {
-			Post setup = new Post(1, "student1",
+			Post setup = new Post(1, "student1", "Test Title",
 					"UPDATE-TEST: Original post content.", LocalDateTime.now());
 			updatePostId = db.createPost(setup);
 
@@ -789,7 +789,7 @@ public class Tester {
 				+ "\n\nTest case: 5 (DB UPDATE — softDeletePost wrong author rejected)");
 		int freshPostId = -1;
 		try {
-			Post fresh = new Post(1, "student1",
+			Post fresh = new Post(1, "student1", "Test Title",
 					"UPDATE-TEST: Fresh post for delete-auth test.", LocalDateTime.now());
 			freshPostId = db.createPost(fresh);
 		} catch (SQLException e) {
@@ -890,7 +890,7 @@ public class Tester {
 		int deleteReply2  = -1;
 
 		try {
-			Post setup = new Post(1, "student1",
+			Post setup = new Post(1, "student1", "Test Title",
 					"DELETE-TEST: Post used by delete unit tests.", LocalDateTime.now());
 			deletePostId = db.createPost(setup);
 

@@ -33,6 +33,7 @@ public class Post {
 	private int           postId;
 	private int           threadId;		// FK → DiscussionThreads.threadId
 	private String        authorUsername;	// FK → userDB.userName
+	private String        title;			// Title text of the post
 	private String        content;			// Body text of the post
 	private LocalDateTime timestamp;		// When the post was created
 	private boolean       isDeleted;		// TRUE after a student soft-deletes the post
@@ -66,9 +67,10 @@ public class Post {
 	 * @param content        the body text of the post
 	 * @param timestamp      the moment the post was submitted
 	 */
-	public Post(int threadId, String authorUsername, String content, LocalDateTime timestamp) {
+	public Post(int threadId, String authorUsername, String title, String content, LocalDateTime timestamp) {
 		this.threadId       = threadId;
 		this.authorUsername = authorUsername;
+		this.title        = title;
 		this.content        = content;
 		this.timestamp      = timestamp;
 		this.isDeleted      = false;	// new posts are never pre-deleted
@@ -89,11 +91,12 @@ public class Post {
 	 * @param timestamp      when the post was created
 	 * @param isDeleted      true if the student has soft-deleted this post
 	 */
-	public Post(int postId, int threadId, String authorUsername, String content,
+	public Post(int postId, int threadId, String authorUsername, String title, String content,
 			LocalDateTime timestamp, boolean isDeleted) {
 		this.postId         = postId;
 		this.threadId       = threadId;
 		this.authorUsername = authorUsername;
+		this.title        = title;
 		this.content        = content;
 		this.timestamp      = timestamp;
 		this.isDeleted      = isDeleted;
@@ -145,8 +148,22 @@ public class Post {
 	 * @return the content string
 	 */
 	public String getContent() { return content; }
+	
+	/*****
+	 * <p> Method: void setContent() </p>
+	 * <p> Description: Sets the body text of this post. </p>
+	 * @param the content string
+	 */
+	public void setContent(String newContent) { this.content = newContent; }
 
 
+	/*****
+	 * <p> Method: String getTitle() </p>
+	 * <p> Description: Returns the title text of this post. </p>
+	 * @return the content string
+	 */
+	public String getTitle() { return title; }
+	
 	/*****
 	 * <p> Method: LocalDateTime getTimestamp() </p>
 	 * <p> Description: Returns the moment this post was created. </p>

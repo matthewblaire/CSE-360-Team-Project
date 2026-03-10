@@ -5,7 +5,11 @@ import java.util.List;
 
 import database.Database;
 import entityClasses.Post;
+import entityClasses.User;
+import guiPost.ViewPost;
+import guiViewPosts.ViewViewPosts;
 import javafx.collections.FXCollections;
+import javafx.stage.Stage;
 
 /*******
  * <p> Title: ControllerMyPosts Class. </p>
@@ -87,6 +91,14 @@ public class ControllerMyPosts {
 	}
 
 
+	
+	public static void doHandlePostDoubleClick(Object selectedItem, Stage ps, User user) {
+		int idx = ViewMyPosts.listview_MyPosts.getSelectionModel().getSelectedIndex();
+		if (idx < 0 || idx >= postIds.size()) return;
+		int postId = postIds.get(idx);
+		ViewPost.displayPost(ps, user, postId);// displayPost(Stage ps, User user, Post post)
+	}
+	
 	/**********
 	 * <p> Method: goToEditPost() </p>
 	 *

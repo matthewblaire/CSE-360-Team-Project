@@ -128,6 +128,13 @@ public class Reply {
 	 */
 	public int getPostId() { return postId; }
 
+	/*****
+	 * <p> Method: void setPostId() </p>
+	 * <p> Description: sets the postId this reply is attached to. </p>
+	 * @return the postId
+	 */
+	public void setPostId(int postId) { this.postId = postId; }
+	
 
 	/*****
 	 * <p> Method: String getAuthorUsername() </p>
@@ -136,6 +143,12 @@ public class Reply {
 	 */
 	public String getAuthorUsername() { return authorUsername; }
 
+	/*****
+	 * <p> Method: void getAuthorUsername() </p>
+	 * <p> Description: Returns the username of the student who wrote this reply. </p>
+	 * param the author's username
+	 */
+	public void getAuthorUsername(String authorUsername) { this.authorUsername = authorUsername; }
 
 	/*****
 	 * <p> Method: String getContent() </p>
@@ -143,6 +156,13 @@ public class Reply {
 	 * @return the content string
 	 */
 	public String getContent() { return content; }
+	
+	/*****
+	 * <p> Method: void getContent() </p>
+	 * <p> Description: sets the body text of this reply. </p>
+	 * @param the content string
+	 */
+	public void setContent(String content) { this.content = content; }
 
 
 	/*****
@@ -152,6 +172,12 @@ public class Reply {
 	 */
 	public LocalDateTime getTimestamp() { return timestamp; }
 
+	/*****
+	 * <p> Method: void getTimestamp() </p>
+	 * <p> Description: sets the moment this reply was created. </p>
+	 * @param the creation timestamp
+	 */
+	public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 
 	/*****
 	 * <p> Method: boolean isDeleted() </p>

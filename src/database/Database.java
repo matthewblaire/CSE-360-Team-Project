@@ -186,6 +186,7 @@ public class Database {
 				+ "postId         INT AUTO_INCREMENT PRIMARY KEY, "
 				+ "threadId       INT NOT NULL, "
 				+ "authorUsername VARCHAR(255) NOT NULL, "
+				+ "title          VARCHAR(255) DEFAULT 'No Title', "
 				+ "content        VARCHAR(2000) NOT NULL, "
 				+ "timestamp      TIMESTAMP NOT NULL, "
 				+ "isDeleted      BOOL DEFAULT FALSE, "
@@ -232,7 +233,7 @@ public class Database {
  */
 	public List<Post> getPostsByThread(int threadId) {
 		List<Post> posts = new ArrayList<>();
-		String query = "SELECT postId, threadId, authorUsername, content, timestamp, isDeleted "
+		String query = "SELECT postId, threadId, authorUsername, title, content, timestamp, isDeleted "
 				+ "FROM Posts WHERE threadId = ? "
 				+ "ORDER BY timestamp ASC";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -243,7 +244,8 @@ public class Database {
 						rs.getInt("postId"),
 						rs.getInt("threadId"),
 						rs.getString("authorUsername"),
-						rs.getString("content"),
+						rs.getBoolean("isDeleted") ? "***Deleted***" : rs.getString("title"),
+						rs.getBoolean("isDeleted") ? "***Deleted***" : rs.getString("content"),
 						rs.getTimestamp("timestamp").toLocalDateTime(),
 						rs.getBoolean("isDeleted")));
 			}
@@ -267,7 +269,7 @@ public class Database {
  */
 	public List<Post> getPostsByAuthor(String username) {
 		List<Post> posts = new ArrayList<>();
-		String query = "SELECT postId, threadId, authorUsername, content, timestamp, isDeleted "
+		String query = "SELECT postId, threadId, authorUsername, title, content, timestamp, isDeleted "
 				+ "FROM Posts WHERE authorUsername = ? "
 				+ "ORDER BY timestamp DESC";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -278,6 +280,7 @@ public class Database {
 						rs.getInt("postId"),
 						rs.getInt("threadId"),
 						rs.getString("authorUsername"),
+						rs.getString("title"),
 						rs.getString("content"),
 						rs.getTimestamp("timestamp").toLocalDateTime(),
 						rs.getBoolean("isDeleted")));
@@ -307,11 +310,11 @@ public class Database {
 		String like = "%" + keyword.toLowerCase() + "%";
 		String query;
 		if (threadId == -1) {
-			query = "SELECT postId, threadId, authorUsername, content, timestamp, isDeleted "
+			query = "SELECT postId, threadId, authorUsername, title, content, timestamp, isDeleted "
 					+ "FROM Posts WHERE isDeleted = FALSE AND LOWER(content) LIKE ? "
 					+ "ORDER BY timestamp DESC";
 		} else {
-			query = "SELECT postId, threadId, authorUsername, content, timestamp, isDeleted "
+			query = "SELECT postId, threadId, authorUsername, title, content, timestamp, isDeleted "
 					+ "FROM Posts WHERE isDeleted = FALSE AND LOWER(content) LIKE ? "
 					+ "AND threadId = ? ORDER BY timestamp DESC";
 		}
@@ -324,6 +327,7 @@ public class Database {
 						rs.getInt("postId"),
 						rs.getInt("threadId"),
 						rs.getString("authorUsername"),
+						rs.getString("title"),
 						rs.getString("content"),
 						rs.getTimestamp("timestamp").toLocalDateTime(),
 						rs.getBoolean("isDeleted")));
@@ -529,7 +533,7 @@ public class Database {
  * @return the matching Post, or null if not found
  */
 	public Post getPostById(int postId) {
-		String query = "SELECT postId, threadId, authorUsername, content, timestamp, isDeleted "
+		String query = "SELECT postId, threadId, authorUsername, title, content, timestamp, isDeleted "
 				+ "FROM Posts WHERE postId = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setInt(1, postId);
@@ -539,7 +543,8 @@ public class Database {
 						rs.getInt("postId"),
 						rs.getInt("threadId"),
 						rs.getString("authorUsername"),
-						rs.getString("content"),
+						rs.getBoolean("isDeleted") ? "***Deleted***" : rs.getString("title"),
+						rs.getBoolean("isDeleted") ? "***Deleted***" : rs.getString("content"),
 						rs.getTimestamp("timestamp").toLocalDateTime(),
 						rs.getBoolean("isDeleted"));
 			}
@@ -746,16 +751,17 @@ public class Database {
 					+ " does not exist in DiscussionThreads.");
 
 		String insertPost =
-				"INSERT INTO Posts (threadId, authorUsername, content, timestamp, isDeleted) "
-				+ "VALUES (?, ?, ?, ?, FALSE)";
+				"INSERT INTO Posts (threadId, authorUsername, title, content, timestamp, isDeleted) "
+				+ "VALUES (?, ?, ?, ?, ?, FALSE)";
 
 		try (PreparedStatement pstmt = connection.prepareStatement(
 				insertPost, Statement.RETURN_GENERATED_KEYS)) {
 
 			pstmt.setInt(1,       post.getThreadId());
 			pstmt.setString(2,    post.getAuthorUsername());
-			pstmt.setString(3,    post.getContent());
-			pstmt.setTimestamp(4, Timestamp.valueOf(post.getTimestamp()));
+			pstmt.setString(3,    post.getTitle());
+			pstmt.setString(4,    post.getContent());
+			pstmt.setTimestamp(5, Timestamp.valueOf(post.getTimestamp()));
 			pstmt.executeUpdate();
 
 			// Retrieve the auto-generated postId and write it back into the object
@@ -822,6 +828,7 @@ public class Database {
 							+ "was returned.");
 				}
 			}
+			
 		}
 	}
 

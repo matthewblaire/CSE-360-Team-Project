@@ -2,6 +2,7 @@ package guiMyPosts;
 
 import database.Database;
 import entityClasses.User;
+import guiViewPosts.ControllerViewPosts;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -172,6 +173,16 @@ public class ViewMyPosts {
 		setupButtonUI(button_EditPost, "Dialog", 14, 200, Pos.CENTER, 608, 108);
 		button_EditPost.setOnAction((_) -> { ControllerMyPosts.goToEditPost(); });
 
+		
+	    // Double click handler for Posts
+		listview_MyPosts.setOnMouseClicked(event -> {
+	        if (event.getClickCount() == 2 && !listview_MyPosts.getSelectionModel().isEmpty()) {
+	            Object selectedItem = listview_MyPosts.getSelectionModel().getSelectedItem();
+	            ControllerMyPosts.doHandlePostDoubleClick(selectedItem, theStage, theUser);
+	            event.consume();
+	        }
+	    });
+		
 		listview_MyPosts.setStyle("-fx-font-family: 'Dialog'; -fx-font-size: 13px;");
 		listview_MyPosts.setLayoutX(20);
 		listview_MyPosts.setLayoutY(138);

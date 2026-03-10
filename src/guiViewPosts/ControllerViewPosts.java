@@ -7,7 +7,10 @@ import database.Database;
 import entityClasses.DiscussionThread;
 import entityClasses.Post;
 import entityClasses.Reply;
+import entityClasses.User;
+import guiPost.ViewPost;
 import javafx.collections.FXCollections;
+import javafx.stage.Stage;
 
 /*******
  * <p> Title: ControllerViewPosts Class. </p>
@@ -199,6 +202,13 @@ public class ControllerViewPosts {
 	}
 
 
+	public static void doHandlePostDoubleClick(Object selectedItem, Stage ps, User user) {
+		int idx = ViewViewPosts.listview_Posts.getSelectionModel().getSelectedIndex();
+		if (idx < 0 || idx >= postIds.size()) return;
+		int postId = postIds.get(idx);
+		ViewPost.displayPost(ps, user, postId);// displayPost(Stage ps, User user, Post post)
+	}
+	
 	/**********
 	 * <p> Method: performReturn() </p>
 	 *
