@@ -254,22 +254,22 @@ public class Tester {
 		if (result.isEmpty()) {
 			// Content is valid
 			if (expectedPass) {
-				System.out.println("***Success*** The content is valid, as expected — PASS");
+				System.out.println("***Success*** The content is valid, as expected - PASS");
 				numPassed++;
 			} else {
 				System.out.println("***Failure*** The content was accepted but was supposed "
-						+ "to be invalid — FAIL");
+						+ "to be invalid - FAIL");
 				numFailed++;
 			}
 		} else {
 			// Content is invalid
 			if (expectedPass) {
 				System.out.println("***Failure*** The content was rejected but was supposed "
-						+ "to be valid — FAIL");
+						+ "to be valid - FAIL");
 				System.out.println("Error message: " + result);
 				numFailed++;
 			} else {
-				System.out.println("***Success*** The content is invalid, as expected — PASS");
+				System.out.println("***Success*** The content is invalid, as expected - PASS");
 				System.out.println("Error message: " + result);
 				numPassed++;
 			}
@@ -302,7 +302,7 @@ public class Tester {
 		// ---- Test 1: Create a valid post in the General thread ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 1 (DB CREATE — valid post in General thread)");
+				+ "\n\nTest case: 1 (DB CREATE - valid post in General thread)");
 		int savedPostId = -1;
 		try {
 			Post post1 = new Post(1, "student1", "Test Title",
@@ -311,42 +311,42 @@ public class Tester {
 
 			if (savedPostId > 0) {
 				System.out.println("***Success*** Post created with postId = " + savedPostId
-						+ " — PASS");
+						+ " - PASS");
 				numPassed++;
 			} else {
 				System.out.println("***Failure*** createPost returned " + savedPostId
-						+ " (expected > 0) — FAIL");
+						+ " (expected > 0) - FAIL");
 				numFailed++;
 			}
 		} catch (SQLException e) {
 			System.out.println("***Failure*** Unexpected SQLException: " + e.getMessage()
-					+ " — FAIL");
+					+ " - FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 2: Attempt to create a post in a non-existent thread ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 2 (DB CREATE — post to non-existent threadId 9999)");
+				+ "\n\nTest case: 2 (DB CREATE - post to non-existent threadId 9999)");
 		try {
 			Post badPost = new Post(9999, "student1", "Test Title",
 					"This should fail because thread 9999 does not exist.",
 					LocalDateTime.now());
 			db.createPost(badPost);
-			// If we reach here, the guard did not fire — test fails
+			// If we reach here, the guard did not fire - test fails
 			System.out.println("***Failure*** createPost accepted a non-existent threadId "
-					+ "— FAIL");
+					+ "- FAIL");
 			numFailed++;
 		} catch (SQLException e) {
 			System.out.println("***Success*** createPost correctly rejected non-existent "
-					+ "threadId: " + e.getMessage() + " — PASS");
+					+ "threadId: " + e.getMessage() + " - PASS");
 			numPassed++;
 		}
 
 		// ---- Test 3: Create a valid reply to the post from Test 1 ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 3 (DB CREATE — valid reply to post " + savedPostId + ")");
+				+ "\n\nTest case: 3 (DB CREATE - valid reply to post " + savedPostId + ")");
 		int savedReplyId = -1;
 		if (savedPostId > 0) {
 			try {
@@ -357,101 +357,101 @@ public class Tester {
 
 				if (savedReplyId > 0) {
 					System.out.println("***Success*** Reply created with replyId = "
-							+ savedReplyId + " — PASS");
+							+ savedReplyId + " - PASS");
 					numPassed++;
 				} else {
 					System.out.println("***Failure*** createReply returned " + savedReplyId
-							+ " (expected > 0) — FAIL");
+							+ " (expected > 0) - FAIL");
 					numFailed++;
 				}
 			} catch (SQLException e) {
 				System.out.println("***Failure*** Unexpected SQLException: " + e.getMessage()
-						+ " — FAIL");
+						+ " - FAIL");
 				numFailed++;
 			}
 		} else {
 			System.out.println("***Skipped*** Post from Test 1 was not created; "
-					+ "cannot test reply — counted as FAIL");
+					+ "cannot test reply - counted as FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 4: Attempt to create a reply to a non-existent post ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 4 (DB CREATE — reply to non-existent postId 999999)");
+				+ "\n\nTest case: 4 (DB CREATE - reply to non-existent postId 999999)");
 		try {
 			Reply badReply = new Reply(999999, "student2",
 					"This should fail because postId 999999 does not exist.",
 					LocalDateTime.now());
 			db.createReply(badReply);
-			// If we reach here, the guard did not fire — test fails
+			// If we reach here, the guard did not fire - test fails
 			System.out.println("***Failure*** createReply accepted a non-existent postId "
-					+ "— FAIL");
+					+ "- FAIL");
 			numFailed++;
 		} catch (SQLException e) {
 			System.out.println("***Success*** createReply correctly rejected non-existent "
-					+ "postId: " + e.getMessage() + " — PASS");
+					+ "postId: " + e.getMessage() + " - PASS");
 			numPassed++;
 		}
 
 		// ---- Test 5: Verify doesPostExist returns true for the created post ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 5 (DB READ-BACK — doesPostExist(" + savedPostId + "))");
+				+ "\n\nTest case: 5 (DB READ-BACK - doesPostExist(" + savedPostId + "))");
 		if (savedPostId > 0) {
 			boolean exists = db.doesPostExist(savedPostId);
 			if (exists) {
 				System.out.println("***Success*** doesPostExist(" + savedPostId
-						+ ") returned true — PASS");
+						+ ") returned true - PASS");
 				numPassed++;
 			} else {
 				System.out.println("***Failure*** doesPostExist(" + savedPostId
-						+ ") returned false after a successful INSERT — FAIL");
+						+ ") returned false after a successful INSERT - FAIL");
 				numFailed++;
 			}
 		} else {
-			System.out.println("***Skipped*** No post to verify — counted as FAIL");
+			System.out.println("***Skipped*** No post to verify - counted as FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 6: Verify doesPostExist returns false for a non-existent post ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 6 (DB READ-BACK — doesPostExist(999999))");
+				+ "\n\nTest case: 6 (DB READ-BACK - doesPostExist(999999))");
 		boolean shouldBeFalse = db.doesPostExist(999999);
 		if (!shouldBeFalse) {
 			System.out.println("***Success*** doesPostExist(999999) returned false "
-					+ "as expected — PASS");
+					+ "as expected - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** doesPostExist(999999) returned true "
-					+ "for a non-existent post — FAIL");
+					+ "for a non-existent post - FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 7: Create a second post by a different author ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 7 (DB CREATE — second post by different author)");
+				+ "\n\nTest case: 7 (DB CREATE - second post by different author)");
 		try {
 			Post post2 = new Post(1, "student2", "Test Title",
-					"I also have a question — will the exam be open-book?",
+					"I also have a question - will the exam be open-book?",
 					LocalDateTime.now());
 			int postId2 = db.createPost(post2);
 
 			if (postId2 > savedPostId) {
 				System.out.println("***Success*** Second post created with postId = " + postId2
-						+ " (greater than first postId = " + savedPostId + ") — PASS");
+						+ " (greater than first postId = " + savedPostId + ") - PASS");
 				numPassed++;
 			} else {
 				System.out.println("***Failure*** Second postId " + postId2
 						+ " is not greater than first postId " + savedPostId
-						+ " — FAIL");
+						+ " - FAIL");
 				numFailed++;
 			}
 		} catch (SQLException e) {
 			System.out.println("***Failure*** Unexpected SQLException on second post: "
-					+ e.getMessage() + " — FAIL");
+					+ e.getMessage() + " - FAIL");
 			numFailed++;
 		}
 	}
@@ -464,16 +464,16 @@ public class Tester {
 	 *
 	 * <p> These tests exercise the READ and ReadStatus methods added to {@link Database}:
 	 * <ol>
-	 *   <li>getPostsByThread — returns posts for the General thread.</li>
-	 *   <li>getPostsByAuthor — returns posts by a known author.</li>
-	 *   <li>searchPosts (all threads) — keyword match finds the seeded post.</li>
-	 *   <li>searchPosts (specific thread) — same keyword, filtered to thread 1.</li>
-	 *   <li>searchPosts — keyword that matches nothing returns empty list.</li>
-	 *   <li>getRepliesForPost — returns replies for a known post.</li>
-	 *   <li>getReplyCount — count matches the number of replies inserted.</li>
-	 *   <li>markPostAsRead / isPostRead — round-trip read-status for a post.</li>
-	 *   <li>markReplyAsRead / isReplyRead — round-trip read-status for a reply.</li>
-	 *   <li>getUnreadReplyCount — unread count drops to zero after marking replies read.</li>
+	 *   <li>getPostsByThread - returns posts for the General thread.</li>
+	 *   <li>getPostsByAuthor - returns posts by a known author.</li>
+	 *   <li>searchPosts (all threads) - keyword match finds the seeded post.</li>
+	 *   <li>searchPosts (specific thread) - same keyword, filtered to thread 1.</li>
+	 *   <li>searchPosts - keyword that matches nothing returns empty list.</li>
+	 *   <li>getRepliesForPost - returns replies for a known post.</li>
+	 *   <li>getReplyCount - count matches the number of replies inserted.</li>
+	 *   <li>markPostAsRead / isPostRead - round-trip read-status for a post.</li>
+	 *   <li>markReplyAsRead / isReplyRead - round-trip read-status for a reply.</li>
+	 *   <li>getUnreadReplyCount - unread count drops to zero after marking replies read.</li>
 	 * </ol>
 	 *
 	 * The test creates its own Post and Reply fixtures inside the General thread
@@ -514,156 +514,156 @@ public class Tester {
 		// ---- Test 1: getPostsByThread returns at least one post for thread 1 ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 1 (DB READ — getPostsByThread(1) returns posts)");
+				+ "\n\nTest case: 1 (DB READ - getPostsByThread(1) returns posts)");
 		List<Post> threadPosts = db.getPostsByThread(1);
 		if (!threadPosts.isEmpty()) {
 			System.out.println("***Success*** getPostsByThread(1) returned "
-					+ threadPosts.size() + " post(s) — PASS");
+					+ threadPosts.size() + " post(s) - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** getPostsByThread(1) returned 0 posts "
-					+ "after INSERT — FAIL");
+					+ "after INSERT - FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 2: getPostsByAuthor returns post by "student1" ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 2 (DB READ — getPostsByAuthor(\"student1\") returns posts)");
+				+ "\n\nTest case: 2 (DB READ - getPostsByAuthor(\"student1\") returns posts)");
 		List<Post> authorPosts = db.getPostsByAuthor("student1");
 		if (!authorPosts.isEmpty()) {
 			System.out.println("***Success*** getPostsByAuthor(\"student1\") returned "
-					+ authorPosts.size() + " post(s) — PASS");
+					+ authorPosts.size() + " post(s) - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** getPostsByAuthor(\"student1\") returned "
-					+ "0 posts — FAIL");
+					+ "0 posts - FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 3: searchPosts all threads — known keyword finds results ----
+		// ---- Test 3: searchPosts all threads - known keyword finds results ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 3 (DB READ — searchPosts(\"READ-TEST\", -1) finds results)");
+				+ "\n\nTest case: 3 (DB READ - searchPosts(\"READ-TEST\", -1) finds results)");
 		List<Post> searchAll = db.searchPosts("READ-TEST", -1);
 		if (!searchAll.isEmpty()) {
 			System.out.println("***Success*** searchPosts(\"READ-TEST\", -1) returned "
-					+ searchAll.size() + " result(s) — PASS");
+					+ searchAll.size() + " result(s) - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** searchPosts returned 0 results for a known "
-					+ "keyword — FAIL");
+					+ "keyword - FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 4: searchPosts with thread filter 1 — still finds results ----
+		// ---- Test 4: searchPosts with thread filter 1 - still finds results ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 4 (DB READ — searchPosts(\"READ-TEST\", 1) with thread filter)");
+				+ "\n\nTest case: 4 (DB READ - searchPosts(\"READ-TEST\", 1) with thread filter)");
 		List<Post> searchFiltered = db.searchPosts("READ-TEST", 1);
 		if (!searchFiltered.isEmpty()) {
 			System.out.println("***Success*** searchPosts(\"READ-TEST\", 1) returned "
-					+ searchFiltered.size() + " result(s) — PASS");
+					+ searchFiltered.size() + " result(s) - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** searchPosts with thread filter returned 0 "
-					+ "results for a known keyword — FAIL");
+					+ "results for a known keyword - FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 5: searchPosts — non-matching keyword returns empty list ----
+		// ---- Test 5: searchPosts - non-matching keyword returns empty list ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 5 (DB READ — searchPosts(\"ZZZNONEXISTENTKEYWORDZZZ\", -1))");
+				+ "\n\nTest case: 5 (DB READ - searchPosts(\"ZZZNONEXISTENTKEYWORDZZZ\", -1))");
 		List<Post> noResults = db.searchPosts("ZZZNONEXISTENTKEYWORDZZZ", -1);
 		if (noResults.isEmpty()) {
 			System.out.println("***Success*** searchPosts returned 0 results for a "
-					+ "non-matching keyword — PASS");
+					+ "non-matching keyword - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** searchPosts returned " + noResults.size()
-					+ " results for a keyword that should not match any post — FAIL");
+					+ " results for a keyword that should not match any post - FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 6: getRepliesForPost returns exactly 2 replies ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 6 (DB READ — getRepliesForPost(" + readTestPostId
+				+ "\n\nTest case: 6 (DB READ - getRepliesForPost(" + readTestPostId
 				+ ") returns 2 replies)");
 		List<Reply> replies = db.getRepliesForPost(readTestPostId);
 		if (replies.size() == 2) {
 			System.out.println("***Success*** getRepliesForPost(" + readTestPostId
-					+ ") returned 2 replies — PASS");
+					+ ") returned 2 replies - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** getRepliesForPost returned " + replies.size()
-					+ " (expected 2) — FAIL");
+					+ " (expected 2) - FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 7: getReplyCount matches the number of inserted replies ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 7 (DB READ — getReplyCount(" + readTestPostId + ") == 2)");
+				+ "\n\nTest case: 7 (DB READ - getReplyCount(" + readTestPostId + ") == 2)");
 		int count = db.getReplyCount(readTestPostId);
 		if (count == 2) {
 			System.out.println("***Success*** getReplyCount(" + readTestPostId
-					+ ") returned 2 — PASS");
+					+ ") returned 2 - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** getReplyCount returned " + count
-					+ " (expected 2) — FAIL");
+					+ " (expected 2) - FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 8: markPostAsRead / isPostRead round-trip ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 8 (DB READ — markPostAsRead / isPostRead round-trip)");
+				+ "\n\nTest case: 8 (DB READ - markPostAsRead / isPostRead round-trip)");
 		db.markPostAsRead(readTestPostId, READER);
 		boolean postIsRead = db.isPostRead(readTestPostId, READER);
 		if (postIsRead) {
 			System.out.println("***Success*** isPostRead returned true after "
-					+ "markPostAsRead — PASS");
+					+ "markPostAsRead - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** isPostRead returned false after "
-					+ "markPostAsRead — FAIL");
+					+ "markPostAsRead - FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 9: markReplyAsRead / isReplyRead round-trip ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 9 (DB READ — markReplyAsRead / isReplyRead round-trip)");
+				+ "\n\nTest case: 9 (DB READ - markReplyAsRead / isReplyRead round-trip)");
 		db.markReplyAsRead(readTestReply1, READER);
 		boolean replyIsRead = db.isReplyRead(readTestReply1, READER);
 		if (replyIsRead) {
 			System.out.println("***Success*** isReplyRead returned true after "
-					+ "markReplyAsRead — PASS");
+					+ "markReplyAsRead - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** isReplyRead returned false after "
-					+ "markReplyAsRead — FAIL");
+					+ "markReplyAsRead - FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 10: getUnreadReplyCount drops to 0 after marking all replies read ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 10 (DB READ — getUnreadReplyCount drops to 0 after "
+				+ "\n\nTest case: 10 (DB READ - getUnreadReplyCount drops to 0 after "
 				+ "marking all replies read)");
 		// Mark the second reply as read too
 		db.markReplyAsRead(readTestReply2, READER);
 		int unread = db.getUnreadReplyCount(readTestPostId, READER);
 		if (unread == 0) {
 			System.out.println("***Success*** getUnreadReplyCount returned 0 after both "
-					+ "replies were marked as read — PASS");
+					+ "replies were marked as read - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** getUnreadReplyCount returned " + unread
-					+ " (expected 0) after marking all replies read — FAIL");
+					+ " (expected 0) after marking all replies read - FAIL");
 			numFailed++;
 		}
 	}
@@ -676,14 +676,14 @@ public class Tester {
 	 * {@link Database#updateReply}, {@link Database#getPostById}, and
 	 * {@link Database#getReplyById}:
 	 * <ol>
-	 *   <li>updatePost — correct author, content changes in the database.</li>
-	 *   <li>updatePost — wrong author, returns 0 rows updated (rejected).</li>
-	 *   <li>updatePost — non-existent postId, returns 0 rows updated.</li>
-	 *   <li>softDeletePost — correct author, isDeleted flips to TRUE.</li>
-	 *   <li>softDeletePost — wrong author, returns 0 rows updated.</li>
-	 *   <li>updatePost on a soft-deleted post — returns 0 (blocked by isDeleted filter).</li>
-	 *   <li>updateReply — correct author, content changes in the database.</li>
-	 *   <li>updateReply — wrong author, returns 0 rows updated.</li>
+	 *   <li>updatePost - correct author, content changes in the database.</li>
+	 *   <li>updatePost - wrong author, returns 0 rows updated (rejected).</li>
+	 *   <li>updatePost - non-existent postId, returns 0 rows updated.</li>
+	 *   <li>softDeletePost - correct author, isDeleted flips to TRUE.</li>
+	 *   <li>softDeletePost - wrong author, returns 0 rows updated.</li>
+	 *   <li>updatePost on a soft-deleted post - returns 0 (blocked by isDeleted filter).</li>
+	 *   <li>updateReply - correct author, content changes in the database.</li>
+	 *   <li>updateReply - wrong author, returns 0 rows updated.</li>
 	 * </ol>
 	 * </p>
 	 */
@@ -711,82 +711,82 @@ public class Tester {
 			return;
 		}
 
-		// ---- Test 1: updatePost — correct author changes content ----
+		// ---- Test 1: updatePost - correct author changes content ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 1 (DB UPDATE — updatePost correct author)");
+				+ "\n\nTest case: 1 (DB UPDATE - updatePost correct author)");
 		int rows = db.updatePost(updatePostId, "EDITED: Updated post content.", "student1");
 		if (rows == 1) {
 			Post check = db.getPostById(updatePostId);
 			if (check != null && check.getContent().startsWith("EDITED:")) {
-				System.out.println("***Success*** updatePost changed content in DB — PASS");
+				System.out.println("***Success*** updatePost changed content in DB - PASS");
 				numPassed++;
 			} else {
 				System.out.println("***Failure*** updatePost returned 1 but content unchanged"
-						+ " — FAIL");
+						+ " - FAIL");
 				numFailed++;
 			}
 		} else {
 			System.out.println("***Failure*** updatePost returned " + rows
-					+ " (expected 1) — FAIL");
+					+ " (expected 1) - FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 2: updatePost — wrong author, must be rejected ----
+		// ---- Test 2: updatePost - wrong author, must be rejected ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 2 (DB UPDATE — updatePost wrong author rejected)");
+				+ "\n\nTest case: 2 (DB UPDATE - updatePost wrong author rejected)");
 		int rowsWrongAuthor = db.updatePost(updatePostId, "HIJACKED content.", "student2");
 		if (rowsWrongAuthor == 0) {
 			System.out.println("***Success*** updatePost rejected wrong-author edit "
-					+ "(0 rows updated) — PASS");
+					+ "(0 rows updated) - PASS");
 			numPassed++;
 		} else {
-			System.out.println("***Failure*** updatePost allowed wrong-author edit — FAIL");
+			System.out.println("***Failure*** updatePost allowed wrong-author edit - FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 3: updatePost — non-existent postId ----
+		// ---- Test 3: updatePost - non-existent postId ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 3 (DB UPDATE — updatePost non-existent postId)");
+				+ "\n\nTest case: 3 (DB UPDATE - updatePost non-existent postId)");
 		int rowsNoPost = db.updatePost(999999, "Should not matter.", "student1");
 		if (rowsNoPost == 0) {
 			System.out.println("***Success*** updatePost returned 0 for non-existent post "
-					+ "— PASS");
+					+ "- PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** updatePost returned " + rowsNoPost
-					+ " for a non-existent postId — FAIL");
+					+ " for a non-existent postId - FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 4: softDeletePost — correct author flips isDeleted ----
+		// ---- Test 4: softDeletePost - correct author flips isDeleted ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 4 (DB UPDATE — softDeletePost correct author)");
+				+ "\n\nTest case: 4 (DB UPDATE - softDeletePost correct author)");
 		int deleteRows = db.softDeletePost(updatePostId, "student1");
 		if (deleteRows == 1) {
 			Post deleted = db.getPostById(updatePostId);
 			if (deleted != null && deleted.isDeleted()) {
-				System.out.println("***Success*** softDeletePost set isDeleted = TRUE — PASS");
+				System.out.println("***Success*** softDeletePost set isDeleted = TRUE - PASS");
 				numPassed++;
 			} else {
 				System.out.println("***Failure*** softDeletePost returned 1 but isDeleted "
-						+ "not TRUE — FAIL");
+						+ "not TRUE - FAIL");
 				numFailed++;
 			}
 		} else {
 			System.out.println("***Failure*** softDeletePost returned " + deleteRows
-					+ " (expected 1) — FAIL");
+					+ " (expected 1) - FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 5: softDeletePost — wrong author, must be rejected ----
+		// ---- Test 5: softDeletePost - wrong author, must be rejected ----
 		// Create a fresh post for this test (the previous one is already deleted)
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 5 (DB UPDATE — softDeletePost wrong author rejected)");
+				+ "\n\nTest case: 5 (DB UPDATE - softDeletePost wrong author rejected)");
 		int freshPostId = -1;
 		try {
 			Post fresh = new Post(1, "student1", "Test Title",
@@ -794,7 +794,7 @@ public class Tester {
 			freshPostId = db.createPost(fresh);
 		} catch (SQLException e) {
 			System.out.println("***Skipped*** Could not create fresh post: "
-					+ e.getMessage() + " — counted as FAIL");
+					+ e.getMessage() + " - counted as FAIL");
 			numFailed++;
 			freshPostId = -1;
 		}
@@ -802,11 +802,11 @@ public class Tester {
 			int wrongDelete = db.softDeletePost(freshPostId, "student2");
 			if (wrongDelete == 0) {
 				System.out.println("***Success*** softDeletePost rejected wrong-author delete"
-						+ " (0 rows) — PASS");
+						+ " (0 rows) - PASS");
 				numPassed++;
 			} else {
 				System.out.println("***Failure*** softDeletePost allowed wrong-author delete"
-						+ " — FAIL");
+						+ " - FAIL");
 				numFailed++;
 			}
 		}
@@ -814,50 +814,50 @@ public class Tester {
 		// ---- Test 6: updatePost on a soft-deleted post is blocked ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 6 (DB UPDATE — updatePost on deleted post blocked)");
+				+ "\n\nTest case: 6 (DB UPDATE - updatePost on deleted post blocked)");
 		int blockedEdit = db.updatePost(updatePostId, "Should be blocked.", "student1");
 		if (blockedEdit == 0) {
 			System.out.println("***Success*** updatePost returned 0 for a soft-deleted post"
-					+ " — PASS");
+					+ " - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** updatePost allowed edit on a deleted post "
-					+ "— FAIL");
+					+ "- FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 7: updateReply — correct author changes content ----
+		// ---- Test 7: updateReply - correct author changes content ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 7 (DB UPDATE — updateReply correct author)");
+				+ "\n\nTest case: 7 (DB UPDATE - updateReply correct author)");
 		int replyRows = db.updateReply(updateReplyId, "EDITED: Updated reply.", "student2");
 		if (replyRows == 1) {
 			Reply check = db.getReplyById(updateReplyId);
 			if (check != null && check.getContent().startsWith("EDITED:")) {
-				System.out.println("***Success*** updateReply changed content in DB — PASS");
+				System.out.println("***Success*** updateReply changed content in DB - PASS");
 				numPassed++;
 			} else {
 				System.out.println("***Failure*** updateReply returned 1 but content "
-						+ "unchanged — FAIL");
+						+ "unchanged - FAIL");
 				numFailed++;
 			}
 		} else {
 			System.out.println("***Failure*** updateReply returned " + replyRows
-					+ " (expected 1) — FAIL");
+					+ " (expected 1) - FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 8: updateReply — wrong author, must be rejected ----
+		// ---- Test 8: updateReply - wrong author, must be rejected ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 8 (DB UPDATE — updateReply wrong author rejected)");
+				+ "\n\nTest case: 8 (DB UPDATE - updateReply wrong author rejected)");
 		int replyWrong = db.updateReply(updateReplyId, "HIJACKED.", "student1");
 		if (replyWrong == 0) {
 			System.out.println("***Success*** updateReply rejected wrong-author edit "
-					+ "(0 rows) — PASS");
+					+ "(0 rows) - PASS");
 			numPassed++;
 		} else {
-			System.out.println("***Failure*** updateReply allowed wrong-author edit — FAIL");
+			System.out.println("***Failure*** updateReply allowed wrong-author edit - FAIL");
 			numFailed++;
 		}
 	}
@@ -869,12 +869,12 @@ public class Tester {
 	 * <p> These tests exercise {@link Database#softDeleteReply} and confirm that the
 	 * author-guard and isDeleted flag behave correctly:
 	 * <ol>
-	 *   <li>softDeleteReply — correct author, isDeleted flips to TRUE.</li>
-	 *   <li>softDeleteReply — wrong author, returns 0 rows (rejected).</li>
-	 *   <li>softDeleteReply — non-existent replyId, returns 0 rows.</li>
-	 *   <li>updateReply on a soft-deleted reply — returns 0 (blocked by isDeleted filter).</li>
-	 *   <li>getReplyById after delete — isDeleted flag is TRUE in the returned object.</li>
-	 *   <li>softDeletePost symmetry — soft-deleting a post does not remove its replies.</li>
+	 *   <li>softDeleteReply - correct author, isDeleted flips to TRUE.</li>
+	 *   <li>softDeleteReply - wrong author, returns 0 rows (rejected).</li>
+	 *   <li>softDeleteReply - non-existent replyId, returns 0 rows.</li>
+	 *   <li>updateReply on a soft-deleted reply - returns 0 (blocked by isDeleted filter).</li>
+	 *   <li>getReplyById after delete - isDeleted flag is TRUE in the returned object.</li>
+	 *   <li>softDeletePost symmetry - soft-deleting a post does not remove its replies.</li>
 	 * </ol>
 	 * </p>
 	 */
@@ -899,7 +899,7 @@ public class Tester {
 			deleteReply1 = db.createReply(r1);
 
 			Reply r2 = new Reply(deletePostId, "student2",
-					"DELETE-TEST reply two — kept to test post-delete visibility.",
+					"DELETE-TEST reply two - kept to test post-delete visibility.",
 					LocalDateTime.now());
 			deleteReply2 = db.createReply(r2);
 		} catch (SQLException e) {
@@ -908,100 +908,100 @@ public class Tester {
 			return;
 		}
 
-		// ---- Test 1: softDeleteReply — correct author flips isDeleted ----
+		// ---- Test 1: softDeleteReply - correct author flips isDeleted ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 1 (DB DELETE — softDeleteReply correct author)");
+				+ "\n\nTest case: 1 (DB DELETE - softDeleteReply correct author)");
 		int rows = db.softDeleteReply(deleteReply1, "student2");
 		if (rows == 1) {
 			Reply check = db.getReplyById(deleteReply1);
 			if (check != null && check.isDeleted()) {
-				System.out.println("***Success*** softDeleteReply set isDeleted = TRUE — PASS");
+				System.out.println("***Success*** softDeleteReply set isDeleted = TRUE - PASS");
 				numPassed++;
 			} else {
 				System.out.println("***Failure*** softDeleteReply returned 1 but isDeleted "
-						+ "not TRUE — FAIL");
+						+ "not TRUE - FAIL");
 				numFailed++;
 			}
 		} else {
 			System.out.println("***Failure*** softDeleteReply returned " + rows
-					+ " (expected 1) — FAIL");
+					+ " (expected 1) - FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 2: softDeleteReply — wrong author, must be rejected ----
+		// ---- Test 2: softDeleteReply - wrong author, must be rejected ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 2 (DB DELETE — softDeleteReply wrong author rejected)");
+				+ "\n\nTest case: 2 (DB DELETE - softDeleteReply wrong author rejected)");
 		int wrongRows = db.softDeleteReply(deleteReply2, "student1");   // student1 did NOT write it
 		if (wrongRows == 0) {
 			System.out.println("***Success*** softDeleteReply rejected wrong-author delete "
-					+ "(0 rows) — PASS");
+					+ "(0 rows) - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** softDeleteReply allowed wrong-author delete "
-					+ "— FAIL");
+					+ "- FAIL");
 			numFailed++;
 		}
 
-		// ---- Test 3: softDeleteReply — non-existent replyId ----
+		// ---- Test 3: softDeleteReply - non-existent replyId ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 3 (DB DELETE — softDeleteReply non-existent replyId)");
+				+ "\n\nTest case: 3 (DB DELETE - softDeleteReply non-existent replyId)");
 		int noRows = db.softDeleteReply(999999, "student2");
 		if (noRows == 0) {
 			System.out.println("***Success*** softDeleteReply returned 0 for non-existent "
-					+ "replyId — PASS");
+					+ "replyId - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** softDeleteReply returned " + noRows
-					+ " for a non-existent replyId — FAIL");
+					+ " for a non-existent replyId - FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 4: updateReply on a soft-deleted reply is blocked ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 4 (DB DELETE — updateReply on deleted reply blocked)");
+				+ "\n\nTest case: 4 (DB DELETE - updateReply on deleted reply blocked)");
 		int blockedEdit = db.updateReply(deleteReply1, "Should be blocked.", "student2");
 		if (blockedEdit == 0) {
 			System.out.println("***Success*** updateReply returned 0 for a soft-deleted reply"
-					+ " — PASS");
+					+ " - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** updateReply allowed edit on a deleted reply "
-					+ "— FAIL");
+					+ "- FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 5: getReplyById returns isDeleted = true after delete ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 5 (DB DELETE — getReplyById reflects isDeleted flag)");
+				+ "\n\nTest case: 5 (DB DELETE - getReplyById reflects isDeleted flag)");
 		Reply deleted = db.getReplyById(deleteReply1);
 		if (deleted != null && deleted.isDeleted()) {
 			System.out.println("***Success*** getReplyById returned reply with isDeleted = "
-					+ "true — PASS");
+					+ "true - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** getReplyById did not reflect isDeleted = true "
-					+ "after softDeleteReply — FAIL");
+					+ "after softDeleteReply - FAIL");
 			numFailed++;
 		}
 
 		// ---- Test 6: Soft-deleting the post does not remove replies ----
 		System.out.println(
 				"____________________________________________________________________________"
-				+ "\n\nTest case: 6 (DB DELETE — softDeletePost preserves replies)");
+				+ "\n\nTest case: 6 (DB DELETE - softDeletePost preserves replies)");
 		db.softDeletePost(deletePostId, "student1");
 		List<Reply> replies = db.getRepliesForPost(deletePostId);
 		if (replies.size() == 2) {
 			System.out.println("***Success*** getRepliesForPost returned 2 replies after "
-					+ "the parent post was soft-deleted — PASS");
+					+ "the parent post was soft-deleted - PASS");
 			numPassed++;
 		} else {
 			System.out.println("***Failure*** getRepliesForPost returned " + replies.size()
-					+ " replies after parent soft-delete (expected 2) — FAIL");
+					+ " replies after parent soft-delete (expected 2) - FAIL");
 			numFailed++;
 		}
 	}

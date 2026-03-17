@@ -6,15 +6,21 @@ import database.Database;
 import entityClasses.DiscussionThread;
 import entityClasses.User;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.VBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 /*******
@@ -198,11 +204,63 @@ public class ViewViewPosts {
 		// Posts ListView
 		setupLabelUI(label_PostsList, "Arial", 14, 200, Pos.BASELINE_LEFT, 20, 146);
 
-		listview_Posts.setStyle("-fx-font-family: 'Dialog'; -fx-font-size: 13px;");
 		listview_Posts.setLayoutX(20);
 		listview_Posts.setLayoutY(165);
 		listview_Posts.setPrefWidth(760);
-		listview_Posts.setPrefHeight(162);
+		listview_Posts.setPrefHeight(200);
+
+		// Custom cell factory — 3 visual states, two-line layout:
+		//   UNREAD        = post never opened         → blue bg
+		//   NEW_REPLIES   = opened but new replies    → amber bg
+		//   READ          = fully caught up           → white bg, muted
+		listview_Posts.setCellFactory(lv -> new ListCell<String>() {
+			private final Label labelTitle = new Label();
+			private final Label labelMeta  = new Label();
+			private final VBox  cellBox    = new VBox(2, labelTitle, labelMeta);
+
+			{
+				cellBox.setPadding(new Insets(4, 6, 4, 6));
+				cellBox.setMaxWidth(Double.MAX_VALUE);
+				labelTitle.setFont(Font.font("Dialog", FontWeight.BOLD, 13));
+				labelMeta.setFont(Font.font("Dialog", FontPosture.ITALIC, 11));
+			}
+
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(null);
+				if (empty || item == null) {
+					setGraphic(null);
+					setStyle("");
+					return;
+				}
+				// Format: PREFIX\tLine1\nLine2
+				String body  = item.contains("\t") ? item.substring(item.indexOf('\t') + 1) : item;
+				int nl       = body.indexOf('\n');
+				String title = nl >= 0 ? body.substring(0, nl) : body;
+				String meta  = nl >= 0 ? body.substring(nl + 1) : "";
+
+				if (item.startsWith("UNREAD\t")) {
+					labelTitle.setText("● NEW  " + title);
+					labelTitle.setTextFill(Color.web("#1a56a0"));
+					labelMeta.setTextFill(Color.web("#3a70c0"));
+					setStyle("-fx-background-color: #ddeeff;");
+				} else if (item.startsWith("NEW_REPLIES\t")) {
+					labelTitle.setText("↩ NEW REPLIES  " + title);
+					labelTitle.setTextFill(Color.web("#8a5c00"));
+					labelMeta.setTextFill(Color.web("#a07020"));
+					setStyle("-fx-background-color: #fff3cd;");
+				} else {
+					labelTitle.setText(title);
+					labelTitle.setTextFill(Color.web("#444444"));
+					labelMeta.setTextFill(Color.web("#999999"));
+					setStyle("-fx-background-color: white;");
+				}
+				labelMeta.setText(meta);
+				setGraphic(cellBox);
+			}
+		});
+
 		// Fire controller when the user selects a row (mouse or keyboard)
 		listview_Posts.getSelectionModel().selectedIndexProperty()
 				.addListener((_, _, _) -> ControllerViewPosts.doSelectPost());
@@ -219,13 +277,46 @@ public class ViewViewPosts {
 		
 		
 		// Replies section
-		setupLabelUI(label_RepliesTitle, "Arial", 14, width, Pos.BASELINE_LEFT, 20, 342);
+		setupLabelUI(label_RepliesTitle, "Arial", 14, width, Pos.BASELINE_LEFT, 20, 372);
 
-		listview_Replies.setStyle("-fx-font-family: 'Dialog'; -fx-font-size: 13px;");
 		listview_Replies.setLayoutX(20);
-		listview_Replies.setLayoutY(362);
+		listview_Replies.setLayoutY(392);
 		listview_Replies.setPrefWidth(760);
-		listview_Replies.setPrefHeight(148);
+		listview_Replies.setPrefHeight(128);
+
+		listview_Replies.setCellFactory(lv -> new ListCell<String>() {
+			private final Label labelText = new Label();
+			private final VBox  cellBox   = new VBox(labelText);
+
+			{
+				cellBox.setPadding(new Insets(4, 6, 4, 6));
+				cellBox.setMaxWidth(Double.MAX_VALUE);
+			}
+
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(null);
+				if (empty || item == null) {
+					setGraphic(null);
+					setStyle("");
+					return;
+				}
+				String display = item.contains("\t") ? item.substring(item.indexOf('\t') + 1) : item;
+				if (item.startsWith("UNREAD_REPLY\t")) {
+					labelText.setText("● NEW  " + display);
+					labelText.setFont(Font.font("Dialog", FontWeight.BOLD, 13));
+					labelText.setTextFill(Color.web("#8a5c00"));
+					setStyle("-fx-background-color: #fff3cd;");
+				} else {
+					labelText.setText("   " + display);
+					labelText.setFont(Font.font("Dialog", FontWeight.NORMAL, 13));
+					labelText.setTextFill(Color.web("#333333"));
+					setStyle("-fx-background-color: white;");
+				}
+				setGraphic(cellBox);
+			}
+		});
 
 
 		// ============================ Area 3: Footer ============================

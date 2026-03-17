@@ -96,21 +96,7 @@ public class ControllerViewPosts {
 			int unreadCount = theDatabase.getUnreadReplyCount(p.getPostId(), currentUser);
 			boolean isRead  = theDatabase.isPostRead(p.getPostId(), currentUser);
 
-			String line;
-			if (p.isDeleted()) {
-				// Show a placeholder so users know the post existed; replies still loadable
-				line = String.format("[ID: %d] @%s | [Post deleted] | Replies: %d",
-						p.getPostId(), p.getAuthorUsername(), replyCount);
-			} else {
-				String preview = p.getContent().length() > 60
-						? p.getContent().substring(0, 60) + "…"
-						: p.getContent();
-				line = String.format("[ID: %d] @%s | %s | Replies: %d | Unread: %d %s",
-						p.getPostId(), p.getAuthorUsername(), preview,
-						replyCount, unreadCount, isRead ? "✓" : "○");
-			}
-
-			displayLines.add(line);
+			displayLines.add(buildPostDisplayLine(p, replyCount, unreadCount, isRead));
 		}
 
 		ViewViewPosts.listview_Posts.setItems(
@@ -157,19 +143,19 @@ public class ControllerViewPosts {
 		for (Reply r : replies) {
 			replyIds.add(r.getReplyId());
 
-			// Mark every displayed reply as read (including deleted ones — no unread noise)
+			// Capture read state BEFORE marking as read so we can color-code the row
+			boolean wasUnread = !theDatabase.isReplyRead(r.getReplyId(), currentUser);
 			theDatabase.markReplyAsRead(r.getReplyId(), currentUser);
 
+			String statusPrefix = wasUnread ? "UNREAD_REPLY\t" : "READ_REPLY\t";
 			String line;
 			if (r.isDeleted()) {
-				line = String.format("[ID: %d] @%s | [Reply deleted]",
-						r.getReplyId(), r.getAuthorUsername());
+				line = statusPrefix + "@" + r.getAuthorUsername() + "  [reply deleted]";
 			} else {
-				String preview = r.getContent().length() > 70
-						? r.getContent().substring(0, 70) + "…"
+				String preview = r.getContent().length() > 80
+						? r.getContent().substring(0, 80) + "…"
 						: r.getContent();
-				line = String.format("[ID: %d] @%s | %s",
-						r.getReplyId(), r.getAuthorUsername(), preview);
+				line = statusPrefix + "@" + r.getAuthorUsername() + "  ·  " + preview;
 			}
 			replyLines.add(line);
 		}
@@ -177,28 +163,42 @@ public class ControllerViewPosts {
 		ViewViewPosts.listview_Replies.setItems(
 				FXCollections.observableArrayList(replyLines));
 		ViewViewPosts.label_RepliesTitle.setText(
-				"Replies for Post ID " + postId + " (" + replies.size() + " total)");
+				"Replies (" + replies.size() + ")" + (replies.isEmpty() ? " — double-click the post to add one" : ""));
 
-		// Update just the one row in the posts list so the ✓/○ indicator flips to ✓
+		// Update just the one row so the unread indicator flips to read immediately,
 		// without calling doLoadPosts() (which would clear the replies we just set).
 		if (idx < currentPosts.size()) {
 			Post p = currentPosts.get(idx);
-			String updatedLine;
-			if (p.isDeleted()) {
-				int replyCount = theDatabase.getReplyCount(postId);
-				updatedLine = String.format("[ID: %d] @%s | [Post deleted] | Replies: %d",
-						p.getPostId(), p.getAuthorUsername(), replyCount);
-			} else {
-				int replyCount  = theDatabase.getReplyCount(postId);
-				int unreadCount = theDatabase.getUnreadReplyCount(postId, currentUser);
-				String preview  = p.getContent().length() > 60
-						? p.getContent().substring(0, 60) + "…"
-						: p.getContent();
-				updatedLine = String.format("[ID: %d] @%s | %s | Replies: %d | Unread: %d ✓",
-						p.getPostId(), p.getAuthorUsername(), preview, replyCount, unreadCount);
-			}
-			ViewViewPosts.listview_Posts.getItems().set(idx, updatedLine);
+			int replyCount  = theDatabase.getReplyCount(postId);
+			int unreadCount = theDatabase.getUnreadReplyCount(postId, currentUser); // 0 now
+			ViewViewPosts.listview_Posts.getItems().set(
+					idx, buildPostDisplayLine(p, replyCount, unreadCount, true));
 		}
+	}
+
+
+	/**
+	 * Builds the encoded display string for a post row.
+	 * Format: {@code "READ\t"} or {@code "UNREAD\t"} prefix, then human-readable text.
+	 * The cell factory in ViewViewPosts strips the prefix and applies visual styling.
+	 */
+	private static String buildPostDisplayLine(Post p, int replyCount, int unreadCount, boolean isRead) {
+		String prefix;
+		if (!isRead) {
+			prefix = "UNREAD\t";
+		} else if (unreadCount > 0) {
+			prefix = "NEW_REPLIES\t";
+		} else {
+			prefix = "READ\t";
+		}
+		String replyLabel = replyCount == 1 ? "1 reply" : replyCount + " replies";
+		String replySuffix = unreadCount > 0 ? replyLabel + "  (" + unreadCount + " new)" : replyLabel;
+		if (p.isDeleted()) {
+			return prefix + "[Deleted post]  ·  @" + p.getAuthorUsername() + "  ·  " + replySuffix + "\n[This post has been deleted]";
+		}
+		String content = p.getContent() == null ? "" : p.getContent();
+		String snippet = content.length() > 100 ? content.substring(0, 100).replace('\n', ' ') + "…" : content.replace('\n', ' ');
+		return prefix + "@" + p.getAuthorUsername() + "  ·  " + replySuffix + "\n" + snippet;
 	}
 
 

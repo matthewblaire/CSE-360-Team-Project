@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -150,6 +151,9 @@ public class ViewUserLogin {
 				"-fx-background-color: #4a90d9; -fx-text-fill: white; "
 				+ "-fx-background-radius: 5; -fx-cursor: hand;");
 		button_Login.setOnAction((_) -> {ControllerUserLogin.doLogin(theStage); });
+
+		text_Username.setOnKeyPressed(e -> { if (e.getCode() == KeyCode.ENTER) ControllerUserLogin.doLogin(theStage); });
+		text_Password.setOnKeyPressed(e -> { if (e.getCode() == KeyCode.ENTER) ControllerUserLogin.doLogin(theStage); });
 
 		HBox loginButtonRow = new HBox();
 		loginButtonRow.setAlignment(Pos.CENTER);

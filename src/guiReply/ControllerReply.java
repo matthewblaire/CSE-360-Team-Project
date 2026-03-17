@@ -55,6 +55,8 @@ public class ControllerReply {
         int ret = theDatabase.createReply(newReply);
         if (ret > 0) {
             System.out.println("Reply created successfully");
+            // Mark the new reply as read for its author immediately
+            theDatabase.markReplyAsRead(ret, user.getUserName());
             // Refresh the post view to show the new reply
             ViewPost.displayPost(stage, user, post.getPostId());
         } else {
