@@ -63,7 +63,7 @@ public class ControllerStudentHome {
 	 * made so I can learn from and contribute to ongoing discussions." </p>
 	 */
 	protected static void goToBrowsePosts() {
-		guiViewPosts.ViewViewPosts.displayViewPosts(ViewStudentHome.theStage,
+		guiBrowsePosts.ViewBrowsePosts.displayBrowsePosts(ViewStudentHome.theStage,
 				ViewStudentHome.theUser);
 	}
 

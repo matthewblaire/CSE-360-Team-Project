@@ -6,8 +6,8 @@ import java.util.List;
 import database.Database;
 import entityClasses.Post;
 import entityClasses.User;
+import guiBrowsePosts.ViewBrowsePosts;
 import guiPost.ViewPost;
-import guiViewPosts.ViewViewPosts;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 

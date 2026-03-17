@@ -132,6 +132,7 @@ public class FoundationsMain extends Application {
 		users.add(new User("admin2", "", "admin2", "", "", "", "admin2@example.com", true, false, false));
 		users.add(new User("user1", "", "user1", "", "", "", "user1@example.com", false, true, false));
 		users.add(new User("user2", "", "user2", "", "", "", "user2@example.com", false, true, false));
+		users.add(new User("", "", "user1", "", "", "", "user1@example.com", false, true, false));
         try {
 	        	// Create users
 	        	for (User user: users) {

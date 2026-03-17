@@ -17,10 +17,10 @@ import javafx.stage.Stage;
 import entityClasses.Post;
 import entityClasses.Reply;
 import entityClasses.User;
+import guiBrowsePosts.ViewBrowsePosts;
 import guiReply.ControllerReply;
 import guiReply.ViewNewReply;
 import guiReply.ViewReply;
-import guiViewPosts.ViewViewPosts;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -142,7 +142,7 @@ public class ViewPost {
 
         setupButtonUI(button_ReturnToAllPosts, "Dialog", 16, 170, Pos.CENTER, 608, 44);
         button_ReturnToAllPosts.setOnAction(_ -> {
-            ViewViewPosts.displayViewPosts(theStage, theUser);
+            ViewBrowsePosts.displayBrowsePosts(theStage, theUser);
         });
 
         // ── Area 2: Post metadata ─────────────────────────────────────────────────

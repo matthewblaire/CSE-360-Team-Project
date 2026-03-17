@@ -2,7 +2,7 @@ package guiMyPosts;
 
 import database.Database;
 import entityClasses.User;
-import guiViewPosts.ControllerViewPosts;
+import guiBrowsePosts.ControllerBrowsePosts;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

@@ -1,4 +1,4 @@
-package guiViewPosts;
+package guiBrowsePosts;
 
 /*******
  * <p> Title: ModelViewPosts Class. </p>
@@ -12,11 +12,11 @@ package guiViewPosts;
  *
  * @version 1.00	2026-02-23	Initial stub for Phase 2
  */
-public class ModelViewPosts {
+public class ModelBrowsePosts {
 
 	/**
 	 * Default constructor — not used.
 	 */
-	public ModelViewPosts() {
+	public ModelBrowsePosts() {
 	}
 }
