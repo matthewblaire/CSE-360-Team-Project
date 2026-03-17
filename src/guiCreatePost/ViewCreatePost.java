@@ -96,26 +96,11 @@ public class ViewCreatePost {
 	/** Validates content and submits the post to the database. */
 	protected static Button button_SubmitPost = new Button("Submit Post");
 
-	/** Visual divider between the post-creation and reply sections. */
-	protected static Line line_Separator2     = new Line(20, 348, width - 20, 348);
 
-	// ---- Area 2: Reply Section ----
 
-	/** Section heading for the reply form. */
-	protected static Label label_ReplySection = new Label(
-			"— Reply to an Existing Post —");
-	/** Prompts the student to enter the numeric Post ID they want to reply to. */
-	protected static Label label_PostId       = new Label("Post ID:");
-	/** Single-line field for the target postId. */
-	protected static TextField text_PostId    = new TextField();
-	/** Prompts the student to type the reply body. */
-	protected static Label label_ReplyContent = new Label("Reply Content:");
-	/** Multi-line text input for the reply body. */
-	protected static TextArea textarea_ReplyContent = new TextArea();
 	/** Inline feedback label; shows validation errors in red. */
 	protected static Label label_ErrorFeedback = new Label();
-	/** Validates the postId and content, then persists the reply. */
-	protected static Button button_SubmitReply = new Button("Submit Reply");
+
 
 	/** Horizontal rule separating the main content from the footer. */
 	protected static Line line_Separator4     = new Line(20, 525, width - 20, 525);
@@ -197,8 +182,7 @@ public class ViewCreatePost {
 
 		// Reset fields and feedback so the form is clean on every visit
 		textarea_PostContent.clear();
-		textarea_ReplyContent.clear();
-		text_PostId.clear();
+
 		label_CharCount.setText("0 / 2000");
 		label_CharCount.setStyle("-fx-text-fill: black;");
 		label_ErrorFeedback.setText("");
@@ -259,7 +243,7 @@ public class ViewCreatePost {
 		textarea_PostContent.setLayoutX(20);
 		textarea_PostContent.setLayoutY(180);
 		textarea_PostContent.setPrefWidth(760);
-		textarea_PostContent.setPrefHeight(120);
+		textarea_PostContent.setPrefHeight(250);
 		textarea_PostContent.setWrapText(true);
 		textarea_PostContent.setPromptText("Type your question or statement here (max 2000 characters)");
 		// Live char-count update on every keystroke
@@ -267,45 +251,19 @@ public class ViewCreatePost {
 			ControllerCreatePost.doUpdateCharCount(newVal));
 
 		// Character count — right-aligned beneath the TextArea
-		setupLabelUI(label_CharCount, "Dialog", 12, 760, Pos.BASELINE_RIGHT, 20, 282);
+		setupLabelUI(label_CharCount, "Dialog", 12, 760, Pos.BASELINE_RIGHT, 15, 410);
 
 		// Submit Post button
-		setupButtonUI(button_SubmitPost, "Dialog", 16, 180, Pos.CENTER, 310, 305);
+		setupButtonUI(button_SubmitPost, "Dialog", 16, 180, Pos.CENTER, 310, 475);
 		button_SubmitPost.setOnAction((_) -> { ControllerCreatePost.doCreatePost(); });
 
-
-		// ============================ Area 2: Reply Section ============================
-
-		// Section divider and heading
-		setupLabelUI(label_ReplySection, "Arial", 15, width, Pos.CENTER, 0, 355);
-
-		// Post ID row (label + TextField side-by-side)
-		setupLabelUI(label_PostId, "Arial", 14, 75, Pos.BASELINE_LEFT, 20, 388);
-		text_PostId.setFont(Font.font("Dialog", 14));
-		text_PostId.setMinWidth(120);
-		text_PostId.setLayoutX(100);
-		text_PostId.setLayoutY(384);
-		text_PostId.setPromptText("e.g. 3");
-				
-		// Reply content area
-		setupLabelUI(label_ReplyContent, "Arial", 14, 200, Pos.BASELINE_LEFT, 20, 420);
-
-		textarea_ReplyContent.setFont(Font.font("Dialog", 13));
-		textarea_ReplyContent.setLayoutX(20);
-		textarea_ReplyContent.setLayoutY(442);
-		textarea_ReplyContent.setPrefWidth(760);
-		textarea_ReplyContent.setPrefHeight(62);
-		textarea_ReplyContent.setWrapText(true);
-		textarea_ReplyContent.setPromptText("Type your reply here…");
 
 		// Inline error / feedback label (red text)
 		setupLabelUI(label_ErrorFeedback, "Arial", 12, 760, Pos.BASELINE_LEFT, 20, 508);
 		label_ErrorFeedback.setStyle("-fx-text-fill: red;");
 		label_ErrorFeedback.setWrapText(true);
 
-		// Submit Reply button
-		setupButtonUI(button_SubmitReply, "Dialog", 16, 180, Pos.CENTER, 310, 490);
-		button_SubmitReply.setOnAction((_) -> { ControllerCreatePost.doCreateReply(); });
+
 
 
 		// ============================ Area 3: Footer ============================
@@ -326,11 +284,7 @@ public class ViewCreatePost {
 				label_PageTitle, label_UserDetails, button_Return, line_Separator1,
 				label_SelectThread, combobox_Thread,
 				label_PostContent,  textarea_PostContent, label_CharCount, button_SubmitPost,
-				line_Separator2,
-				label_ReplySection,
-				label_PostId, text_PostId,
-				label_ReplyContent, textarea_ReplyContent,
-				label_ErrorFeedback, button_SubmitReply,
+				label_ErrorFeedback, 
 				line_Separator4,
 //				label_Title,
 				textField_Title,

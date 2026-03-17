@@ -153,8 +153,6 @@ public class ViewBrowsePosts {
 			combobox_Thread.getSelectionModel().select(0);
 
 		
-		
-
 		theStage.setTitle("CSE 360 Foundations: Browse Posts");
 		theStage.setScene(theBrowsePostsScene);
 		
