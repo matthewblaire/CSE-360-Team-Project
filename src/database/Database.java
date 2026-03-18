@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import entityClasses.DiscussionThread;
 import entityClasses.Post;
-import entityClasses.ReadStatus;
 import entityClasses.Reply;
 import entityClasses.User;
 

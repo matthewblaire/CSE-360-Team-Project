@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import database.Database;
 import entityClasses.DiscussionThread;
 import entityClasses.Post;
-import entityClasses.Reply;
 import recognizers.PostContentRecognizer;
 
 /*******

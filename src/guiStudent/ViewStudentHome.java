@@ -57,16 +57,14 @@ public class ViewStudentHome {
 	protected static Line line_Separator1 = new Line(20, 95, width-20, 95);
 
 	// GUI Area 2: Discussion system entry points — Phase 2 functionality.
-	// These four buttons let students create posts/replies and use the READ operations:
-	// Browse Posts (by thread), My Posts (own posts with unread counts), Search Posts.
+	// These three buttons let students create posts/replies and use the READ operations:
+	// Browse Posts (by thread, with keyword search), My Posts (own posts with unread counts).
 	/** The button that navigates to the Create Post / Reply page. */
 	protected static Button button_CreatePost  = new Button("Create Post / Reply");
 	/** The button that navigates to the Browse Posts page. */
 	protected static Button button_BrowsePosts = new Button("Browse Posts");
 	/** The button that navigates to the My Posts page. */
 	protected static Button button_MyPosts     = new Button("My Posts");
-	/** The button that navigates to the Search Posts page. */
-	protected static Button button_SearchPosts = new Button("Search Posts");
 	
 	
 	
@@ -192,9 +190,6 @@ public class ViewStudentHome {
 
 		setupButtonUI(button_MyPosts,     "Dialog", 18, 300, Pos.CENTER, 250, 280);
 		button_MyPosts.setOnAction((_) -> { ControllerStudentHome.goToMyPosts(); });
-
-		setupButtonUI(button_SearchPosts, "Dialog", 18, 300, Pos.CENTER, 250, 340);
-		button_SearchPosts.setOnAction((_) -> { ControllerStudentHome.goToSearchPosts(); });
 		
 		
 		// GUI Area 3
@@ -209,7 +204,7 @@ public class ViewStudentHome {
 		// Place all of the widget items into the Root Pane's list of children
          theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
-			button_CreatePost, button_BrowsePosts, button_MyPosts, button_SearchPosts,
+			button_CreatePost, button_BrowsePosts, button_MyPosts,
 	        line_Separator4, button_Logout, button_Quit);
 }
 	

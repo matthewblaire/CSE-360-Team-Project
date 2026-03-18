@@ -83,20 +83,6 @@ public class ControllerStudentHome {
 
 
 	/**********
-	 * <p> Method: goToSearchPosts() </p>
-	 *
-	 * <p> Description: Navigates the student to the Search Posts page (guiSearchPosts) where
-	 * they can search all posts by keyword with an optional thread filter.
-	 * This satisfies the Phase 2 user story: "As a student, I can search for posts to quickly
-	 * find help on a specific topic." </p>
-	 */
-	protected static void goToSearchPosts() {
-		guiSearchPosts.ViewSearchPosts.displaySearchPosts(ViewStudentHome.theStage,
-				ViewStudentHome.theUser);
-	}
-
-
-	/**********
 	 * <p> Method: performUpdate() </p>
 	 * 
 	 * <p> Description: This method directs the user to the User Update Page so the user can change

@@ -1,16 +1,10 @@
 package guiPost;
 
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import entityClasses.Post;
-import entityClasses.Reply;
 import entityClasses.User;
 import guiBrowsePosts.ViewBrowsePosts;
-import guiStudent.ViewStudentHome;
 import database.Database;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import applicationMain.FoundationsMain;
 

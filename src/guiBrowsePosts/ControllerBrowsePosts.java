@@ -145,6 +145,34 @@ public class ControllerBrowsePosts {
 	}
 
 
+	protected static void doSearch() {
+		String keyword = ViewBrowsePosts.text_Keyword.getText().trim();
+		if (keyword.isEmpty()) {
+			doLoadPosts();
+			return;
+		}
+		DiscussionThread selected = ViewBrowsePosts.combobox_Thread.getSelectionModel().getSelectedItem();
+		int threadId = (selected == null) ? -1 : selected.getThreadId();
+		List<Post> results = theDatabase.searchPosts(keyword, threadId);
+
+		postIds.clear();
+		currentPosts.clear();
+		List<String> displayLines = new ArrayList<>();
+		String currentUser = ViewBrowsePosts.theUser.getUserName();
+
+		for (Post p : results) {
+			postIds.add(p.getPostId());
+			currentPosts.add(p);
+			int replyCount  = theDatabase.getReplyCount(p.getPostId());
+			int unreadCount = theDatabase.getUnreadReplyCount(p.getPostId(), currentUser);
+			boolean isRead  = theDatabase.isPostRead(p.getPostId(), currentUser);
+			displayLines.add(buildPostDisplayLine(p, replyCount, unreadCount, isRead));
+		}
+		ViewBrowsePosts.listview_Posts.setItems(FXCollections.observableArrayList(displayLines));
+		replyIds.clear();
+	}
+
+
 	/**
 	 * Builds the encoded display string for a post row.
 	 * Format: {@code "READ\t"} or {@code "UNREAD\t"} prefix, then human-readable text.

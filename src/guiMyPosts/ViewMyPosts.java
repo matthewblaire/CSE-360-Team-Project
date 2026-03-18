@@ -1,8 +1,6 @@
 package guiMyPosts;
 
-import database.Database;
 import entityClasses.User;
-import guiBrowsePosts.ControllerBrowsePosts;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -88,9 +86,6 @@ public class ViewMyPosts {
 
 	/** Singleton reference; null until displayMyPosts() is called for the first time. */
 	private static ViewMyPosts theView;
-
-	/** Database reference shared by this package. */
-	private static Database theDatabase = applicationMain.FoundationsMain.database;
 
 	/** The JavaFX Stage for this page. */
 	protected static Stage theStage;

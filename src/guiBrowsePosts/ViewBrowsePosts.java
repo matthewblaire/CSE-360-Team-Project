@@ -11,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -79,6 +80,10 @@ public class ViewBrowsePosts {
 	protected static ComboBox<DiscussionThread> combobox_Thread = new ComboBox<>();
 	/** Button to reload the post list for the selected thread. */
 	protected static Button button_LoadPosts  = new Button("Load Posts");
+	/** Keyword text field for searching posts. */
+	protected static TextField text_Keyword   = new TextField();
+	/** Button to execute a keyword search on the current thread. */
+	protected static Button    button_Search  = new Button("Search");
 
 	/** Heading for the posts list. */
 	protected static Label label_PostsList    = new Label("Posts:");
@@ -201,6 +206,17 @@ public class ViewBrowsePosts {
 		setupButtonUI(button_LoadPosts, "Dialog", 14, 120, Pos.CENTER, 440, 104);
 		button_LoadPosts.setOnAction((_) -> { ControllerBrowsePosts.doLoadPosts(); });
 
+		text_Keyword.setFont(Font.font("Dialog", 14));
+		text_Keyword.setMinWidth(130);
+		text_Keyword.setPrefWidth(130);
+		text_Keyword.setLayoutX(568);
+		text_Keyword.setLayoutY(108);
+		text_Keyword.setPromptText("Search...");
+		text_Keyword.setOnAction((_) -> { ControllerBrowsePosts.doSearch(); });
+
+		setupButtonUI(button_Search, "Dialog", 14, 74, Pos.CENTER, 706, 104);
+		button_Search.setOnAction((_) -> { ControllerBrowsePosts.doSearch(); });
+
 		// Posts ListView
 		setupLabelUI(label_PostsList, "Arial", 14, 200, Pos.BASELINE_LEFT, 20, 146);
 
@@ -213,7 +229,7 @@ public class ViewBrowsePosts {
 		//   UNREAD        = post never opened         → blue bg
 		//   NEW_REPLIES   = opened but new replies    → amber bg
 		//   READ          = fully caught up           → white bg, muted
-		listview_Posts.setCellFactory(lv -> new ListCell<String>() {
+		listview_Posts.setCellFactory(_ -> new ListCell<String>() {
 			private final Label labelTitle = new Label();
 			private final Label labelMeta  = new Label();
 			private final VBox  cellBox    = new VBox(2, labelTitle, labelMeta);
@@ -289,7 +305,7 @@ public class ViewBrowsePosts {
 		// Add all widgets to the root Pane
 		theRootPane.getChildren().addAll(
 				label_PageTitle, label_UserDetails, button_Return, line_Separator1,
-				label_SelectThread, combobox_Thread, button_LoadPosts,
+				label_SelectThread, combobox_Thread, button_LoadPosts, text_Keyword, button_Search,
 				label_PostsList, listview_Posts,
 				line_Separator4, button_Logout, button_Quit);
 	}

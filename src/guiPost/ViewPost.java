@@ -76,7 +76,6 @@ public class ViewPost {
     protected static Button button_Logout           = new Button("Logout");
     protected static Button button_Quit             = new Button("Quit");
 
-    private static ViewPost  theView;
     private static Database  theDatabase = applicationMain.FoundationsMain.database;
 
     protected static Stage theStage;
@@ -102,7 +101,7 @@ public class ViewPost {
         theUser  = user;
         currentPost = theDatabase.getPostById(postId);
 
-        theView = new ViewPost();
+        new ViewPost();
 
         // Mark post and all its replies as read for the current user
         theDatabase.markPostAsRead(postId, theUser.getUserName());
