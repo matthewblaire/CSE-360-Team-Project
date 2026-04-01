@@ -15,7 +15,6 @@ import java.sql.SQLException;
 
 import entityClasses.Post;
 import entityClasses.User;
-import guiReply.ControllerReply;
 
 /*******
  * <p> Title: ViewNewReply Class. </p>

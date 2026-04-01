@@ -1,16 +1,10 @@
 package guiPost;
 
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import entityClasses.Post;
-import entityClasses.Reply;
 import entityClasses.User;
-import guiStudent.ViewStudentHome;
-import guiViewPosts.ViewViewPosts;
+import guiBrowsePosts.ViewBrowsePosts;
 import database.Database;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import applicationMain.FoundationsMain;
 
@@ -134,7 +128,7 @@ public class ControllerPost {
     	String postUserUsername = user.getUserName();
         if (post.getAuthorUsername().equals(postUserUsername) || user.getNewStaffRole() || user.getAdminRole()) {
         	theDatabase.softDeletePost(postId, postUserUsername);
-        	ViewViewPosts.displayViewPosts(stage, user);
+        	ViewBrowsePosts.displayBrowsePosts(stage, user);
         } 
     }
     

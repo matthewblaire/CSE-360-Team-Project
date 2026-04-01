@@ -1,8 +1,6 @@
 package guiMyPosts;
 
-import database.Database;
 import entityClasses.User;
-import guiViewPosts.ControllerViewPosts;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -69,8 +67,7 @@ public class ViewMyPosts {
 	protected static Label label_PostCount   = new Label("Your posts: 0");
 	/** Refresh button to reload posts. */
 	protected static Button button_Refresh   = new Button("Refresh");
-	/** Navigates to the Edit Post page with the selected post pre-loaded. */
-	protected static Button button_EditPost  = new Button("Edit Selected Post");
+	
 	/** Displays formatted post summaries with reply and unread counts. */
 	protected static ListView<String> listview_MyPosts = new ListView<>();
 
@@ -89,9 +86,6 @@ public class ViewMyPosts {
 
 	/** Singleton reference; null until displayMyPosts() is called for the first time. */
 	private static ViewMyPosts theView;
-
-	/** Database reference shared by this package. */
-	private static Database theDatabase = applicationMain.FoundationsMain.database;
 
 	/** The JavaFX Stage for this page. */
 	protected static Stage theStage;
@@ -126,6 +120,8 @@ public class ViewMyPosts {
 		theUser  = user;
 
 		if (theView == null) theView = new ViewMyPosts();
+		theStage.setTitle("CSE 360 Foundations: My Posts");
+		theStage.setScene(theMyPostsScene);
 
 		// Dynamic refresh
 		label_UserDetails.setText("User: " + theUser.getUserName());
@@ -135,8 +131,7 @@ public class ViewMyPosts {
 		// Populate the list immediately on every visit
 		ControllerMyPosts.doLoadMyPosts();
 
-		theStage.setTitle("CSE 360 Foundations: My Posts");
-		theStage.setScene(theMyPostsScene);
+		
 		theStage.show();
 	}
 
@@ -170,8 +165,7 @@ public class ViewMyPosts {
 		setupButtonUI(button_Refresh, "Dialog", 14, 120, Pos.CENTER, 480, 108);
 		button_Refresh.setOnAction((_) -> { ControllerMyPosts.doLoadMyPosts(); });
 
-		setupButtonUI(button_EditPost, "Dialog", 14, 200, Pos.CENTER, 608, 108);
-		button_EditPost.setOnAction((_) -> { ControllerMyPosts.goToEditPost(); });
+
 
 		
 	    // Double click handler for Posts
@@ -202,7 +196,7 @@ public class ViewMyPosts {
 		// Add all widgets to the root Pane
 		theRootPane.getChildren().addAll(
 				label_PageTitle, label_UserDetails, button_Return, line_Separator1,
-				label_PostCount, button_Refresh, button_EditPost, listview_MyPosts,
+				label_PostCount, button_Refresh, listview_MyPosts,
 				line_Separator4, button_Logout, button_Quit);
 	}
 

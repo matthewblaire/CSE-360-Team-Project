@@ -1,9 +1,9 @@
-package guiEditPost;
+package guiBrowsePosts;
 
 /*******
- * <p> Title: ModelEditPost Class. </p>
+ * <p> Title: ModelViewPosts Class. </p>
  *
- * <p> Description: Model stub for the Edit Post / Reply page.  Business logic beyond database
+ * <p> Description: Model stub for the Browse Posts page.  Business logic beyond database
  * access will be placed here in future phases. </p>
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
@@ -12,11 +12,11 @@ package guiEditPost;
  *
  * @version 1.00	2026-02-23	Initial stub for Phase 2
  */
-public class ModelEditPost {
+public class ModelBrowsePosts {
 
 	/**
 	 * Default constructor — not used.
 	 */
-	public ModelEditPost() {
+	public ModelBrowsePosts() {
 	}
 }

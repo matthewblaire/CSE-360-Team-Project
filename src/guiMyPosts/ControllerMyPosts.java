@@ -7,7 +7,6 @@ import database.Database;
 import entityClasses.Post;
 import entityClasses.User;
 import guiPost.ViewPost;
-import guiViewPosts.ViewViewPosts;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 
@@ -99,20 +98,6 @@ public class ControllerMyPosts {
 		ViewPost.displayPost(ps, user, postId);// displayPost(Stage ps, User user, Post post)
 	}
 	
-	/**********
-	 * <p> Method: goToEditPost() </p>
-	 *
-	 * <p> Description: Navigates the student to the Edit Post / Reply page
-	 * ({@link guiEditPost.ViewEditPost}) with the currently selected post pre-loaded.  If no
-	 * row is selected the method returns silently; the student must select a post first. </p>
-	 */
-	protected static void goToEditPost() {
-		int idx = ViewMyPosts.listview_MyPosts.getSelectionModel().getSelectedIndex();
-		if (idx < 0 || idx >= postIds.size()) return;
-		int postId = postIds.get(idx);
-		guiEditPost.ViewEditPost.displayEditPost(ViewMyPosts.theStage, ViewMyPosts.theUser,
-				postId);
-	}
 
 
 	/**********

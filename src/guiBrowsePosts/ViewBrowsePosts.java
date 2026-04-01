@@ -1,4 +1,4 @@
-package guiViewPosts;
+package guiBrowsePosts;
 
 import java.util.List;
 
@@ -11,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -24,7 +25,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 /*******
- * <p> Title: ViewViewPosts Class. </p>
+ * <p> Title: ViewBrowsePosts Class. </p>
  *
  * <p> Description: The View component of the Browse Posts MVC triplet.  This singleton page
  * lets a logged-in student browse all non-deleted posts in a chosen discussion thread.
@@ -38,7 +39,7 @@ import javafx.stage.Stage;
  * </ul>
  *
  * Selecting a row in the Posts ListView triggers
- * {@link ControllerViewPosts#doSelectPost()}, which marks the post and all its replies as
+ * {@link ControllerBrowsePosts#doSelectPost()}, which marks the post and all its replies as
  * read for the current user, then repopulates the Replies ListView. </p>
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
@@ -47,7 +48,7 @@ import javafx.stage.Stage;
  *
  * @version 1.00	2026-02-23	Initial version for Phase 2 — Student Discussion System
  */
-public class ViewViewPosts {
+public class ViewBrowsePosts {
 
 	/*-*******************************************************************************************
 
@@ -79,16 +80,15 @@ public class ViewViewPosts {
 	protected static ComboBox<DiscussionThread> combobox_Thread = new ComboBox<>();
 	/** Button to reload the post list for the selected thread. */
 	protected static Button button_LoadPosts  = new Button("Load Posts");
+	/** Keyword text field for searching posts. */
+	protected static TextField text_Keyword   = new TextField();
+	/** Button to execute a keyword search on the current thread. */
+	protected static Button    button_Search  = new Button("Search");
 
 	/** Heading for the posts list. */
 	protected static Label label_PostsList    = new Label("Posts:");
 	/** Displays formatted post summaries; selection triggers reply loading. */
 	protected static ListView<String> listview_Posts = new ListView<>();
-
-	/** Dynamic heading for the replies pane; updated when a post is selected. */
-	protected static Label label_RepliesTitle = new Label("Replies — select a post above");
-	/** Displays the replies for the currently selected post. */
-	protected static ListView<String> listview_Replies = new ListView<>();
 
 
 	// ---- Area 3: Footer ----
@@ -104,7 +104,7 @@ public class ViewViewPosts {
 	// ---- Singleton state ----
 
 	/** Singleton reference; null until displayViewPosts() is called for the first time. */
-	private static ViewViewPosts theView;
+	private static ViewBrowsePosts theView;
 
 	/** Database reference shared by this package. */
 	private static Database theDatabase = applicationMain.FoundationsMain.database;
@@ -117,7 +117,7 @@ public class ViewViewPosts {
 	protected static User  theUser;
 
 	/** The single Scene instance reused on every visit. */
-	private static Scene theViewPostsScene;
+	private static Scene theBrowsePostsScene;
 
 
 	/*-*******************************************************************************************
@@ -142,12 +142,12 @@ public class ViewViewPosts {
 	 * @param ps    the primary JavaFX Stage
 	 * @param user  the currently logged-in Student
 	 */
-	public static void displayViewPosts(Stage ps, User user) {
+	public static void displayBrowsePosts(Stage ps, User user) {
 
 		theStage = ps;
 		theUser  = user;
 
-		if (theView == null) theView = new ViewViewPosts();
+		if (theView == null) theView = new ViewBrowsePosts();
 
 		// Dynamic refresh
 		label_UserDetails.setText("User: " + theUser.getUserName());
@@ -157,17 +157,22 @@ public class ViewViewPosts {
 		if (!threads.isEmpty())
 			combobox_Thread.getSelectionModel().select(0);
 
+		
+		theStage.setTitle("CSE 360 Foundations: Browse Posts");
+		theStage.setScene(theBrowsePostsScene);
+		
 		// Clear both lists
 		listview_Posts.setItems(FXCollections.observableArrayList());
-		listview_Replies.setItems(FXCollections.observableArrayList());
-		label_RepliesTitle.setText("Replies — select a post above");
-		ControllerViewPosts.postIds.clear();
-		ControllerViewPosts.currentPosts.clear();
-		ControllerViewPosts.replyIds.clear();
-
-		theStage.setTitle("CSE 360 Foundations: Browse Posts");
-		theStage.setScene(theViewPostsScene);
+		ControllerBrowsePosts.postIds.clear();
+		ControllerBrowsePosts.currentPosts.clear();
+		ControllerBrowsePosts.replyIds.clear();
+		
+		ControllerBrowsePosts.doLoadPosts();
+				
 		theStage.show();
+		
+		
+		
 	}
 
 
@@ -178,10 +183,10 @@ public class ViewViewPosts {
 	 * Static layout and event handlers are set here; dynamic data is handled in
 	 * displayViewPosts(). </p>
 	 */
-	private ViewViewPosts() {
+	private ViewBrowsePosts() {
 
 		theRootPane     = new Pane();
-		theViewPostsScene = new Scene(theRootPane, width, height);
+		theBrowsePostsScene = new Scene(theRootPane, width, height);
 
 
 		// ============================ Area 1: Header ============================
@@ -190,7 +195,7 @@ public class ViewViewPosts {
 		setupLabelUI(label_UserDetails, "Arial", 18, width - 220, Pos.BASELINE_LEFT, 20, 52);
 
 		setupButtonUI(button_Return, "Dialog", 16, 170, Pos.CENTER, 608, 44);
-		button_Return.setOnAction((_) -> { ControllerViewPosts.performReturn(); });
+		button_Return.setOnAction((_) -> { ControllerBrowsePosts.performReturn(); });
 
 
 		// ============================ Area 2: Thread selector ============================
@@ -199,7 +204,18 @@ public class ViewViewPosts {
 		setupComboBoxUI(combobox_Thread, "Dialog", 14, 280, 145, 108);
 
 		setupButtonUI(button_LoadPosts, "Dialog", 14, 120, Pos.CENTER, 440, 104);
-		button_LoadPosts.setOnAction((_) -> { ControllerViewPosts.doLoadPosts(); });
+		button_LoadPosts.setOnAction((_) -> { ControllerBrowsePosts.doLoadPosts(); });
+
+		text_Keyword.setFont(Font.font("Dialog", 14));
+		text_Keyword.setMinWidth(130);
+		text_Keyword.setPrefWidth(130);
+		text_Keyword.setLayoutX(568);
+		text_Keyword.setLayoutY(108);
+		text_Keyword.setPromptText("Search...");
+		text_Keyword.setOnAction((_) -> { ControllerBrowsePosts.doSearch(); });
+
+		setupButtonUI(button_Search, "Dialog", 14, 74, Pos.CENTER, 706, 104);
+		button_Search.setOnAction((_) -> { ControllerBrowsePosts.doSearch(); });
 
 		// Posts ListView
 		setupLabelUI(label_PostsList, "Arial", 14, 200, Pos.BASELINE_LEFT, 20, 146);
@@ -207,13 +223,13 @@ public class ViewViewPosts {
 		listview_Posts.setLayoutX(20);
 		listview_Posts.setLayoutY(165);
 		listview_Posts.setPrefWidth(760);
-		listview_Posts.setPrefHeight(200);
+		listview_Posts.setPrefHeight(350);
 
 		// Custom cell factory — 3 visual states, two-line layout:
 		//   UNREAD        = post never opened         → blue bg
 		//   NEW_REPLIES   = opened but new replies    → amber bg
 		//   READ          = fully caught up           → white bg, muted
-		listview_Posts.setCellFactory(lv -> new ListCell<String>() {
+		listview_Posts.setCellFactory(_ -> new ListCell<String>() {
 			private final Label labelTitle = new Label();
 			private final Label labelMeta  = new Label();
 			private final VBox  cellBox    = new VBox(2, labelTitle, labelMeta);
@@ -263,77 +279,34 @@ public class ViewViewPosts {
 
 		// Fire controller when the user selects a row (mouse or keyboard)
 		listview_Posts.getSelectionModel().selectedIndexProperty()
-				.addListener((_, _, _) -> ControllerViewPosts.doSelectPost());
+				.addListener((_, _, _) -> ControllerBrowsePosts.doSelectPost());
 
 		
 	    // Double click handler for Posts
 	    listview_Posts.setOnMouseClicked(event -> {
 	        if (event.getClickCount() == 2 && !listview_Posts.getSelectionModel().isEmpty()) {
 	            Object selectedItem = listview_Posts.getSelectionModel().getSelectedItem();
-	            ControllerViewPosts.doHandlePostDoubleClick(selectedItem, theStage, theUser);
+	            ControllerBrowsePosts.doHandlePostDoubleClick(selectedItem, theStage, theUser);
 	            event.consume();
 	        }
 	    });
 		
 		
-		// Replies section
-		setupLabelUI(label_RepliesTitle, "Arial", 14, width, Pos.BASELINE_LEFT, 20, 372);
-
-		listview_Replies.setLayoutX(20);
-		listview_Replies.setLayoutY(392);
-		listview_Replies.setPrefWidth(760);
-		listview_Replies.setPrefHeight(128);
-
-		listview_Replies.setCellFactory(lv -> new ListCell<String>() {
-			private final Label labelText = new Label();
-			private final VBox  cellBox   = new VBox(labelText);
-
-			{
-				cellBox.setPadding(new Insets(4, 6, 4, 6));
-				cellBox.setMaxWidth(Double.MAX_VALUE);
-			}
-
-			@Override
-			protected void updateItem(String item, boolean empty) {
-				super.updateItem(item, empty);
-				setText(null);
-				if (empty || item == null) {
-					setGraphic(null);
-					setStyle("");
-					return;
-				}
-				String display = item.contains("\t") ? item.substring(item.indexOf('\t') + 1) : item;
-				if (item.startsWith("UNREAD_REPLY\t")) {
-					labelText.setText("● NEW  " + display);
-					labelText.setFont(Font.font("Dialog", FontWeight.BOLD, 13));
-					labelText.setTextFill(Color.web("#8a5c00"));
-					setStyle("-fx-background-color: #fff3cd;");
-				} else {
-					labelText.setText("   " + display);
-					labelText.setFont(Font.font("Dialog", FontWeight.NORMAL, 13));
-					labelText.setTextFill(Color.web("#333333"));
-					setStyle("-fx-background-color: white;");
-				}
-				setGraphic(cellBox);
-			}
-		});
-
 
 		// ============================ Area 3: Footer ============================
 
 		setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20,  540);
-		button_Logout.setOnAction((_) -> { ControllerViewPosts.performLogout(); });
+		button_Logout.setOnAction((_) -> { ControllerBrowsePosts.performLogout(); });
 
 		setupButtonUI(button_Quit,   "Dialog", 18, 250, Pos.CENTER, 300, 540);
-		button_Quit.setOnAction((_) -> { ControllerViewPosts.performQuit(); });
+		button_Quit.setOnAction((_) -> { ControllerBrowsePosts.performQuit(); });
 
 
 		// Add all widgets to the root Pane
 		theRootPane.getChildren().addAll(
 				label_PageTitle, label_UserDetails, button_Return, line_Separator1,
-				label_SelectThread, combobox_Thread, button_LoadPosts,
+				label_SelectThread, combobox_Thread, button_LoadPosts, text_Keyword, button_Search,
 				label_PostsList, listview_Posts,
-				label_RepliesTitle, listview_Replies,
 				line_Separator4, button_Logout, button_Quit);
 	}
 

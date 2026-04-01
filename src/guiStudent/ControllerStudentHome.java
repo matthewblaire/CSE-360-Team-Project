@@ -63,7 +63,7 @@ public class ControllerStudentHome {
 	 * made so I can learn from and contribute to ongoing discussions." </p>
 	 */
 	protected static void goToBrowsePosts() {
-		guiViewPosts.ViewViewPosts.displayViewPosts(ViewStudentHome.theStage,
+		guiBrowsePosts.ViewBrowsePosts.displayBrowsePosts(ViewStudentHome.theStage,
 				ViewStudentHome.theUser);
 	}
 
@@ -78,20 +78,6 @@ public class ControllerStudentHome {
 	 */
 	protected static void goToMyPosts() {
 		guiMyPosts.ViewMyPosts.displayMyPosts(ViewStudentHome.theStage,
-				ViewStudentHome.theUser);
-	}
-
-
-	/**********
-	 * <p> Method: goToSearchPosts() </p>
-	 *
-	 * <p> Description: Navigates the student to the Search Posts page (guiSearchPosts) where
-	 * they can search all posts by keyword with an optional thread filter.
-	 * This satisfies the Phase 2 user story: "As a student, I can search for posts to quickly
-	 * find help on a specific topic." </p>
-	 */
-	protected static void goToSearchPosts() {
-		guiSearchPosts.ViewSearchPosts.displaySearchPosts(ViewStudentHome.theStage,
 				ViewStudentHome.theUser);
 	}
 

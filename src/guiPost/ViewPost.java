@@ -17,10 +17,10 @@ import javafx.stage.Stage;
 import entityClasses.Post;
 import entityClasses.Reply;
 import entityClasses.User;
+import guiBrowsePosts.ViewBrowsePosts;
 import guiReply.ControllerReply;
 import guiReply.ViewNewReply;
 import guiReply.ViewReply;
-import guiViewPosts.ViewViewPosts;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -76,7 +76,6 @@ public class ViewPost {
     protected static Button button_Logout           = new Button("Logout");
     protected static Button button_Quit             = new Button("Quit");
 
-    private static ViewPost  theView;
     private static Database  theDatabase = applicationMain.FoundationsMain.database;
 
     protected static Stage theStage;
@@ -102,7 +101,7 @@ public class ViewPost {
         theUser  = user;
         currentPost = theDatabase.getPostById(postId);
 
-        theView = new ViewPost();
+        new ViewPost();
 
         // Mark post and all its replies as read for the current user
         theDatabase.markPostAsRead(postId, theUser.getUserName());
@@ -142,7 +141,7 @@ public class ViewPost {
 
         setupButtonUI(button_ReturnToAllPosts, "Dialog", 16, 170, Pos.CENTER, 608, 44);
         button_ReturnToAllPosts.setOnAction(_ -> {
-            ViewViewPosts.displayViewPosts(theStage, theUser);
+            ViewBrowsePosts.displayBrowsePosts(theStage, theUser);
         });
 
         // ── Area 2: Post metadata ─────────────────────────────────────────────────
