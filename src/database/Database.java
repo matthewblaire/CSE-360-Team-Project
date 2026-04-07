@@ -9,6 +9,7 @@ import entityClasses.DiscussionThread;
 import entityClasses.Post;
 import entityClasses.Reply;
 import entityClasses.User;
+import entityClasses.Request;
 
 import java.time.LocalDateTime;
 import java.sql.Timestamp;
@@ -148,6 +149,9 @@ public class Database {
 
 	    // Phase 2: create discussion system tables
 	    createDiscussionTables();
+
+		// Phase 3: create request versioning table
+	    createRequestTables();
 	}
 
 
@@ -215,6 +219,30 @@ public class Database {
 				+ "readAt     TIMESTAMP NOT NULL, "
 				+ "UNIQUE(username, targetId, targetType))";
 		statement.execute(readStatusTable);
+	}
+
+	/*******
+ * <p> Method: createRequestTables </p>
+ *
+ * <p> Description: Creates the Requests table used by the TP3 prototype for reopening a closed
+ * request as a new row linked back to the original closed request. The nullable
+ * originalClosedRequestId column refers to itself: original requests store NULL, while
+ * reopened requests store the requestId of the closed request they were derived from. </p>
+ *
+ * @throws SQLException if the CREATE TABLE statement fails
+ */
+	private void createRequestTables() throws SQLException {
+
+		String requestsTable = "CREATE TABLE IF NOT EXISTS Requests ("
+				+ "requestId INT AUTO_INCREMENT PRIMARY KEY, "
+				+ "authorUsername VARCHAR(255) NOT NULL, "
+				+ "title VARCHAR(255) NOT NULL, "
+				+ "description VARCHAR(2000) NOT NULL, "
+				+ "status VARCHAR(20) NOT NULL, "
+				+ "originalClosedRequestId INT NULL, "
+				+ "createdAt TIMESTAMP NOT NULL, "
+				+ "FOREIGN KEY (originalClosedRequestId) REFERENCES Requests(requestId))";
+		statement.execute(requestsTable);
 	}
 
 
@@ -2008,4 +2036,350 @@ public int getNumAdmins() throws SQLException
 			se.printStackTrace(); 
 		} 
 	}
+
+	/*******
+ * <p> Method: int createRequest(Request request) </p>
+ *
+ * <p> Description: Inserts a new Request row into the Requests table and returns the generated
+ * requestId.  This method is used for both original requests and reopened requests.  Original
+ * rows should supply a null originalClosedRequestId; reopened rows should supply the original
+ * closed request ID only after that ID has already been validated. </p>
+ *
+ * @param request the Request object to persist
+ * @return the auto-generated requestId
+ * @throws SQLException if the INSERT fails or no generated key is returned
+ */
+	public int createRequest(Request request) throws SQLException {
+
+		String insertRequest =
+				"INSERT INTO Requests (authorUsername, title, description, status, "
+				+ "originalClosedRequestId, createdAt) VALUES (?, ?, ?, ?, ?, ?)";
+
+		try (PreparedStatement pstmt = connection.prepareStatement(
+				insertRequest, Statement.RETURN_GENERATED_KEYS)) {
+
+			pstmt.setString(1, request.getAuthorUsername());
+			pstmt.setString(2, request.getTitle());
+			pstmt.setString(3, request.getDescription());
+			pstmt.setString(4, request.getStatus());
+
+			if (request.getOriginalClosedRequestId() == null) {
+				pstmt.setNull(5, Types.INTEGER);
+			} else {
+				pstmt.setInt(5, request.getOriginalClosedRequestId());
+			}
+
+			pstmt.setTimestamp(6, Timestamp.valueOf(request.getCreatedAt()));
+			pstmt.executeUpdate();
+
+			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+				if (generatedKeys.next()) {
+					int generatedRequestId = generatedKeys.getInt(1);
+					request.setRequestId(generatedRequestId);
+					return generatedRequestId;
+				} else {
+					throw new SQLException("createRequest: INSERT succeeded but no generated key "
+							+ "was returned.");
+				}
+			}
+		}
+	}
+
+
+/*******
+ * <p> Method: Request getRequestById(int requestId) </p>
+ *
+ * <p> Description: Returns the Request row with the given requestId, or null if no such row
+ * exists.  This method is used by the tests to verify both the reopened request and the original
+ * closed request it links to. </p>
+ *
+ * @param requestId the requestId to look up
+ * @return the matching Request, or null if not found
+ */
+	public Request getRequestById(int requestId) {
+		String query = "SELECT requestId, authorUsername, title, description, status, "
+				+ "originalClosedRequestId, createdAt FROM Requests WHERE requestId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, requestId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				return buildRequestFromResultSet(rs);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+/*******
+ * <p> Method: List<Request> getRequestHistory(int requestId) </p>
+ *
+ * <p> Description: Returns the full history chain for a request. If {@code requestId} is the
+ * original closed request, the result includes that row and every reopened descendant. If
+ * {@code requestId} refers to a reopened request, the method first resolves its
+ * originalClosedRequestId and then returns the full chain anchored at that original request.
+ * Results are ordered by creation time ascending so the history reads oldest-to-newest. </p>
+ *
+ * @param requestId the original or reopened request ID whose history should be retrieved
+ * @return a chronologically ordered list of related request rows; empty if the anchor is invalid
+ */
+	public List<Request> getRequestHistory(int requestId) {
+		List<Request> requests = new ArrayList<>();
+		Request anchor = getRequestById(requestId);
+		if (anchor == null) return requests;
+
+		int rootRequestId = (anchor.getOriginalClosedRequestId() == null)
+				? anchor.getRequestId()
+				: anchor.getOriginalClosedRequestId();
+
+		String query = "SELECT requestId, authorUsername, title, description, status, "
+				+ "originalClosedRequestId, createdAt FROM Requests "
+				+ "WHERE requestId = ? OR originalClosedRequestId = ? "
+				+ "ORDER BY createdAt ASC, requestId ASC";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, rootRequestId);
+			pstmt.setInt(2, rootRequestId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				requests.add(buildRequestFromResultSet(rs));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return requests;
+	}
+
+
+/*******
+ * <p> Method: boolean doesClosedRequestExist(int requestId) </p>
+ *
+ * <p> Description: Returns true only when the specified requestId exists in the Requests table
+ * and that row is marked CLOSED.  This is the critical validation gate for reopening: a reopened
+ * request must point to a real closed request, not to an open request or a non-existent row. </p>
+ *
+ * @param requestId the original requestId to validate
+ * @return true if the request exists and is CLOSED
+ */
+	public boolean doesClosedRequestExist(int requestId) {
+		String query = "SELECT COUNT(*) FROM Requests WHERE requestId = ? AND status = 'CLOSED'";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, requestId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) return rs.getInt(1) > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+
+/*******
+ * <p> Method: String validateOriginalClosedRequestId(int originalClosedRequestId) </p>
+ *
+ * <p> Description: Validates that the supplied original closed request ID refers to an existing
+ * request row whose status is CLOSED.  The method returns an empty string when the ID is valid;
+ * otherwise it returns a user-facing error message explaining that the ID does not belong to a
+ * closed request.  This mirrors the recognizer pattern used elsewhere in the project. </p>
+ *
+ * @param originalClosedRequestId the original request ID supplied for the reopened request
+ * @return an empty string if valid, else an error message
+ */
+	public String validateOriginalClosedRequestId(int originalClosedRequestId) {
+		if (originalClosedRequestId <= 0) {
+			return "Original closed request ID number must be greater than 0.";
+		}
+		if (!doesClosedRequestExist(originalClosedRequestId)) {
+			return "Original closed request ID number does not belong to a closed request.";
+		}
+		return "";
+	}
+
+
+/*******
+ * <p> Method: boolean isStaffUser(String username) </p>
+ *
+ * <p> Description: Returns true when the given username exists in userDB and has the Staff role.
+ * Reopened request creation is limited to staff users. </p>
+ *
+ * @param username the username to validate
+ * @return true if the user has the Staff role
+ */
+	public boolean isStaffUser(String username) {
+		String query = "SELECT COUNT(*) FROM userDB WHERE userName = ? AND staffRole = TRUE";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, username);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) return rs.getInt(1) > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+
+/*******
+ * <p> Method: boolean isAdminUser(String username) </p>
+ *
+ * <p> Description: Returns true when the given username exists in userDB and has the Admin role.
+ * This is used to gate request-history visibility methods intended for administrators. </p>
+ *
+ * @param username the username to validate
+ * @return true if the user has the Admin role
+ */
+	public boolean isAdminUser(String username) {
+		String query = "SELECT COUNT(*) FROM userDB WHERE userName = ? AND adminRole = TRUE";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, username);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) return rs.getInt(1) > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+
+/*******
+ * <p> Method: int closeRequest(int requestId) </p>
+ *
+ * <p> Description: Marks an existing request row as CLOSED.  The row is intentionally retained so
+ * later reopened versions can link back to it and preserve the request history. </p>
+ *
+ * @param requestId the requestId to close
+ * @return the number of rows updated
+ */
+	public int closeRequest(int requestId) {
+		String update = "UPDATE Requests SET status = 'CLOSED' WHERE requestId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(update)) {
+			pstmt.setInt(1, requestId);
+			return pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+/*******
+ * <p> Method: int getRequestCount() </p>
+ *
+ * <p> Description: Returns the number of rows currently stored in the Requests table. </p>
+ *
+ * @return the number of request rows, or 0 if the query fails
+ */
+	public int getRequestCount() {
+		String query = "SELECT COUNT(*) FROM Requests";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) return rs.getInt(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+/*******
+ * <p> Method: int reopenClosedRequest(String staffUsername, String title, String description,
+ * int originalClosedRequestId) </p>
+ *
+ * <p> Description: Creates a brand-new OPEN request row that represents a reopened version of a
+ * previously closed request.  The original request is never overwritten.  Instead, the new row
+ * stores the original request ID in originalClosedRequestId so the system preserves history and
+ * allows callers to navigate back to the original closed request.
+ *
+ * Input validation is performed before insertion:
+ * title must satisfy {@link recognizers.TitleRecognizer},
+ * description must satisfy {@link recognizers.PostContentRecognizer},
+ * the originalClosedRequestId must refer to an existing CLOSED request, and
+ * staffUsername must belong to a user with the Staff role. </p>
+ *
+ * @param staffUsername the staff user reopening the request
+ * @param title the updated title for the reopened request
+ * @param description the updated description for the reopened request
+ * @param originalClosedRequestId the original closed request to link back to
+ * @return the generated requestId for the new reopened request
+ * @throws SQLException if validation fails or the INSERT fails
+ */
+	public int reopenClosedRequest(String staffUsername, String title, String description,
+			int originalClosedRequestId) throws SQLException {
+
+		String titleError = recognizers.TitleRecognizer.evaluateTitle(title);
+		if (!titleError.isEmpty()) {
+			throw new SQLException("reopenClosedRequest: " + titleError);
+		}
+
+		String descriptionError =
+				recognizers.PostContentRecognizer.evaluatePostContent(description);
+		if (!descriptionError.isEmpty()) {
+			throw new SQLException("reopenClosedRequest: " + descriptionError);
+		}
+
+		String originalIdError = validateOriginalClosedRequestId(originalClosedRequestId);
+		if (!originalIdError.isEmpty()) {
+			throw new SQLException("reopenClosedRequest: " + originalIdError);
+		}
+
+		if (!isStaffUser(staffUsername)) {
+			throw new SQLException("reopenClosedRequest: Only a Staff user may reopen a request.");
+		}
+
+		// Preserve history by inserting a new OPEN row instead of overwriting the closed request.
+		Request reopened = new Request(staffUsername, title, description, "OPEN",
+				originalClosedRequestId, LocalDateTime.now());
+		return createRequest(reopened);
+	}
+
+
+/*******
+ * <p> Method: List<Request> getRequestsVisibleToAdmin(String adminUsername) </p>
+ *
+ * <p> Description: Returns all request rows visible to an administrator, including original and
+ * reopened versions. This supports admin review of reopened requests and their preserved
+ * historical links. Non-admin callers are rejected with a SQLException. </p>
+ *
+ * @param adminUsername the username requesting the admin-visible request list
+ * @return a list of all requests ordered newest-first
+ * @throws SQLException if the caller is not an admin
+ */
+	public List<Request> getRequestsVisibleToAdmin(String adminUsername) throws SQLException {
+		if (!isAdminUser(adminUsername)) {
+			throw new SQLException("getRequestsVisibleToAdmin: Only an Admin user may view all "
+					+ "requests.");
+		}
+
+		List<Request> requests = new ArrayList<>();
+		String query = "SELECT requestId, authorUsername, title, description, status, "
+				+ "originalClosedRequestId, createdAt FROM Requests "
+				+ "ORDER BY createdAt DESC, requestId DESC";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				requests.add(buildRequestFromResultSet(rs));
+			}
+		}
+		return requests;
+	}
+
+
+	/**
+	 * Builds a {@link Request} from the current row in a Requests query result set.
+	 *
+	 * @param rs the positioned result set
+	 * @return the mapped Request domain object
+	 * @throws SQLException if the row cannot be read
+	 */
+	private Request buildRequestFromResultSet(ResultSet rs) throws SQLException {
+		Integer originalId = (Integer) rs.getObject("originalClosedRequestId");
+		return new Request(
+				rs.getInt("requestId"),
+				rs.getString("authorUsername"),
+				rs.getString("title"),
+				rs.getString("description"),
+				rs.getString("status"),
+				originalId,
+				rs.getTimestamp("createdAt").toLocalDateTime());
+	}
+	
 }
