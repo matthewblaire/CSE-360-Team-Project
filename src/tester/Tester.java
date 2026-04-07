@@ -8,6 +8,8 @@ import java.util.List;
 import database.Database;
 import entityClasses.Post;
 import entityClasses.Reply;
+import entityClasses.Request;
+import entityClasses.User;
 import recognizers.EmailAddressRecognizer;
 import recognizers.InviteCodeRecognizer;
 import recognizers.NameRecognizer;
@@ -197,6 +199,13 @@ public class Tester {
 		printStats();
 		resetCurrentStats();
 		System.out.println("---End Discussion DELETE Tests---");
+
+			// ---- Phase 3: Reopened Request Link Tests ----
+		System.out.println("---Beginning Reopened Request Link Tests---");
+		performReopenedRequestLinkTests();
+		printStats();
+		resetCurrentStats();
+		System.out.println("---End Reopened Request Link Tests---");
 
 		printFinalStats();
 	}
@@ -1340,6 +1349,300 @@ public class Tester {
 			System.out.println("At least 8 characters - Satisfied");
 		else
 			System.out.println("At least 8 characters - Not Satisfied");
+	}
+
+	 /**
+	 * Runs HW3 prototype tests for reopening a closed request as a new version linked to the
+	 * original closed request.
+	 *
+	 * <p> These tests implement the positive and negative scenarios described in
+	 * "Which Aspect and Why.pdf":
+	 * <ol>
+	 *   <li>Positive - a admin user reopens a closed request and the new request stores the
+	 *       original closed request ID.</li>
+	 *   <li>Positive - the original closed request can still be fetched by the linked ID so the
+	 *       historical row is preserved.</li>
+	 *   <li>Negative - validation rejects an original request ID that refers to an OPEN request.</li>
+	 *   <li>Negative - validation rejects an original closed request ID that does not exist.</li>
+	 *   <li>Negative - a reopened request is not created when validation fails.</li>
+	 *   <li>Negative - a non-admin user cannot reopen a closed request.</li>
+	 * </ol>
+	 * </p>
+	 */
+	private static void performReopenedRequestLinkTests() {
+
+		Database db = applicationMain.FoundationsMain.database;
+		String suffix = String.valueOf(System.nanoTime());
+		String updatedTitle = "Need grading review - reopened";
+		String updatedDescription =
+				"This request is reopened with updated details for admin follow-up.";
+
+		User adminUser = new User("requestAdmin_" + suffix, "AdminPass2026!", "Req", "",
+				"Admin", "Req", "request_admin_" + suffix + "@example.com", true, false, false);
+		User staffUser = new User("requestStaff_" + suffix, "StaffPass2026!", "Req", "",
+				"Staff", "Req", "request_staff_" + suffix + "@example.com", false, false, true);
+
+		try {
+			db.register(adminUser);
+			db.register(staffUser);
+		} catch (SQLException e) {
+			System.out.println("REQUEST REOPEN TESTS SETUP FAILED: " + e.getMessage());
+			numFailed += 10;
+			return;
+		}
+
+		int originalRequestId = -1;
+		int openRequestId = -1;
+		try {
+			Request original = new Request(staffUser.getUserName(), "Error with grading review",
+					"My original request was closed but needs follow-up.", "OPEN", null,
+					LocalDateTime.now());
+			originalRequestId = db.createRequest(original);
+			db.closeRequest(originalRequestId);
+
+			Request stillOpen = new Request(staffUser.getUserName(), "Open request",
+					"This request remains open and should not be accepted as the original closed "
+					+ "request for a reopen action.", "OPEN", null, LocalDateTime.now());
+			openRequestId = db.createRequest(stillOpen);
+		} catch (SQLException e) {
+			System.out.println("REQUEST REOPEN TESTS SETUP FAILED: " + e.getMessage());
+			numFailed += 10;
+			return;
+		}
+
+		// ---- Test 1: Positive - a staff user can reopen a closed request ----
+		System.out.println(
+				"____________________________________________________________________________"
+				+ "\n\nTest case: 1 (REQUEST - staff user can reopen a closed request)");
+		int reopenedRequestId = -1;
+		try {
+			reopenedRequestId = db.reopenClosedRequest(staffUser.getUserName(),
+					updatedTitle,
+					updatedDescription,
+					originalRequestId);
+			Request reopened = db.getRequestById(reopenedRequestId);
+
+			if (reopened != null && reopenedRequestId > 0 && "OPEN".equals(reopened.getStatus())) {
+				System.out.println("***Success*** Staff user reopened the closed request and the "
+						+ "new row remained OPEN - PASS");
+				numPassed++;
+			} else {
+				System.out.println("***Failure*** Staff reopen attempt did not produce a valid "
+						+ "OPEN request row - FAIL");
+				numFailed++;
+			}
+		} catch (SQLException e) {
+			System.out.println("***Failure*** Reopening a valid closed request unexpectedly "
+					+ "failed: " + e.getMessage() + " - FAIL");
+			numFailed++;
+		}
+
+		// ---- Test 2: Positive - reopened request is stored with updated title/description ----
+		System.out.println(
+				"____________________________________________________________________________"
+				+ "\n\nTest case: 2 (REQUEST - reopened request is properly stored)");
+		Request reopenedFetched = db.getRequestById(reopenedRequestId);
+		if (reopenedFetched != null
+				&& updatedTitle.equals(reopenedFetched.getTitle())
+				&& updatedDescription.equals(reopenedFetched.getDescription())) {
+			System.out.println("***Success*** Reopened request stored the updated title and "
+					+ "description in the database - PASS");
+			numPassed++;
+		} else {
+			System.out.println("***Failure*** Reopened request was not stored with the expected "
+					+ "updated title/description - FAIL");
+			numFailed++;
+		}
+
+		// ---- Test 3: Positive - reopened request stores a link to the original closed request ----
+		System.out.println(
+				"____________________________________________________________________________"
+				+ "\n\nTest case: 3 (REQUEST - reopened request links to original closed request)");
+		if (reopenedFetched != null
+				&& reopenedFetched.getOriginalClosedRequestId() != null
+				&& reopenedFetched.getOriginalClosedRequestId() == originalRequestId) {
+			System.out.println("***Success*** Reopened request stored the proper link to the "
+					+ "original closed request - PASS");
+			numPassed++;
+		} else {
+			System.out.println("***Failure*** Reopened request did not store the expected "
+					+ "original request link - FAIL");
+			numFailed++;
+		}
+
+		// ---- Test 4: Positive - database keeps the full request history ----
+		System.out.println(
+				"____________________________________________________________________________"
+				+ "\n\nTest case: 4 (REQUEST - database maintains request history)");
+		Request originalFetched = db.getRequestById(originalRequestId);
+		List<Request> requestHistory = db.getRequestHistory(originalRequestId);
+		boolean historyContainsOriginal = false;
+		boolean historyContainsReopened = false;
+		for (Request requestVersion : requestHistory) {
+			if (requestVersion.getRequestId() == originalRequestId) historyContainsOriginal = true;
+			if (requestVersion.getRequestId() == reopenedRequestId) historyContainsReopened = true;
+		}
+		if (originalFetched != null
+				&& "CLOSED".equals(originalFetched.getStatus())
+				&& historyContainsOriginal
+				&& historyContainsReopened
+				&& requestHistory.size() >= 2) {
+			System.out.println("***Success*** Original and reopened versions were both retained "
+					+ "in request history - PASS");
+			numPassed++;
+		} else {
+			System.out.println("***Failure*** Request history did not preserve both original "
+					+ "and reopened versions - FAIL");
+			numFailed++;
+		}
+
+		// ---- Test 5: Negative - existing OPEN request ID fails closed-request validation ----
+		System.out.println(
+				"____________________________________________________________________________"
+				+ "\n\nTest case: 5 (REQUEST - open request ID rejected as original closed ID)");
+		String openOriginalIdError = db.validateOriginalClosedRequestId(openRequestId);
+		if (!openOriginalIdError.isEmpty()) {
+			System.out.println("***Success*** Open request ID was rejected because it is not "
+					+ "a closed request - PASS");
+			numPassed++;
+		} else {
+			System.out.println("***Failure*** Open request ID was incorrectly accepted as a "
+					+ "closed request - FAIL");
+			numFailed++;
+		}
+
+		// ---- Test 6: Negative - invalid original ID prevents reopened request creation ----
+		System.out.println(
+				"____________________________________________________________________________"
+				+ "\n\nTest case: 6 (REQUEST - invalid original closed request ID rejected)");
+		int requestCountBefore = db.getRequestCount();
+		try {
+			db.reopenClosedRequest(staffUser.getUserName(),
+					"Bad reopen attempt",
+					"This should not be inserted because the original request ID is invalid.",
+					999999);
+			System.out.println("***Failure*** Reopened request was created with an invalid "
+					+ "original closed request ID - FAIL");
+			numFailed++;
+		} catch (SQLException e) {
+			int requestCountAfter = db.getRequestCount();
+			if (requestCountBefore == requestCountAfter) {
+				System.out.println("***Success*** Invalid reopen attempt was rejected and no new "
+						+ "request row was created - PASS");
+				numPassed++;
+			} else {
+				System.out.println("***Failure*** Validation failed but request row count changed "
+						+ "- FAIL");
+				numFailed++;
+			}
+		}
+
+		// ---- Test 7: Negative - invalid title fails updated request input criteria ----
+		System.out.println(
+				"____________________________________________________________________________"
+				+ "\n\nTest case: 7 (REQUEST - invalid updated title rejected)");
+		int requestCountBeforeBadTitle = db.getRequestCount();
+		try {
+			db.reopenClosedRequest(staffUser.getUserName(),
+					"",
+					"Updated description is valid but the title is not.",
+					originalRequestId);
+			System.out.println("***Failure*** Reopened request was created with an invalid title "
+					+ "- FAIL");
+			numFailed++;
+		} catch (SQLException e) {
+			int requestCountAfterBadTitle = db.getRequestCount();
+			if (requestCountBeforeBadTitle == requestCountAfterBadTitle) {
+				System.out.println("***Success*** Invalid updated title was rejected and no new "
+						+ "request row was created - PASS");
+				numPassed++;
+			} else {
+				System.out.println("***Failure*** Invalid title was rejected, but request count "
+						+ "still changed - FAIL");
+				numFailed++;
+			}
+		}
+
+		// ---- Test 8: Negative - invalid description fails updated request input criteria ----
+		System.out.println(
+				"____________________________________________________________________________"
+				+ "\n\nTest case: 8 (REQUEST - invalid updated description rejected)");
+		int requestCountBeforeBadDescription = db.getRequestCount();
+		try {
+			db.reopenClosedRequest(staffUser.getUserName(),
+					"Valid updated title",
+					"   ",
+					originalRequestId);
+			System.out.println("***Failure*** Reopened request was created with an invalid "
+					+ "description - FAIL");
+			numFailed++;
+		} catch (SQLException e) {
+			int requestCountAfterBadDescription = db.getRequestCount();
+			if (requestCountBeforeBadDescription == requestCountAfterBadDescription) {
+				System.out.println("***Success*** Invalid updated description was rejected and no "
+						+ "new request row was created - PASS");
+				numPassed++;
+			} else {
+				System.out.println("***Failure*** Invalid description was rejected, but request "
+						+ "count still changed - FAIL");
+				numFailed++;
+			}
+		}
+
+		// ---- Test 9: Negative - only staff may reopen a closed request ----
+		System.out.println(
+				"____________________________________________________________________________"
+				+ "\n\nTest case: 9 (REQUEST - non-staff user cannot reopen closed request)");
+		int requestCountBeforeNonAdmin = db.getRequestCount();
+		try {
+			db.reopenClosedRequest(adminUser.getUserName(),
+					"Staff reopen attempt",
+					"This should fail because staffs are not allowed to reopen requests.",
+					originalRequestId);
+			System.out.println("***Failure*** Non-staff user was allowed to reopen a request "
+					+ "- FAIL");
+			numFailed++;
+		} catch (SQLException e) {
+			int requestCountAfterNonAdmin = db.getRequestCount();
+			if (requestCountBeforeNonAdmin == requestCountAfterNonAdmin) {
+				System.out.println("***Success*** Non-admin reopen attempt was rejected and no "
+						+ "new request row was created - PASS");
+				numPassed++;
+			} else {
+				System.out.println("***Failure*** Non-admin reopen attempt failed, but a new "
+						+ "request row was still created - FAIL");
+				numFailed++;
+			}
+		}
+
+		// ---- Test 10: Positive - admins can view reopened requests ----
+		System.out.println(
+				"____________________________________________________________________________"
+				+ "\n\nTest case: 10 (REQUEST - reopened requests are visible to admins)");
+		try {
+			List<Request> adminVisibleRequests = db.getRequestsVisibleToAdmin(adminUser.getUserName());
+			boolean adminCanSeeReopenedRequest = false;
+			for (Request visibleRequest : adminVisibleRequests) {
+				if (visibleRequest.getRequestId() == reopenedRequestId) {
+					adminCanSeeReopenedRequest = true;
+					break;
+				}
+			}
+
+			if (adminCanSeeReopenedRequest) {
+				System.out.println("***Success*** Admin-visible request list included the "
+						+ "reopened request - PASS");
+				numPassed++;
+			} else {
+				System.out.println("***Failure*** Admin-visible request list did not include "
+						+ "the reopened request - FAIL");
+				numFailed++;
+			}
+		} catch (SQLException e) {
+			System.out.println("***Failure*** Admin could not view reopened requests: "
+					+ e.getMessage() + " - FAIL");
+			numFailed++;
+		}
 	}
 	
 	
