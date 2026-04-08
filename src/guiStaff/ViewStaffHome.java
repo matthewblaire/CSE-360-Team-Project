@@ -12,6 +12,8 @@ import database.Database;
 //import database.Database;
 import entityClasses.User;
 
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 
 /*******
  * <p> Title: ViewStaffHome Class. </p>
@@ -25,7 +27,7 @@ import entityClasses.User;
  * @author Lynn Robert Carter
  * 
  * @version 1.00		2025-04-20 Initial version
- *  
+ *  @version 1.01		2026-04-08 Added staff discussion thread CRUD UI controls
  */
 
 public class ViewStaffHome {
@@ -60,7 +62,31 @@ public class ViewStaffHome {
 	// GUI ARea 2: This is a stub, so there are no widgets here.  For an actual role page, this are
 	// would contain the widgets needed for the user to play the assigned role.
 	
+	// GUI Area 2: Staff thread CRUD management widgets
 	
+	/** Label for the thread management area. */
+	protected static Label label_ThreadManagement = new Label();
+
+	/** List of discussion threads available for staff management. */
+	protected static ListView<String> listView_Threads = new ListView<>();
+
+	/** Text field for creating a new thread. */
+	protected static TextField text_NewThreadTitle = new TextField();
+
+	/** Text field for renaming the selected thread. */
+	protected static TextField text_UpdatedThreadTitle = new TextField();
+
+	/** Button to refresh the thread list. */
+	protected static Button button_RefreshThreads = new Button("Refresh Threads");
+
+	/** Button to create a new thread. */
+	protected static Button button_CreateThread = new Button("Create Thread");
+
+	/** Button to update the selected thread title. */
+	protected static Button button_UpdateThread = new Button("Rename Selected Thread");
+
+	/** Button to delete the selected thread. */
+	protected static Button button_DeleteThread = new Button("Delete Selected Thread");
 	
 	// This is a separator and it is used to partition the GUI for various tasks
 	/** The line separator between the main content area and the bottom button area. */
@@ -135,6 +161,8 @@ public class ViewStaffHome {
 		applicationMain.FoundationsMain.activeHomePage = theRole;
 		
 		label_UserDetails.setText("User: " + theUser.getUserName());// Set the username
+		
+		refreshThreadList();
 
 		// Set the title for the window, display the page, and wait for the Admin to do something
 		theStage.setTitle("CSE 360 Foundations: Staff Home Page");
@@ -177,6 +205,37 @@ public class ViewStaffHome {
 		
 			// This is a stub, so this area is empty
 		
+		// GUI Area 2
+		label_ThreadManagement.setText("Discussion Thread Management");
+		setupLabelUI(label_ThreadManagement, "Arial", 22, width, Pos.BASELINE_LEFT, 20, 120);
+
+		listView_Threads.setLayoutX(20);
+		listView_Threads.setLayoutY(160);
+		listView_Threads.setPrefWidth(300);
+		listView_Threads.setPrefHeight(260);
+
+		text_NewThreadTitle.setLayoutX(350);
+		text_NewThreadTitle.setLayoutY(170);
+		text_NewThreadTitle.setPrefWidth(280);
+		text_NewThreadTitle.setPromptText("Enter new thread title");
+
+		text_UpdatedThreadTitle.setLayoutX(350);
+		text_UpdatedThreadTitle.setLayoutY(230);
+		text_UpdatedThreadTitle.setPrefWidth(280);
+		text_UpdatedThreadTitle.setPromptText("Enter updated title for selected thread");
+
+		setupButtonUI(button_RefreshThreads, "Dialog", 16, 180, Pos.CENTER, 350, 290);
+		button_RefreshThreads.setOnAction((_) -> { ControllerStaffHome.performRefreshThreads(); });
+
+		setupButtonUI(button_CreateThread, "Dialog", 16, 180, Pos.CENTER, 350, 340);
+		button_CreateThread.setOnAction((_) -> { ControllerStaffHome.performCreateThread(); });
+
+		setupButtonUI(button_UpdateThread, "Dialog", 16, 220, Pos.CENTER, 350, 390);
+		button_UpdateThread.setOnAction((_) -> { ControllerStaffHome.performUpdateThread(); });
+
+		setupButtonUI(button_DeleteThread, "Dialog", 16, 220, Pos.CENTER, 350, 440);
+		button_DeleteThread.setOnAction((_) -> { ControllerStaffHome.performDeleteThread(); });
+		
 		
 		// GUI Area 3
         setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
@@ -190,7 +249,35 @@ public class ViewStaffHome {
 		// Place all of the widget items into the Root Pane's list of children
         theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
+			label_ThreadManagement, listView_Threads, text_NewThreadTitle,
+			text_UpdatedThreadTitle, button_RefreshThreads, button_CreateThread,
+			button_UpdateThread, button_DeleteThread,
 	        line_Separator4, button_Logout, button_Quit);
+        
+	}
+	
+	/**********
+	 * <p> Method: refreshThreadList() </p>
+	 *
+	 * <p> Description: Refreshes the visible ListView of active discussion threads
+	 * so staff can select a thread to rename or delete. If there are no active
+	 * threads, the ListView displays a placeholder message. </p>
+	 */
+	
+	protected static void refreshThreadList() {
+		listView_Threads.getItems().clear();
+
+		java.util.List<entityClasses.DiscussionThread> threads =
+				theDatabase.getActiveDiscussionThreads();
+
+		if (threads.isEmpty()) {
+			listView_Threads.getItems().add("No active threads available");
+			return;
+		}
+
+		for (entityClasses.DiscussionThread thread : threads) {
+			listView_Threads.getItems().add(thread.getThreadId() + ": " + thread.getTitle());
+		}
 	}
 	
 	

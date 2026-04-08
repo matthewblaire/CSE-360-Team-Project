@@ -22,6 +22,7 @@ import java.sql.Timestamp;
  * on the H2 main page.)  This class leverages H2 and provides numerous special supporting methods.
  * </p>
  * 
+ * 
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  * 
  * @author Lynn Robert Carter
@@ -180,8 +181,17 @@ public class Database {
 		// DiscussionThreads — named containers that group related Posts
 		String threadTable = "CREATE TABLE IF NOT EXISTS DiscussionThreads ("
 				+ "threadId INT AUTO_INCREMENT PRIMARY KEY, "
-				+ "title    VARCHAR(255) UNIQUE NOT NULL)";
+				+ "title    VARCHAR(255) UNIQUE NOT NULL, "
+				+ "isDeleted BOOL DEFAULT FALSE)";
 		statement.execute(threadTable);
+
+		// SAFETY: upgrade older databases that were created before isDeleted existed.
+		// If the column already exists, H2 will throw and we safely ignore it.
+		try {
+			statement.execute("ALTER TABLE DiscussionThreads ADD COLUMN isDeleted BOOL DEFAULT FALSE");
+		} catch (SQLException e) {
+			// Column probably already exists — safe to ignore
+		}
 
 		// Posts — student questions and statements
 		// isDeleted = FALSE by default; set to TRUE when a student deletes their own post
@@ -751,6 +761,209 @@ public class Database {
 		}
 	}
 
+	
+	/*******
+	 * <p> Method: int createDiscussionThread(String title) </p>
+	 *
+	 * <p> Description: Creates a new discussion thread for staff thread management.
+	 * The new thread starts as active (isDeleted = FALSE). The generated threadId
+	 * is returned so the caller can confirm which thread was created.
+	 * This method is validated by JUnit tests in
+	 * {@code tester.FullStaffThreadCRUDTester}. </p>
+	 *
+	 * @param title the human-readable title for the new discussion thread
+	 * @return the auto-generated threadId for the new thread
+	 * @throws SQLException if the INSERT fails or no generated key is returned
+	 */
+	
+	public int createDiscussionThread(String title) throws SQLException {
+		String insertThread =
+				"INSERT INTO DiscussionThreads (title, isDeleted) VALUES (?, FALSE)";
+
+		try (PreparedStatement pstmt = connection.prepareStatement(
+				insertThread, Statement.RETURN_GENERATED_KEYS)) {
+
+			pstmt.setString(1, title);
+			pstmt.executeUpdate();
+
+			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+				if (generatedKeys.next()) {
+					return generatedKeys.getInt(1);
+				} else {
+					throw new SQLException("createDiscussionThread: INSERT succeeded but no "
+							+ "generated key was returned.");
+				}
+			}
+		}
+	}
+
+
+	/*******
+	 * <p> Method: List&lt;DiscussionThread&gt; getActiveDiscussionThreads() </p>
+	 *
+	 * <p> Description: Returns only active discussion threads (isDeleted = FALSE),
+	 * ordered by threadId ascending. This method is appropriate for normal application
+	 * use where deleted threads should not appear to users.
+	 * This method is validated by JUnit tests in
+	 * {@code tester.FullStaffThreadCRUDTester}. </p>
+	 *
+	 * @return a list of active discussion threads
+	 */
+	
+	public List<DiscussionThread> getActiveDiscussionThreads() {
+		List<DiscussionThread> threads = new ArrayList<>();
+		String query = "SELECT threadId, title FROM DiscussionThreads "
+				+ "WHERE isDeleted = FALSE ORDER BY threadId ASC";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				threads.add(new DiscussionThread(rs.getInt("threadId"),
+						rs.getString("title")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return threads;
+	}
+
+
+	/*******
+	 * <p> Method: List&lt;DiscussionThread&gt; getAllDiscussionThreadsForStaff() </p>
+	 *
+	 * <p> Description: Returns all discussion threads for staff management, including
+	 * those that have been soft-deleted. This supports staff review and management
+	 * actions where visibility into all thread rows is useful.
+	 * This method is validated by JUnit tests in
+	 * {@code tester.FullStaffThreadCRUDTester}. </p>
+	 *
+	 * @return a list of all discussion threads, active and soft-deleted
+	 */
+	
+	public List<DiscussionThread> getAllDiscussionThreadsForStaff() {
+		List<DiscussionThread> threads = new ArrayList<>();
+		String query = "SELECT threadId, title FROM DiscussionThreads ORDER BY threadId ASC";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				threads.add(new DiscussionThread(rs.getInt("threadId"),
+						rs.getString("title")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return threads;
+	}
+
+
+	/*******
+	 * <p> Method: boolean updateDiscussionThreadTitle(int threadId, String newTitle) </p>
+	 *
+	 * <p> Description: Renames the specified discussion thread if it is not already
+	 * soft-deleted. The method returns true only when exactly one active thread row
+	 * was updated. This method is validated by JUnit tests in
+	 * {@code tester.FullStaffThreadCRUDTester}. </p>
+	 *
+	 * @param threadId the threadId of the thread to rename
+	 * @param newTitle the replacement title
+	 * @return true if the rename succeeded, else false
+	 */
+	
+	public boolean updateDiscussionThreadTitle(int threadId, String newTitle) {
+		String update = "UPDATE DiscussionThreads SET title = ? "
+				+ "WHERE threadId = ? AND isDeleted = FALSE";
+		try (PreparedStatement pstmt = connection.prepareStatement(update)) {
+			pstmt.setString(1, newTitle);
+			pstmt.setInt(2, threadId);
+			return pstmt.executeUpdate() == 1;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+
+	/*******
+	 * <p> Method: boolean softDeleteDiscussionThreadCascade(int threadId) </p>
+	 *
+	 * <p> Description: Soft-deletes a discussion thread and also soft-deletes all posts
+	 * and replies that belong to that thread. This method supports staff moderation by
+	 * preserving the discussion data while removing it from normal active use.
+	 *
+	 * The operation is performed inside a transaction so the thread, posts, and replies
+	 * are all updated together. If any part fails, the transaction is rolled back.
+	 * This method is validated by JUnit tests in
+	 * {@code tester.FullStaffThreadCRUDTester}. </p>
+	 *
+	 * @param threadId the threadId of the thread to soft-delete
+	 * @return true if the thread row was soft-deleted, else false
+	 */
+	
+	
+	public boolean softDeleteDiscussionThreadCascade(int threadId) {
+		String deleteReplies =
+				"UPDATE Replies SET isDeleted = TRUE WHERE postId IN "
+				+ "(SELECT postId FROM Posts WHERE threadId = ?)";
+		String deletePosts =
+				"UPDATE Posts SET isDeleted = TRUE WHERE threadId = ?";
+		String deleteThread =
+				"UPDATE DiscussionThreads SET isDeleted = TRUE "
+				+ "WHERE threadId = ? AND isDeleted = FALSE";
+
+		try {
+			connection.setAutoCommit(false);
+
+			try (PreparedStatement pstmtReplies = connection.prepareStatement(deleteReplies);
+				 PreparedStatement pstmtPosts = connection.prepareStatement(deletePosts);
+				 PreparedStatement pstmtThread = connection.prepareStatement(deleteThread)) {
+
+				pstmtReplies.setInt(1, threadId);
+				pstmtReplies.executeUpdate();
+
+				pstmtPosts.setInt(1, threadId);
+				pstmtPosts.executeUpdate();
+
+				pstmtThread.setInt(1, threadId);
+				int updatedThreadRows = pstmtThread.executeUpdate();
+
+				connection.commit();
+				return updatedThreadRows == 1;
+			} catch (SQLException e) {
+				connection.rollback();
+				e.printStackTrace();
+			} finally {
+				connection.setAutoCommit(true);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+
+	/*******
+	 * <p> Method: boolean isDiscussionThreadDeleted(int threadId) </p>
+	 *
+	 * <p> Description: Returns true if the specified discussion thread exists and has
+	 * been soft deleted. Returns false when the thread is active or does not exist. </p>
+	 *
+	 * @param threadId the threadId to check
+	 * @return true if the thread is soft-deleted, else false
+	 */
+	public boolean isDiscussionThreadDeleted(int threadId) {
+		String query = "SELECT isDeleted FROM DiscussionThreads WHERE threadId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, threadId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				return rs.getBoolean("isDeleted");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 
 /*******
  * <p> Method: int createPost(Post post) </p>
@@ -872,7 +1085,8 @@ public class Database {
  */
 	public List<DiscussionThread> getThreadList() {
 		List<DiscussionThread> threads = new ArrayList<>();
-		String query = "SELECT threadId, title FROM DiscussionThreads ORDER BY threadId ASC";
+		String query = "SELECT threadId, title FROM DiscussionThreads "
+				+ "WHERE isDeleted = FALSE ORDER BY threadId ASC";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
