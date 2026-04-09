@@ -60,7 +60,8 @@ public class ViewStaffHome {
 	// GUI ARea 2: This is a stub, so there are no widgets here.  For an actual role page, this are
 	// would contain the widgets needed for the user to play the assigned role.
 	
-	
+	/** the button navigates to user metrics view**/
+	protected static Button button_viewUserMetrics = new Button("View User Metrics");
 	
 	// This is a separator and it is used to partition the GUI for various tasks
 	/** The line separator between the main content area and the bottom button area. */
@@ -175,8 +176,9 @@ public class ViewStaffHome {
 		
 		// GUI Area 2
 		
-			// This is a stub, so this area is empty
-		
+			// This is a stub, so this area is empty - not anymore
+		setupButtonUI(button_viewUserMetrics, "Dialog", 18, 300, Pos.CENTER, 250, 220);
+		button_viewUserMetrics.setOnAction((_) -> { ControllerStaffHome.goToUserMetrics(); });
 		
 		// GUI Area 3
         setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
@@ -189,7 +191,7 @@ public class ViewStaffHome {
 		
 		// Place all of the widget items into the Root Pane's list of children
         theRootPane.getChildren().addAll(
-			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
+			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1, button_viewUserMetrics,
 	        line_Separator4, button_Logout, button_Quit);
 	}
 	
@@ -239,5 +241,14 @@ public class ViewStaffHome {
 		b.setAlignment(p);
 		b.setLayoutX(x);
 		b.setLayoutY(y);		
+	}
+
+	/**********
+	 * Protected local method to return the current user
+	 * 
+	 * @param theUser		current user
+	 */
+	protected static User getTheUser() {
+		return theUser;
 	}
 }
