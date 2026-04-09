@@ -12,7 +12,6 @@ import entityClasses.User;
 import entityClasses.Request;
 
 import java.time.LocalDateTime;
-import java.sql.Timestamp;
 
 /*******
  * <p> Title: Database Class. </p>
@@ -2381,5 +2380,40 @@ public int getNumAdmins() throws SQLException
 				originalId,
 				rs.getTimestamp("createdAt").toLocalDateTime());
 	}
+	
+	
+	/*******
+	 * <p> Method: List<Post>; getRepliesByAuthor(String username) </p>
+	 *
+	 * <p> Description: Returns ALL Replies written by the given user (including soft-deleted ones),
+	 * ordered by timestamp descending (newest first) so the student sees their most recent
+	 * content at the top.  Soft-deleted posts are included so the student can see their full
+	 * history; the caller should check {@link Post#isDeleted()} and mark them accordingly. </p>
+	 *
+	 * @param username  the authorUsername to filter on
+	 * @return a List of Reply objects (active and deleted); empty if the user has no replies
+	 */
+		public List<Reply> getRepliesByAuthor(String username) {
+			List<Reply> replies = new ArrayList<>();
+			String query = "SELECT replyId, postId, authorUsername, content, timestamp, isDeleted "
+					+ "FROM Replies WHERE authorUsername = ? "
+					+ "ORDER BY timestamp DESC";
+			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+				pstmt.setString(1, username);
+				ResultSet rs = pstmt.executeQuery();
+				while (rs.next()) {
+					replies.add(new Reply(
+							rs.getInt("replyId"),
+							rs.getInt("postId"),
+							rs.getString("authorUsername"),
+							rs.getString("content"),
+							rs.getTimestamp("timestamp").toLocalDateTime(),
+							rs.getBoolean("isDeleted")));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return replies;
+		}
 	
 }

@@ -73,4 +73,15 @@ public class ControllerStaffHome {
 	protected static void performQuit() {
 		System.exit(0);
 	}
+	
+	/**********
+	 * <p> Method: performUpdate() </p>
+	 * 
+	 * <p> Description: This method directs the user to the User Update Page so the user can change
+	 * the user account attributes. </p>
+	 * 
+	 */
+	protected static void goToUserMetrics () {
+		guiUserMetrics.ViewUserMetrics.displayUserMetrics(ViewStaffHome.theStage, ViewStaffHome.getTheUser());
+	}
 }
