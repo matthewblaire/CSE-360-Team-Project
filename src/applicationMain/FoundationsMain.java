@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import database.Database;
+import entityClasses.PrivateMessage;
 import entityClasses.User;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -133,7 +134,7 @@ public class FoundationsMain extends Application {
 		users.add(new User("student2", "", "student2", "", "", "", "user2@example.com", false, true, false));
 		users.add(new User("staff1", "", "staff1", "", "", "", "user2@example.com", false, false, true));
 		users.add(new User("staff2", "", "staff2", "", "", "", "user1@example.com", false, false, true));
-		
+		users.add(new User("", "", "staff3", "", "", "", "user1@example.com", true, true, true));
         try {
 	        	// Create users
 	        	for (User user: users) {
@@ -146,6 +147,16 @@ public class FoundationsMain extends Application {
             e.printStackTrace();
             System.exit(0);
         }
+        
+        // seed db with some private messages
+        try {
+			database.createMessage(new PrivateMessage("staff1", "student1", "Message Content", -1, -1));
+			database.createMessage(new PrivateMessage("student1", "staff1", "Some other Message Content", -1, -1));
+			database.createMessage(new PrivateMessage("staff1", "student2", "Message Content 3", -1, -1));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// If the database is empty, no users have been established, so this user must be an admin
 		// user doing initial system startup activities and we need to set that admin's username

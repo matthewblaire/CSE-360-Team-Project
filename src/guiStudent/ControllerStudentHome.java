@@ -80,6 +80,16 @@ public class ControllerStudentHome {
 		guiMyPosts.ViewMyPosts.displayMyPosts(ViewStudentHome.theStage,
 				ViewStudentHome.theUser);
 	}
+	
+	/**
+	 * Method: goToMessagesList()
+	 * 
+	 * Description: navigates the student to the Messages List page where they can see all of the messages that concern them
+	 */
+	protected static void goToMessagesList() {
+		guiMessagesList.ViewMessagesList.displayMessagesList(ViewStudentHome.theStage,
+				ViewStudentHome.theUser);
+	}
 
 
 	/**********

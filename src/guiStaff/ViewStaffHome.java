@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import database.Database;
 //import database.Database;
 import entityClasses.User;
+import guiStudent.ControllerStudentHome;
 
 
 /*******
@@ -63,6 +64,16 @@ public class ViewStaffHome {
 	/** the button navigates to user metrics view**/
 	protected static Button button_viewUserMetrics = new Button("View User Metrics");
 	
+	/**
+	 * The button to navigate to browse posts
+	 */
+	protected static Button button_browsePosts = new Button("Browse Posts");
+	
+	/**
+	 * The button to navigate to messages list
+	 */
+	protected static Button button_messagesList = new Button("My Messages");
+	
 	// This is a separator and it is used to partition the GUI for various tasks
 	/** The line separator between the main content area and the bottom button area. */
 	protected static Line line_Separator4 = new Line(20, 525, width-20,525);
@@ -73,6 +84,9 @@ public class ViewStaffHome {
 	protected static Button button_Logout = new Button("Logout");
 	/** The button to quit the application. */
 	protected static Button button_Quit = new Button("Quit");
+	
+
+	
 
 	// This is the end of the GUI objects for the page.
 	
@@ -180,6 +194,12 @@ public class ViewStaffHome {
 		setupButtonUI(button_viewUserMetrics, "Dialog", 18, 300, Pos.CENTER, 250, 220);
 		button_viewUserMetrics.setOnAction((_) -> { ControllerStaffHome.goToUserMetrics(); });
 		
+		setupButtonUI(button_browsePosts, "Dialog", 18, 300, Pos.CENTER, 250, 160);
+		button_browsePosts.setOnAction((_) -> { ControllerStaffHome.goToBrowsePosts(); });
+		
+		setupButtonUI(button_messagesList, "Dialog", 18, 300, Pos.CENTER, 250, 280);
+		button_messagesList.setOnAction((_) -> { ControllerStaffHome.goToMessagesList(); });
+		
 		// GUI Area 3
         setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
         button_Logout.setOnAction((_) -> {ControllerStaffHome.performLogout(); });
@@ -192,7 +212,7 @@ public class ViewStaffHome {
 		// Place all of the widget items into the Root Pane's list of children
         theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1, button_viewUserMetrics,
-	        line_Separator4, button_Logout, button_Quit);
+	        line_Separator4, button_Logout, button_Quit, button_browsePosts, button_messagesList);
 	}
 	
 	

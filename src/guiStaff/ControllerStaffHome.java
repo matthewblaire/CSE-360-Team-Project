@@ -1,5 +1,6 @@
 package guiStaff;
 
+import guiStudent.ViewStudentHome;
 
 /*******
  * <p> Title: ControllerStaffClass. </p>
@@ -83,5 +84,16 @@ public class ControllerStaffHome {
 	 */
 	protected static void goToUserMetrics () {
 		guiUserMetrics.ViewUserMetrics.displayUserMetrics(ViewStaffHome.theStage, ViewStaffHome.getTheUser());
+	}
+	
+	protected static void goToBrowsePosts () {
+		guiBrowsePosts.ViewBrowsePosts.displayBrowsePosts(ViewStaffHome.theStage,
+				ViewStaffHome.getTheUser());
+	}
+	
+	protected static void goToMessagesList()
+	{
+		guiMessagesList.ViewMessagesList.displayMessagesList(ViewStaffHome.theStage,
+				ViewStaffHome.getTheUser());
 	}
 }

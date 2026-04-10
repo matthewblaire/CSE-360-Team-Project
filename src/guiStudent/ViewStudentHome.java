@@ -66,6 +66,9 @@ public class ViewStudentHome {
 	/** The button that navigates to the My Posts page. */
 	protected static Button button_MyPosts     = new Button("My Posts");
 	
+	/** The button that navigates to the Messages List page. */
+	protected static Button button_MyMessages     = new Button("My Messages");
+	
 	
 	
 	// This is a separator and it is used to partition the GUI for various tasks
@@ -191,6 +194,8 @@ public class ViewStudentHome {
 		setupButtonUI(button_MyPosts,     "Dialog", 18, 300, Pos.CENTER, 250, 280);
 		button_MyPosts.setOnAction((_) -> { ControllerStudentHome.goToMyPosts(); });
 		
+		setupButtonUI(button_MyMessages,     "Dialog", 18, 300, Pos.CENTER, 250, 340);
+		button_MyMessages.setOnAction((_) -> { ControllerStudentHome.goToMessagesList(); });
 		
 		// GUI Area 3
         setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
@@ -205,7 +210,7 @@ public class ViewStudentHome {
          theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
 			button_CreatePost, button_BrowsePosts, button_MyPosts,
-	        line_Separator4, button_Logout, button_Quit);
+	        line_Separator4, button_Logout, button_Quit, button_MyMessages);
 }
 	
 	

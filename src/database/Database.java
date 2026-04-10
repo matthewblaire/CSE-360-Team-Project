@@ -165,17 +165,23 @@ public class Database {
  * 
  * @throws SQLException if the statement fails
  */
-private void createPrivateMessageTables() throws SQLException {
+private void createPrivateMessageTables() {
 	String privateMessageTable = "CREATE TABLE IF NOT EXISTS PrivateMessages ("
-			+ "messageId INT AUTO_INCREMENT PRIMARY KEY"
+			+ "messageId INT AUTO_INCREMENT PRIMARY KEY,"
 			+ "replyId        INT NULL, "
 			+ "postId         INT NULL, "
 			+ "authorUsername VARCHAR(255) NOT NULL, "
-			+ "recipientUsername VARCHAR(255) NOT NULL"
+			+ "recipientUsername VARCHAR(255) NOT NULL,"
 			+ "content        VARCHAR(2000) NOT NULL, "
 			+ "timestamp      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
-			+ "isDeleted      BOOL DEFAULT FALSE, ";
-	statement.execute(privateMessageTable);
+			+ "isDeleted      BOOL DEFAULT FALSE "
+			+ ")";
+	try {
+		statement.execute(privateMessageTable);
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 	
 }
 
@@ -219,7 +225,7 @@ public int createMessage(PrivateMessage message) throws SQLException {
 
 	String insertMessage =
 			"INSERT INTO PrivateMessages (replyId, postId, authorUsername, recipientUsername, content) "
-			+ "VALUES (?, ?, ?, ?, ?, )";
+			+ "VALUES (?, ?, ?, ?, ?)";
 
 	try (PreparedStatement pstmt = connection.prepareStatement(
 			insertMessage, Statement.RETURN_GENERATED_KEYS)) {
@@ -257,8 +263,8 @@ public int createMessage(PrivateMessage message) throws SQLException {
  */
 public List<PrivateMessage> getMessagesBetween(String userA, String userB) {
 	List<PrivateMessage> messages = new ArrayList<>();
-	String query = "SELECT *"
-			+ "FROM PrivateMessages WHERE  (authorUsername = ? AND recipientUsername = ?) OR (authorUsername = ? AND recipientUsername = ?)"
+	String query = "SELECT * "
+			+ "FROM PrivateMessages WHERE  (authorUsername = ? AND recipientUsername = ?) OR (authorUsername = ? AND recipientUsername = ?) "
 			+ "ORDER BY timestamp ASC";
 	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 		pstmt.setString(1, userA);
@@ -296,8 +302,8 @@ public List<PrivateMessage> getMessagesBetween(String userA, String userB) {
  */
 public List<PrivateMessage> getMessagesConcerning(String user) {
 	List<PrivateMessage> messages = new ArrayList<>();
-	String query = "SELECT *"
-			+ "FROM PrivateMessages WHERE  (authorUsername = ? OR recipientUsername = ?)"
+	String query = "SELECT * "
+			+ "FROM PrivateMessages WHERE  (authorUsername = ? OR recipientUsername = ?) "
 			+ "ORDER BY timestamp ASC";
 	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 		pstmt.setString(1, user);
