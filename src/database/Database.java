@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import entityClasses.DiscussionThread;
 import entityClasses.Post;
+import entityClasses.PrivateMessage;
 import entityClasses.Reply;
 import entityClasses.User;
 import entityClasses.Request;
@@ -151,7 +152,177 @@ public class Database {
 
 		// Phase 3: create request versioning table
 	    createRequestTables();
+	    
+	    // Phase 4: create 1-on-1 feedback tables
+	    createPrivateMessageTables();
+	   
 	}
+	
+/**
+ * Method: createPrivateMessageTable
+ * 
+ * Description: creates the tables required for private 1-on-1 messaging.
+ * 
+ * @throws SQLException if the statement fails
+ */
+private void createPrivateMessageTables() throws SQLException {
+	String privateMessageTable = "CREATE TABLE IF NOT EXISTS PrivateMessages ("
+			+ "messageId INT AUTO_INCREMENT PRIMARY KEY"
+			+ "replyId        INT NULL, "
+			+ "postId         INT NULL, "
+			+ "authorUsername VARCHAR(255) NOT NULL, "
+			+ "recipientUsername VARCHAR(255) NOT NULL"
+			+ "content        VARCHAR(2000) NOT NULL, "
+			+ "timestamp      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+			+ "isDeleted      BOOL DEFAULT FALSE, ";
+	statement.execute(privateMessageTable);
+	
+}
+
+
+/**
+ * doesMessageExist
+ * 
+ * Used for finding out whether a given messageId already exists in the database
+ * 
+ * @param messageId Id of the message to check for
+ * @return true if message exists in the database, false if message does not exist in the database
+ */
+public Boolean doesMessageExist(int messageId)
+{
+	String query = "SELECT COUNT(*) FROM PrivateMessages WHERE messageId = ?";
+	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+		pstmt.setInt(1, messageId);
+		ResultSet rs = pstmt.executeQuery();
+		if (rs.next()) return rs.getInt(1) > 0;
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	return false;
+}
+
+/**
+ * createMessage
+ * 
+ * Method for inserting a message into the database
+ * 
+ * @param message Message to insert into the database
+ * @return the generated ID of the message after insertion
+ * @throws SQLException if the messageId is already in use, if the insertion query fails, or if the messageId fails to generate upon insertion
+ */
+public int createMessage(PrivateMessage message) throws SQLException {
+
+	// Guard: reject messages with IDs that already exist
+	if (doesMessageExist(message.messageId))
+		throw new SQLException("createMessage: messageId" + message.messageId
+				+ " already exists.");
+
+	String insertMessage =
+			"INSERT INTO PrivateMessages (replyId, postId, authorUsername, recipientUsername, content) "
+			+ "VALUES (?, ?, ?, ?, ?, )";
+
+	try (PreparedStatement pstmt = connection.prepareStatement(
+			insertMessage, Statement.RETURN_GENERATED_KEYS)) {
+
+		pstmt.setInt(1,       message.replyId);
+		pstmt.setInt(2, message.postId);
+		pstmt.setString(3, message.senderUsername);
+		pstmt.setString(4, message.recipientUsername);
+		pstmt.setString(5,    message.content);
+		pstmt.executeUpdate();
+
+		// Retrieve the auto-generated postId and write it back into the object
+		try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+			if (generatedKeys.next()) {
+				int generatedMessageId = generatedKeys.getInt(1);
+				message.messageId = generatedMessageId;
+				return generatedMessageId;
+			} else {
+				throw new SQLException("createMessage: INSERT succeeded but no generated key "
+						+ "was returned.");
+			}
+		}
+	}
+}
+
+
+/**
+ * getMessagesBetween
+ * 
+ * Used to read all messages between two users (userA and userB)
+ * 
+ * @param userA UserName of first relevant user (sender or recipient)
+ * @param userB UserName of second relevant user (sender or recipient)
+ * @return List of private messages between userA and userB
+ */
+public List<PrivateMessage> getMessagesBetween(String userA, String userB) {
+	List<PrivateMessage> messages = new ArrayList<>();
+	String query = "SELECT *"
+			+ "FROM PrivateMessages WHERE  (authorUsername = ? AND recipientUsername = ?) OR (authorUsername = ? AND recipientUsername = ?)"
+			+ "ORDER BY timestamp ASC";
+	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+		pstmt.setString(1, userA);
+		pstmt.setString(2, userB);
+		pstmt.setString(3, userB);
+		pstmt.setString(4, userA);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			messages.add(new PrivateMessage(
+					rs.getString("authorUsername"),
+					rs.getString("recipientUsername"),
+					rs.getString("content"),
+					rs.getInt("replyId"),
+					rs.getInt("postId"),
+					rs.getInt("messageId"),
+					rs.getTimestamp("timestamp").toLocalDateTime(),
+					rs.getBoolean("isDeleted")));
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	return messages;
+}
+
+
+
+/**
+ * getMessagesConcerning
+ * 
+ * Used to retrieve all messages concerning a specific user; messages where that user is either the sender 
+ * or the recipient.
+ *  
+ * @param user UserName of relevant user (either sender or recipient)
+ * @return list of all messages concerning the passed-in user
+ */
+public List<PrivateMessage> getMessagesConcerning(String user) {
+	List<PrivateMessage> messages = new ArrayList<>();
+	String query = "SELECT *"
+			+ "FROM PrivateMessages WHERE  (authorUsername = ? OR recipientUsername = ?)"
+			+ "ORDER BY timestamp ASC";
+	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+		pstmt.setString(1, user);
+		pstmt.setString(2, user);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			messages.add(new PrivateMessage(
+					rs.getString("authorUsername"),
+					rs.getString("recipientUsername"),
+					rs.getString("content"),
+					rs.getInt("replyId"),
+					rs.getInt("postId"),
+					rs.getInt("messageId"),
+					rs.getTimestamp("timestamp").toLocalDateTime(),
+					rs.getBoolean("isDeleted")));
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	return messages;
+}
+
+
+
+
 
 
 /*******
