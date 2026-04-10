@@ -76,6 +76,9 @@ public class ControllerAddRemoveRoles {
 	 */
 	protected static void repaintTheWindow() {
 		// Clear what had been displayed
+		ViewAddRemoveRoles.theStage.setTitle("CSE 360 Foundation Code: Admin Opertaions Page");
+		ViewAddRemoveRoles.theStage.setScene(ViewAddRemoveRoles.theAddRemoveRolesScene);
+		
 		ViewAddRemoveRoles.theRootPane.getChildren().clear();
 		
 		// Defermine which of the two views to show to the user
@@ -111,8 +114,7 @@ public class ControllerAddRemoveRoles {
 		// Add the list of widgets to the stage and show it
 		
 		// Set the title for the window
-		ViewAddRemoveRoles.theStage.setTitle("CSE 360 Foundation Code: Admin Opertaions Page");
-		ViewAddRemoveRoles.theStage.setScene(ViewAddRemoveRoles.theAddRemoveRolesScene);
+		
 		ViewAddRemoveRoles.theStage.show();
 	}
 	

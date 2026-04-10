@@ -119,7 +119,7 @@ public class Database {
  * <p> Description: Used to create new instances of the two database tables used by this class.</p>
  * 
  */
-	private void createTables() throws SQLException {
+	public void createTables() throws SQLException {
 		// Create the user database
 		String userTable = "CREATE TABLE IF NOT EXISTS userDB ("
 				+ "id INT AUTO_INCREMENT PRIMARY KEY, "

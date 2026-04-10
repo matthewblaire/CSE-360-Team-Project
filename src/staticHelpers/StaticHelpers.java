@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 
 public class StaticHelpers {
 	
-	public static void routeUserToHomeScreen(User theUser, Stage theStage)
+	public static void routeUserToHomeScreen(Stage theStage, User theUser)
 	{
 		if (theUser.getNumRoles() > 1)
 		{

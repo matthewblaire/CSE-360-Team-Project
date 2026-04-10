@@ -107,6 +107,8 @@ public class FoundationsMain extends Application {
 			if (RESET_DATABASE_ON_STARTUP)
 			{
 				database.dropAllObjects();
+				// need to run createTables again 
+				database.createTables();
 			}
 			
 		} catch (SQLException e) {

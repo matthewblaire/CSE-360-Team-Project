@@ -165,8 +165,8 @@ public class ControllerCreatePost {
 	 * unsaved content. </p>
 	 */
 	protected static void performReturn() {
-		guiStudent.ViewStudentHome.displayStudentHome(
-				ViewCreatePost.theStage, ViewCreatePost.theUser);
+		
+		staticHelpers.StaticHelpers.routeUserToHomeScreen(ViewCreatePost.theStage, ViewCreatePost.theUser);
 	}
 
 

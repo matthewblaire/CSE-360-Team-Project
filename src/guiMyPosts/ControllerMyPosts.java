@@ -106,7 +106,7 @@ public class ControllerMyPosts {
 	 * <p> Description: Returns the student to the Student Home page. </p>
 	 */
 	protected static void performReturn() {
-		guiStudent.ViewStudentHome.displayStudentHome(
+		staticHelpers.StaticHelpers.routeUserToHomeScreen(
 				ViewMyPosts.theStage, ViewMyPosts.theUser);
 	}
 
