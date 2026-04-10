@@ -4,33 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import database.Database;
-import entityClasses.Post;
 import entityClasses.PrivateMessage;
 import entityClasses.User;
-import guiPost.ViewPost;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 
 /*******
- * <p> Title: ControllerMyPosts Class. </p>
+ * <p> Title: ControllerMessagesList Class. </p>
  *
- * <p> Description: Controller for the My Posts page.  Provides protected static methods
- * invoked by {@link ViewMessagesList} button and event handlers.
- *
- * Responsibilities:
- * <ul>
- *   <li>Load the current student's posts with per-post reply count and unread reply count.</li>
- *   <li>Handle navigation (Return → Student Home, Logout, Quit).</li>
- * </ul>
- *
- * This controller is a collection of protected static methods — it is never instantiated.
- * All widget access goes through the public static fields of {@link ViewMessagesList}. </p>
- *
- * <p> Copyright: Lynn Robert Carter © 2025 </p>
+ * <p> Description: Controller for the Messages List page. Provides protected static methods
+ * invoked by {@link ViewMessagesList} button and event handlers. </p>
  *
  * @author CSE 360 Team
  *
- * @version 1.00	2026-02-23	Initial version for Phase 2 — Student Discussion System
  */
 public class ControllerMessagesList {
 
@@ -46,48 +32,42 @@ public class ControllerMessagesList {
 	public ControllerMessagesList() {
 	}
 
-
 	/**********
-	 * <p> Method: doLoadMyPosts() </p>
+	 * <p> Method: doLoadMyMessages() </p>
 	 *
-	 * <p> Description: Queries the database for all distinct user + otherUser combinations, where each combination is treated as a message thread </p>
+	 * <p> Description: Queries the database for all distinct user + otherUser combinations,
+	 * where each combination is treated as a message thread. </p>
 	 */
 	protected static void doLoadMyMessages() {
 
 		String currentUser = ViewMessagesList.theUser.getUserName();
-		
+
 		List<PrivateMessage> messages = theDatabase.getMessagesConcerning(currentUser);
-		
+
 		listOfDistinctOtherUsers.clear();
 
-		for (PrivateMessage m : messages)
-		{
+		for (PrivateMessage m : messages) {
 			String otherUser;
-			if (m.senderUsername.equals(currentUser))
-			{
+			if (m.senderUsername.equals(currentUser)) {
 				otherUser = m.recipientUsername;
 			}
-			else
-			{
+			else {
 				otherUser = m.senderUsername;
 			}
-			
-			
-			if (listOfDistinctOtherUsers.contains(otherUser) || otherUser.equals(currentUser))
-			{
+
+			if (listOfDistinctOtherUsers.contains(otherUser) || otherUser.equals(currentUser)) {
 				continue;
 			}
-			else
-			{
+			else {
 				listOfDistinctOtherUsers.add(otherUser);
 			}
 		}
 
-		List<String> displayLines = new ArrayList<>();
-		for (String otherUser : listOfDistinctOtherUsers)
-		{
+		List<String> displayLines = new ArrayList<String>();
+		for (String otherUser : listOfDistinctOtherUsers) {
 			List<PrivateMessage> messagesBetween = theDatabase.getMessagesBetween(currentUser, otherUser);
-			String line = "Conversation with " + otherUser + "... " + messagesBetween.size() + " messages total";
+			String line = "Conversation with " + otherUser + "... "
+					+ messagesBetween.size() + " messages total";
 			displayLines.add(line);
 		}
 
@@ -95,21 +75,24 @@ public class ControllerMessagesList {
 				FXCollections.observableArrayList(displayLines));
 
 		ViewMessagesList.label_PostCount.setText(
-				"Message threads: " + messages.size());
+				"Message threads: " + listOfDistinctOtherUsers.size());
 	}
 
-
-	
+	/**********
+	 * <p> Method: doHandleMessageThreadDoubleClick(Object selectedItem, Stage ps, User user) </p>
+	 *
+	 * <p> Description: Opens the selected message thread. </p>
+	 *
+	 * @param selectedItem the selected list item
+	 * @param ps the primary stage
+	 * @param user the currently logged-in user
+	 */
 	public static void doHandleMessageThreadDoubleClick(Object selectedItem, Stage ps, User user) {
 		int idx = ViewMessagesList.listview_MyMessageThreads.getSelectionModel().getSelectedIndex();
 		if (idx < 0 || idx >= listOfDistinctOtherUsers.size()) return;
 		String otherUser = listOfDistinctOtherUsers.get(idx);
-		assert(false);
-		// replace with a call to display the message thread between the two users
-		// ViewPost.displayPost(ps, user, postId);// displayPost(Stage ps, User user, Post post)
+		guiMessageThread.ViewMessageThread.displayMessageThread(ps, user, otherUser);
 	}
-	
-
 
 	/**********
 	 * <p> Method: performReturn() </p>
@@ -121,7 +104,6 @@ public class ControllerMessagesList {
 				ViewMessagesList.theStage, ViewMessagesList.theUser);
 	}
 
-
 	/**********
 	 * <p> Method: performLogout() </p>
 	 *
@@ -130,7 +112,6 @@ public class ControllerMessagesList {
 	protected static void performLogout() {
 		guiUserLogin.ViewUserLogin.displayUserLogin(ViewMessagesList.theStage);
 	}
-
 
 	/**********
 	 * <p> Method: performQuit() </p>

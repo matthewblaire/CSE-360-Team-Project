@@ -75,6 +75,7 @@ public class ViewPost {
     protected static Button button_Delete           = new Button("Delete");
     protected static Button button_Logout           = new Button("Logout");
     protected static Button button_Quit             = new Button("Quit");
+    protected static Button button_Feedback         = new Button("Feedback");
 
     private static Database  theDatabase = applicationMain.FoundationsMain.database;
 
@@ -236,6 +237,20 @@ public class ViewPost {
                 }
             });
             theRootPane.getChildren().add(button_Delete);
+        }
+        
+        if (isStaffOrAdmin && currentPost != null && !currentPost.isDeleted()) {
+            setupButtonUI(button_Feedback, "Dialog", 13, 110, Pos.CENTER, width - 440, 297);
+            button_Feedback.setStyle("-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-background-radius: 5;");
+            button_Feedback.setOnAction(_ -> {
+                guiMessageThread.ViewMessageThread.displayMessageThread(
+                        theStage,
+                        theUser,
+                        currentPost.getAuthorUsername(),
+                        currentPost.getPostId(),
+                        -1);
+            });
+            theRootPane.getChildren().add(button_Feedback);
         }
 
         // ── Area 5: Replies scroll pane ───────────────────────────────────────────
