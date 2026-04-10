@@ -100,8 +100,7 @@ public class ControllerMessagesList {
 	 * <p> Description: Returns the student to the Student Home page. </p>
 	 */
 	protected static void performReturn() {
-		guiStudent.ViewStudentHome.displayStudentHome(
-				ViewMessagesList.theStage, ViewMessagesList.theUser);
+		staticHelpers.StaticHelpers.routeUserToHomeScreen(ViewMessagesList.theUser, ViewMessagesList.theStage);
 	}
 
 	/**********

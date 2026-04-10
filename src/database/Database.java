@@ -76,21 +76,36 @@ public class Database {
 	}
 	
 	
+	
+	/**
+	 * Method: dropAllObjects
+	 * 
+	 * Description: Drops all objects in the database for testing purposes.
+	 */
+	public void dropAllObjects() {
+		try {
+			statement = connection.createStatement();
+			statement.execute("DROP ALL OBJECTS");
+		} catch (SQLException e){
+			System.err.println("Failed to drop all objects");
+		}
+	}
+	
 /*******
  * <p> Method: connectToDatabase </p>
  * 
  * <p> Description: Used to establish the in-memory instance of the H2 database from secondary
  *		storage.</p>
- *
  * @throws SQLException when the DriverManager is unable to establish a connection
  * 
  */
+	
 	public void connectToDatabase() throws SQLException {
 		try {
 			Class.forName(JDBC_DRIVER); // Load the JDBC driver
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
 			statement = connection.createStatement();
-
+			
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
 			System.err.println("JDBC Driver not found: " + e.getMessage());
