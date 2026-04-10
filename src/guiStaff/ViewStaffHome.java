@@ -223,10 +223,7 @@ public class ViewStaffHome {
 		// Place all of the widget items into the Root Pane's list of children
         theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1, button_viewUserMetrics,
-	        line_Separator4, button_Logout, button_Quit, button_browsePosts, button_messagesList,
-			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
-			button_viewUserMetrics, button_SubmitRequest, button_ViewQueue,
-	        line_Separator4, button_Logout, button_Quit);
+	        line_Separator4, button_Logout, button_Quit, button_browsePosts, button_messagesList);
 	}
 	
 	
