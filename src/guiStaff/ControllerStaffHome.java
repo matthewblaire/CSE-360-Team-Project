@@ -76,11 +76,10 @@ public class ControllerStaffHome {
 	}
 	
 	/**********
-	 * <p> Method: performUpdate() </p>
-	 * 
-	 * <p> Description: This method directs the user to the User Update Page so the user can change
-	 * the user account attributes. </p>
-	 * 
+	 * <p> Method: goToUserMetrics() </p>
+	 *
+	 * <p> Description: This method directs the user to the User Metrics page. </p>
+	 *
 	 */
 	protected static void goToUserMetrics () {
 		guiUserMetrics.ViewUserMetrics.displayUserMetrics(ViewStaffHome.theStage, ViewStaffHome.getTheUser());
@@ -95,5 +94,27 @@ public class ControllerStaffHome {
 	{
 		guiMessagesList.ViewMessagesList.displayMessagesList(ViewStaffHome.theStage,
 				ViewStaffHome.getTheUser());
+	}
+
+	/**********
+	 * <p> Method: goToSubmitRequest() </p>
+	 *
+	 * <p> Description: This method directs the staff user to the Submit Admin Request page where
+	 * they can compose and send a new request to the administrators. </p>
+	 *
+	 */
+	protected static void goToSubmitRequest() {
+		guiStaffRequest.ViewStaffRequest.displayStaffRequest(ViewStaffHome.theStage, ViewStaffHome.getTheUser());
+	}
+
+	/**********
+	 * <p> Method: goToRequestQueue() </p>
+	 *
+	 * <p> Description: This method directs the user to the Request Queue page where all pending
+	 * and resolved admin requests submitted by staff can be viewed. </p>
+	 *
+	 */
+	protected static void goToRequestQueue() {
+		guiRequestQueue.ViewRequestQueue.displayRequestQueue(ViewStaffHome.theStage, ViewStaffHome.getTheUser());
 	}
 }

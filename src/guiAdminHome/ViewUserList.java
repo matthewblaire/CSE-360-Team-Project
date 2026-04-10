@@ -91,7 +91,10 @@ public class ViewUserList {
 		theUser = user;
 		theStage = ps;
 
-		// Clear the view
+		// Always create a fresh instance so theRootPane and theUserListScene are initialized
+		new ViewUserList();
+
+		// Clear the view (now safe — theRootPane was just assigned)
 		ViewUserList.theRootPane.getChildren().clear();
 		
 		// Populate the user list

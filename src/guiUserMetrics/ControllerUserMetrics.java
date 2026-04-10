@@ -1,19 +1,14 @@
 package guiUserMetrics;
 
-import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import database.Database;
 import entityClasses.Post;
 import entityClasses.Reply;
 import entityClasses.User;
-import guiSetOTP.ViewSetOTP;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-
-import applicationMain.FoundationsMain;
 
 /*******
  * <p> Title: ControllerPost Class. </p>

@@ -63,6 +63,11 @@ public class ViewStaffHome {
 	
 	/** the button navigates to user metrics view**/
 	protected static Button button_viewUserMetrics = new Button("View User Metrics");
+
+	/** The button to navigate to the staff request submission page. */
+	protected static Button button_SubmitRequest = new Button("Submit Admin Request");
+	/** The button to navigate to the request queue page. */
+	protected static Button button_ViewQueue = new Button("View Request Queue");
 	
 	/**
 	 * The button to navigate to browse posts
@@ -189,10 +194,16 @@ public class ViewStaffHome {
 		button_UpdateThisUser.setOnAction((_) -> {ControllerStaffHome.performUpdate(); });
 		
 		// GUI Area 2
-		
+
 			// This is a stub, so this area is empty - not anymore
 		setupButtonUI(button_viewUserMetrics, "Dialog", 18, 300, Pos.CENTER, 250, 220);
 		button_viewUserMetrics.setOnAction((_) -> { ControllerStaffHome.goToUserMetrics(); });
+
+		setupButtonUI(button_SubmitRequest, "Dialog", 18, 300, Pos.CENTER, 250, 290);
+		button_SubmitRequest.setOnAction((_) -> { ControllerStaffHome.goToSubmitRequest(); });
+
+		setupButtonUI(button_ViewQueue, "Dialog", 18, 300, Pos.CENTER, 250, 350);
+		button_ViewQueue.setOnAction((_) -> { ControllerStaffHome.goToRequestQueue(); });
 		
 		setupButtonUI(button_browsePosts, "Dialog", 18, 300, Pos.CENTER, 250, 160);
 		button_browsePosts.setOnAction((_) -> { ControllerStaffHome.goToBrowsePosts(); });
@@ -212,7 +223,10 @@ public class ViewStaffHome {
 		// Place all of the widget items into the Root Pane's list of children
         theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1, button_viewUserMetrics,
-	        line_Separator4, button_Logout, button_Quit, button_browsePosts, button_messagesList);
+	        line_Separator4, button_Logout, button_Quit, button_browsePosts, button_messagesList,
+			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
+			button_viewUserMetrics, button_SubmitRequest, button_ViewQueue,
+	        line_Separator4, button_Logout, button_Quit);
 	}
 	
 	

@@ -126,6 +126,7 @@ public class ViewUserMetrics {
 					hs = ControllerUserMetrics.getUserMetrics(theStage, theUser, selectedUser);
 					if (hs == null) return;
 			        
+					@SuppressWarnings("unchecked")
 					List<Object[]> postsMetrics = (List<Object[]>) hs.get("postsMetrics");
 					Double postsTotalLength = 0.;
 					if (postsMetrics != null) {
@@ -139,6 +140,7 @@ public class ViewUserMetrics {
 					Double postsAvgLength = Math.ceil(postsTotalLength / (postsMetrics.size() + 10E-10));
 					
 					textMetrics += "\n";
+					@SuppressWarnings("unchecked")
 					List<Object[]> repliesMetrics = (List<Object[]>) hs.get("repliesMetrics");
 					Double repliesTotalLength = 0.;
 					if (repliesMetrics != null) {

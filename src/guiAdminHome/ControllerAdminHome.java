@@ -177,8 +177,20 @@ public class ControllerAdminHome {
 	}
 	
 	/**********
-	 * <p> 
-	 * 
+	 * <p>
+	 *
+	 * Title: viewRequestQueue () Method. </p>
+	 *
+	 * <p> Description: Protected method that directs the admin user to the Request Queue page
+	 * where all staff-submitted admin requests can be reviewed. </p>
+	 */
+	protected static void viewRequestQueue() {
+		guiRequestQueue.ViewRequestQueue.displayRequestQueue(ViewAdminHome.theStage, ViewAdminHome.theUser);
+	}
+
+	/**********
+	 * <p>
+	 *
 	 * Title: invalidEmailAddress () Method. </p>
 	 * 
 	 * <p> Description: Protected method that is intended to check an email address before it is
