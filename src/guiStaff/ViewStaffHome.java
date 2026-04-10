@@ -199,10 +199,10 @@ public class ViewStaffHome {
 		setupButtonUI(button_viewUserMetrics, "Dialog", 18, 300, Pos.CENTER, 250, 220);
 		button_viewUserMetrics.setOnAction((_) -> { ControllerStaffHome.goToUserMetrics(); });
 
-		setupButtonUI(button_SubmitRequest, "Dialog", 18, 300, Pos.CENTER, 250, 290);
+		setupButtonUI(button_SubmitRequest, "Dialog", 18, 300, Pos.CENTER, 250, 340);
 		button_SubmitRequest.setOnAction((_) -> { ControllerStaffHome.goToSubmitRequest(); });
 
-		setupButtonUI(button_ViewQueue, "Dialog", 18, 300, Pos.CENTER, 250, 350);
+		setupButtonUI(button_ViewQueue, "Dialog", 18, 300, Pos.CENTER, 250, 400);
 		button_ViewQueue.setOnAction((_) -> { ControllerStaffHome.goToRequestQueue(); });
 		
 		setupButtonUI(button_browsePosts, "Dialog", 18, 300, Pos.CENTER, 250, 160);
@@ -223,7 +223,7 @@ public class ViewStaffHome {
 		// Place all of the widget items into the Root Pane's list of children
         theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1, button_viewUserMetrics,
-	        line_Separator4, button_Logout, button_Quit, button_browsePosts, button_messagesList);
+	        line_Separator4, button_Logout, button_Quit, button_browsePosts, button_messagesList, button_SubmitRequest, button_ViewQueue);
 	}
 	
 	
