@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import database.Database;
 //import database.Database;
 import entityClasses.User;
+import guiStudent.ControllerStudentHome;
 
 
 /*******
@@ -60,7 +61,23 @@ public class ViewStaffHome {
 	// GUI ARea 2: This is a stub, so there are no widgets here.  For an actual role page, this are
 	// would contain the widgets needed for the user to play the assigned role.
 	
+	/** the button navigates to user metrics view**/
+	protected static Button button_viewUserMetrics = new Button("View User Metrics");
+
+	/** The button to navigate to the staff request submission page. */
+	protected static Button button_SubmitRequest = new Button("Submit Admin Request");
+	/** The button to navigate to the request queue page. */
+	protected static Button button_ViewQueue = new Button("View Request Queue");
 	
+	/**
+	 * The button to navigate to browse posts
+	 */
+	protected static Button button_browsePosts = new Button("Browse Posts");
+	
+	/**
+	 * The button to navigate to messages list
+	 */
+	protected static Button button_messagesList = new Button("My Messages");
 	
 	// This is a separator and it is used to partition the GUI for various tasks
 	/** The line separator between the main content area and the bottom button area. */
@@ -72,6 +89,9 @@ public class ViewStaffHome {
 	protected static Button button_Logout = new Button("Logout");
 	/** The button to quit the application. */
 	protected static Button button_Quit = new Button("Quit");
+	
+
+	
 
 	// This is the end of the GUI objects for the page.
 	
@@ -174,9 +194,22 @@ public class ViewStaffHome {
 		button_UpdateThisUser.setOnAction((_) -> {ControllerStaffHome.performUpdate(); });
 		
 		// GUI Area 2
+
+			// This is a stub, so this area is empty - not anymore
+		setupButtonUI(button_viewUserMetrics, "Dialog", 18, 300, Pos.CENTER, 250, 220);
+		button_viewUserMetrics.setOnAction((_) -> { ControllerStaffHome.goToUserMetrics(); });
+
+		setupButtonUI(button_SubmitRequest, "Dialog", 18, 300, Pos.CENTER, 250, 340);
+		button_SubmitRequest.setOnAction((_) -> { ControllerStaffHome.goToSubmitRequest(); });
+
+		setupButtonUI(button_ViewQueue, "Dialog", 18, 300, Pos.CENTER, 250, 400);
+		button_ViewQueue.setOnAction((_) -> { ControllerStaffHome.goToRequestQueue(); });
 		
-			// This is a stub, so this area is empty
+		setupButtonUI(button_browsePosts, "Dialog", 18, 300, Pos.CENTER, 250, 160);
+		button_browsePosts.setOnAction((_) -> { ControllerStaffHome.goToBrowsePosts(); });
 		
+		setupButtonUI(button_messagesList, "Dialog", 18, 300, Pos.CENTER, 250, 280);
+		button_messagesList.setOnAction((_) -> { ControllerStaffHome.goToMessagesList(); });
 		
 		// GUI Area 3
         setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
@@ -189,8 +222,8 @@ public class ViewStaffHome {
 		
 		// Place all of the widget items into the Root Pane's list of children
         theRootPane.getChildren().addAll(
-			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
-	        line_Separator4, button_Logout, button_Quit);
+			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1, button_viewUserMetrics,
+	        line_Separator4, button_Logout, button_Quit, button_browsePosts, button_messagesList, button_SubmitRequest, button_ViewQueue);
 	}
 	
 	
@@ -239,5 +272,14 @@ public class ViewStaffHome {
 		b.setAlignment(p);
 		b.setLayoutX(x);
 		b.setLayoutY(y);		
+	}
+
+	/**********
+	 * Protected local method to return the current user
+	 * 
+	 * @param theUser		current user
+	 */
+	protected static User getTheUser() {
+		return theUser;
 	}
 }

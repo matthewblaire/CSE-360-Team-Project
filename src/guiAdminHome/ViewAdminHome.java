@@ -121,6 +121,8 @@ public class ViewAdminHome {
 	protected static Button button_ListUsers = new Button("List All Users");
 	/** The button to navigate to the add/remove roles page. */
 	protected static Button button_AddRemoveRoles = new Button("Add/Remove Roles");
+	/** The button to navigate to the request queue page. */
+	protected static Button button_ViewRequestQueue = new Button("View Request Queue");
 	/** The alert displayed when a feature is not yet implemented. */
 	protected static Alert alertNotImplemented = new Alert(AlertType.INFORMATION);
 
@@ -269,22 +271,25 @@ public class ViewAdminHome {
 		button_SendInvitation.setOnAction((_) -> {ControllerAdminHome.performInvitation(); });
 	
 		// GUI Area 4
-		setupButtonUI(button_ManageInvitations, "Dialog", 16, 250, Pos.CENTER, 20, 270);
-		button_ManageInvitations.setOnAction((_) -> 
+		setupButtonUI(button_ManageInvitations, "Dialog", 16, 250, Pos.CENTER, 20, 265);
+		button_ManageInvitations.setOnAction((_) ->
 			{ControllerAdminHome.manageInvitations(); });
-	
-		setupButtonUI(button_SetOnetimePassword, "Dialog", 16, 250, Pos.CENTER, 20, 320);
-		button_SetOnetimePassword.setOnAction((_) -> 
+
+		setupButtonUI(button_SetOnetimePassword, "Dialog", 16, 250, Pos.CENTER, 20, 310);
+		button_SetOnetimePassword.setOnAction((_) ->
 			{ControllerAdminHome.setOnetimePassword(); });
 
-		setupButtonUI(button_DeleteUser, "Dialog", 16, 250, Pos.CENTER, 20, 370);
+		setupButtonUI(button_DeleteUser, "Dialog", 16, 250, Pos.CENTER, 20, 355);
 		button_DeleteUser.setOnAction((_) -> {ControllerAdminHome.deleteUser(); });
 
-		setupButtonUI(button_ListUsers, "Dialog", 16, 250, Pos.CENTER, 20, 420);
+		setupButtonUI(button_ListUsers, "Dialog", 16, 250, Pos.CENTER, 20, 400);
 		button_ListUsers.setOnAction((_) -> {ControllerAdminHome.listUsers(theStage, theUser); });
 
-		setupButtonUI(button_AddRemoveRoles, "Dialog", 16, 250, Pos.CENTER, 20, 470);
+		setupButtonUI(button_AddRemoveRoles, "Dialog", 16, 250, Pos.CENTER, 20, 445);
 		button_AddRemoveRoles.setOnAction((_) -> {ControllerAdminHome.addRemoveRoles(); });
+
+		setupButtonUI(button_ViewRequestQueue, "Dialog", 16, 250, Pos.CENTER, 20, 490);
+		button_ViewRequestQueue.setOnAction((_) -> {ControllerAdminHome.viewRequestQueue(); });
 		
 		// GUI Area 5
 		setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
@@ -300,7 +305,7 @@ public class ViewAdminHome {
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
     		label_NumberOfInvitations, label_NumberOfUsers,
     		line_Separator2,
-    		label_Invitations, 
+    		label_Invitations,
     		label_InvitationEmailAddress, text_InvitationEmailAddress,
     		combobox_SelectRole, button_SendInvitation, line_Separator3,
     		button_ManageInvitations,
@@ -308,7 +313,8 @@ public class ViewAdminHome {
     		button_DeleteUser,
     		button_ListUsers,
     		button_AddRemoveRoles,
-    		line_Separator4, 
+    		button_ViewRequestQueue,
+    		line_Separator4,
     		button_Logout,
     		button_Quit
     		);

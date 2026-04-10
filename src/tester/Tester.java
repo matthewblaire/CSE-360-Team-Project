@@ -1372,15 +1372,14 @@ public class Tester {
 	private static void performReopenedRequestLinkTests() {
 
 		Database db = applicationMain.FoundationsMain.database;
-		String suffix = String.valueOf(System.nanoTime());
 		String updatedTitle = "Need grading review - reopened";
 		String updatedDescription =
 				"This request is reopened with updated details for admin follow-up.";
 
-		User adminUser = new User("requestAdmin_" + suffix, "AdminPass2026!", "Req", "",
-				"Admin", "Req", "request_admin_" + suffix + "@example.com", true, false, false);
-		User staffUser = new User("requestStaff_" + suffix, "StaffPass2026!", "Req", "",
-				"Staff", "Req", "request_staff_" + suffix + "@example.com", false, false, true);
+		User adminUser = new User("requestAdmin_test", "AdminPass2026!", "Req", "",
+				"Admin", "Req", "request_admin_test@example.com", true, false, false);
+		User staffUser = new User("requestStaff_test", "StaffPass2026!", "Req", "",
+				"Staff", "Req", "request_staff_test@example.com", false, false, true);
 
 		try {
 			db.register(adminUser);

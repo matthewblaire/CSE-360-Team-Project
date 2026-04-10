@@ -28,6 +28,8 @@ public class Request {
 	private String description;              // Detailed request description
 	private String status;                   // OPEN or CLOSED
 	private Integer originalClosedRequestId; // Null for original rows; set for reopened copies
+	private String severity;                 // Low / Medium / High / Critical (default Medium)
+	private String closeComment;             // Admin comment explaining what was done; null when open
 	private LocalDateTime createdAt;         // Time the row was created
 
 
@@ -50,9 +52,9 @@ public class Request {
 	 * <p> Method: Request(String authorUsername, String title, String description, String status,
 	 * Integer originalClosedRequestId, LocalDateTime createdAt) </p>
 	 *
-	 * <p> Description: Constructor used before a Request is inserted into the database.  The
-	 * requestId is still unknown at this point, so it remains 0 until the database returns a
-	 * generated key. </p>
+	 * <p> Description: Constructor used before a Request is inserted into the database.
+	 * Severity defaults to "Medium" and closeComment defaults to null.
+	 * Kept for backward compatibility with existing callers. </p>
 	 *
 	 * @param authorUsername the username associated with this request row
 	 * @param title the request title
@@ -68,13 +70,44 @@ public class Request {
 		this.description = description;
 		this.status = status;
 		this.originalClosedRequestId = originalClosedRequestId;
+		this.severity = "Medium";
+		this.closeComment = null;
+		this.createdAt = createdAt;
+	}
+
+
+	/*****
+	 * <p> Method: Request(String authorUsername, String title, String description, String status,
+	 * Integer originalClosedRequestId, String severity, LocalDateTime createdAt) </p>
+	 *
+	 * <p> Description: Constructor used before a Request is inserted into the database when
+	 * a severity level is provided by the submitting staff user. </p>
+	 *
+	 * @param authorUsername the username associated with this request row
+	 * @param title the request title
+	 * @param description the request description
+	 * @param status the lifecycle status for the request
+	 * @param originalClosedRequestId the linked closed request ID for reopened requests, else null
+	 * @param severity the urgency level (Low / Medium / High / Critical)
+	 * @param createdAt when this request row was created
+	 */
+	public Request(String authorUsername, String title, String description, String status,
+			Integer originalClosedRequestId, String severity, LocalDateTime createdAt) {
+		this.authorUsername = authorUsername;
+		this.title = title;
+		this.description = description;
+		this.status = status;
+		this.originalClosedRequestId = originalClosedRequestId;
+		this.severity = (severity != null && !severity.isEmpty()) ? severity : "Medium";
+		this.closeComment = null;
 		this.createdAt = createdAt;
 	}
 
 
 	/*****
 	 * <p> Method: Request(int requestId, String authorUsername, String title, String description,
-	 * String status, Integer originalClosedRequestId, LocalDateTime createdAt) </p>
+	 * String status, Integer originalClosedRequestId, String severity, String closeComment,
+	 * LocalDateTime createdAt) </p>
 	 *
 	 * <p> Description: Full constructor used when loading a Request from the database. </p>
 	 *
@@ -84,16 +117,21 @@ public class Request {
 	 * @param description the request description
 	 * @param status the lifecycle status for the request
 	 * @param originalClosedRequestId the linked original closed request ID, else null
+	 * @param severity the urgency level (Low / Medium / High / Critical)
+	 * @param closeComment the admin comment recorded when the ticket was closed, else null
 	 * @param createdAt when this request row was created
 	 */
 	public Request(int requestId, String authorUsername, String title, String description,
-			String status, Integer originalClosedRequestId, LocalDateTime createdAt) {
+			String status, Integer originalClosedRequestId, String severity,
+			String closeComment, LocalDateTime createdAt) {
 		this.requestId = requestId;
 		this.authorUsername = authorUsername;
 		this.title = title;
 		this.description = description;
 		this.status = status;
 		this.originalClosedRequestId = originalClosedRequestId;
+		this.severity = (severity != null && !severity.isEmpty()) ? severity : "Medium";
+		this.closeComment = closeComment;
 		this.createdAt = createdAt;
 	}
 
@@ -175,4 +213,37 @@ public class Request {
 	 * @param status the new lifecycle status
 	 */
 	public void setStatus(String status) { this.status = status; }
+
+
+	/*****
+	 * <p> Method: String getSeverity() </p>
+	 * <p> Description: Returns the urgency level of the request. </p>
+	 * @return Low / Medium / High / Critical
+	 */
+	public String getSeverity() { return severity; }
+
+
+	/*****
+	 * <p> Method: void setSeverity(String severity) </p>
+	 * <p> Description: Updates the urgency level of the request. </p>
+	 * @param severity the new severity level
+	 */
+	public void setSeverity(String severity) { this.severity = severity; }
+
+
+	/*****
+	 * <p> Method: String getCloseComment() </p>
+	 * <p> Description: Returns the admin comment recorded when the ticket was closed,
+	 * or null if the ticket has not yet been closed or no comment was provided. </p>
+	 * @return the close comment text, or null
+	 */
+	public String getCloseComment() { return closeComment; }
+
+
+	/*****
+	 * <p> Method: void setCloseComment(String closeComment) </p>
+	 * <p> Description: Updates the close comment for this request. </p>
+	 * @param closeComment the admin resolution comment
+	 */
+	public void setCloseComment(String closeComment) { this.closeComment = closeComment; }
 }

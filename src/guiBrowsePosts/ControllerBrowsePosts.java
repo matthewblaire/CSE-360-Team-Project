@@ -211,8 +211,26 @@ public class ControllerBrowsePosts {
 	 * <p> Description: Returns the student to the Student Home page. </p>
 	 */
 	protected static void performReturn() {
-		guiStudent.ViewStudentHome.displayStudentHome(
-				ViewBrowsePosts.theStage, ViewBrowsePosts.theUser);
+		if (ViewBrowsePosts.theUser.getNumRoles() > 1)
+		{
+			guiMultipleRoleDispatch.ViewMultipleRoleDispatch.
+			displayMultipleRoleDispatch(ViewBrowsePosts.theStage, ViewBrowsePosts.theUser);
+		} else {
+			
+			// Admin role
+			if (ViewBrowsePosts.theUser.getAdminRole()) {
+				guiAdminHome.ViewAdminHome.displayAdminHome(ViewBrowsePosts.theStage, ViewBrowsePosts.theUser);
+			} else if (ViewBrowsePosts.theUser.getNewStudentRole()) {
+				guiStudent.ViewStudentHome.displayStudentHome(ViewBrowsePosts.theStage, ViewBrowsePosts.theUser);
+			} else if (ViewBrowsePosts.theUser.getNewStaffRole()) {
+				guiStaff.ViewStaffHome.displayStaffHome(ViewBrowsePosts.theStage, ViewBrowsePosts.theUser);
+								// Other roles
+			} else {
+				System.out.println("***** BrowsePosts goToUserHome request has an invalid role");
+			}
+			
+		}
+		
 	}
 
 

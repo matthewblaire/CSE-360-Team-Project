@@ -112,9 +112,11 @@ public class ViewReply extends VBox {
         Button button_Edit = new Button("Edit");
         Button button_Save_Edit = new Button("Save");
         Button button_Delete = new Button("Delete");
+        Button button_Feedback = new Button("Feedback");
         button_Edit.setVisible(false);
         button_Save_Edit.setVisible(false);
         button_Delete.setVisible(false);
+        button_Feedback.setVisible(false);
         
         // Create a container for buttons
         HBox buttonContainer = new HBox(10); // 10px spacing between buttons
@@ -175,6 +177,18 @@ public class ViewReply extends VBox {
                 ControllerReply.performMarkReplyDeleted(reply, theUser, theStage, post);
             }
         });
+        
+        button_Feedback.setFont(Font.font("Arial", 12));
+        button_Feedback.setMinWidth(90);
+        button_Feedback.setStyle("-fx-background-color: #8e44ad; -fx-text-fill: white;");
+        button_Feedback.setOnAction(_ -> {
+            guiMessageThread.ViewMessageThread.displayMessageThread(
+                    theStage,
+                    theUser,
+                    reply.getAuthorUsername(),
+                    -1,
+                    reply.getReplyId());
+        });
 
         // Show buttons if user is the author and reply is not deleted
         if (theUser.getUserName().equals(this.authorUsername) && !this.isDeleted) {
@@ -190,6 +204,11 @@ public class ViewReply extends VBox {
             buttonContainer.getChildren().addAll(button_Delete);
         } else {
             buttonContainer.getChildren().clear();
+        }
+        
+        if ((theUser.getAdminRole() || theUser.getNewStaffRole()) && !this.isDeleted) {
+            button_Feedback.setVisible(true);
+            buttonContainer.getChildren().add(button_Feedback);
         }
         // Then add all elements to the VBox, including the button container and edit field
         getChildren().addAll(label_Author, label_Content, textField_Edit, label_Timestamps, separator, buttonContainer);

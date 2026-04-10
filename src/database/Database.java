@@ -7,12 +7,12 @@ import java.util.UUID;
 
 import entityClasses.DiscussionThread;
 import entityClasses.Post;
+import entityClasses.PrivateMessage;
 import entityClasses.Reply;
 import entityClasses.User;
 import entityClasses.Request;
 
 import java.time.LocalDateTime;
-import java.sql.Timestamp;
 
 /*******
  * <p> Title: Database Class. </p>
@@ -89,9 +89,7 @@ public class Database {
 		try {
 			Class.forName(JDBC_DRIVER); // Load the JDBC driver
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
-			statement = connection.createStatement(); 
-			// You can use this command to clear the database and restart from fresh.
-			statement.execute("DROP ALL OBJECTS");
+			statement = connection.createStatement();
 
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
@@ -152,7 +150,197 @@ public class Database {
 
 		// Phase 3: create request versioning table
 	    createRequestTables();
+	    
+	    // Phase 4: create 1-on-1 feedback tables
+	    createPrivateMessageTables();
+
+	    // SAFETY: add severity and closeComment to any Requests table created before these
+	    // columns existed.  ALTER TABLE ADD COLUMN fails silently if already present.
+	    try {
+	        statement.execute(
+	        		"ALTER TABLE Requests ADD COLUMN severity VARCHAR(20) NOT NULL DEFAULT 'Medium'");
+	    } catch (SQLException e) {
+	        // Column already exists — safe to ignore
+	    }
+
+	    try {
+	        statement.execute("ALTER TABLE Requests ADD COLUMN closeComment VARCHAR(2000)");
+	    } catch (SQLException e) {
+	        // Column already exists — safe to ignore
+	    }
 	}
+	
+/**
+ * Method: createPrivateMessageTable
+ * 
+ * Description: creates the tables required for private 1-on-1 messaging.
+ * 
+ * @throws SQLException if the statement fails
+ */
+private void createPrivateMessageTables() {
+	String privateMessageTable = "CREATE TABLE IF NOT EXISTS PrivateMessages ("
+			+ "messageId INT AUTO_INCREMENT PRIMARY KEY,"
+			+ "replyId        INT NULL, "
+			+ "postId         INT NULL, "
+			+ "authorUsername VARCHAR(255) NOT NULL, "
+			+ "recipientUsername VARCHAR(255) NOT NULL,"
+			+ "content        VARCHAR(2000) NOT NULL, "
+			+ "timestamp      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+			+ "isDeleted      BOOL DEFAULT FALSE "
+			+ ")";
+	try {
+		statement.execute(privateMessageTable);
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+}
+
+
+/**
+ * doesMessageExist
+ * 
+ * Used for finding out whether a given messageId already exists in the database
+ * 
+ * @param messageId Id of the message to check for
+ * @return true if message exists in the database, false if message does not exist in the database
+ */
+public Boolean doesMessageExist(int messageId)
+{
+	String query = "SELECT COUNT(*) FROM PrivateMessages WHERE messageId = ?";
+	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+		pstmt.setInt(1, messageId);
+		ResultSet rs = pstmt.executeQuery();
+		if (rs.next()) return rs.getInt(1) > 0;
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	return false;
+}
+
+/**
+ * createMessage
+ * 
+ * Method for inserting a message into the database
+ * 
+ * @param message Message to insert into the database
+ * @return the generated ID of the message after insertion
+ * @throws SQLException if the messageId is already in use, if the insertion query fails, or if the messageId fails to generate upon insertion
+ */
+public int createMessage(PrivateMessage message) throws SQLException {
+
+	// Guard: reject messages with IDs that already exist
+	if (doesMessageExist(message.messageId))
+		throw new SQLException("createMessage: messageId" + message.messageId
+				+ " already exists.");
+
+	String insertMessage =
+			"INSERT INTO PrivateMessages (replyId, postId, authorUsername, recipientUsername, content) "
+			+ "VALUES (?, ?, ?, ?, ?)";
+
+	try (PreparedStatement pstmt = connection.prepareStatement(
+			insertMessage, Statement.RETURN_GENERATED_KEYS)) {
+
+		pstmt.setInt(1,       message.replyId);
+		pstmt.setInt(2, message.postId);
+		pstmt.setString(3, message.senderUsername);
+		pstmt.setString(4, message.recipientUsername);
+		pstmt.setString(5,    message.content);
+		pstmt.executeUpdate();
+
+		// Retrieve the auto-generated postId and write it back into the object
+		try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+			if (generatedKeys.next()) {
+				int generatedMessageId = generatedKeys.getInt(1);
+				message.messageId = generatedMessageId;
+				return generatedMessageId;
+			} else {
+				throw new SQLException("createMessage: INSERT succeeded but no generated key "
+						+ "was returned.");
+			}
+		}
+	}
+}
+
+
+/**
+ * getMessagesBetween
+ * 
+ * Used to read all messages between two users (userA and userB)
+ * 
+ * @param userA UserName of first relevant user (sender or recipient)
+ * @param userB UserName of second relevant user (sender or recipient)
+ * @return List of private messages between userA and userB
+ */
+public List<PrivateMessage> getMessagesBetween(String userA, String userB) {
+	List<PrivateMessage> messages = new ArrayList<>();
+	String query = "SELECT * "
+			+ "FROM PrivateMessages WHERE  (authorUsername = ? AND recipientUsername = ?) OR (authorUsername = ? AND recipientUsername = ?) "
+			+ "ORDER BY timestamp ASC";
+	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+		pstmt.setString(1, userA);
+		pstmt.setString(2, userB);
+		pstmt.setString(3, userB);
+		pstmt.setString(4, userA);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			messages.add(new PrivateMessage(
+					rs.getString("authorUsername"),
+					rs.getString("recipientUsername"),
+					rs.getString("content"),
+					rs.getInt("replyId"),
+					rs.getInt("postId"),
+					rs.getInt("messageId"),
+					rs.getTimestamp("timestamp").toLocalDateTime(),
+					rs.getBoolean("isDeleted")));
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	return messages;
+}
+
+
+
+/**
+ * getMessagesConcerning
+ * 
+ * Used to retrieve all messages concerning a specific user; messages where that user is either the sender 
+ * or the recipient.
+ *  
+ * @param user UserName of relevant user (either sender or recipient)
+ * @return list of all messages concerning the passed-in user
+ */
+public List<PrivateMessage> getMessagesConcerning(String user) {
+	List<PrivateMessage> messages = new ArrayList<>();
+	String query = "SELECT * "
+			+ "FROM PrivateMessages WHERE  (authorUsername = ? OR recipientUsername = ?) "
+			+ "ORDER BY timestamp ASC";
+	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+		pstmt.setString(1, user);
+		pstmt.setString(2, user);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			messages.add(new PrivateMessage(
+					rs.getString("authorUsername"),
+					rs.getString("recipientUsername"),
+					rs.getString("content"),
+					rs.getInt("replyId"),
+					rs.getInt("postId"),
+					rs.getInt("messageId"),
+					rs.getTimestamp("timestamp").toLocalDateTime(),
+					rs.getBoolean("isDeleted")));
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	return messages;
+}
+
+
+
+
 
 
 /*******
@@ -240,6 +428,8 @@ public class Database {
 				+ "description VARCHAR(2000) NOT NULL, "
 				+ "status VARCHAR(20) NOT NULL, "
 				+ "originalClosedRequestId INT NULL, "
+				+ "severity VARCHAR(20) NOT NULL DEFAULT 'Medium', "
+				+ "closeComment VARCHAR(2000), "
 				+ "createdAt TIMESTAMP NOT NULL, "
 				+ "FOREIGN KEY (originalClosedRequestId) REFERENCES Requests(requestId))";
 		statement.execute(requestsTable);
@@ -1031,8 +1221,9 @@ public int getNumAdmins() throws SQLException
  * 
  */
 	public void register(User user) throws SQLException {
-		String insertUser = "INSERT INTO userDB (userName, password, firstName, middleName, "
+		String insertUser = "MERGE INTO userDB (userName, password, firstName, middleName, "
 				+ "lastName, preferredFirstName, emailAddress, adminRole, studentRole, staffRole) "
+				+ "KEY (userName) "
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			currentUsername = user.getUserName();
@@ -2053,7 +2244,7 @@ public int getNumAdmins() throws SQLException
 
 		String insertRequest =
 				"INSERT INTO Requests (authorUsername, title, description, status, "
-				+ "originalClosedRequestId, createdAt) VALUES (?, ?, ?, ?, ?, ?)";
+				+ "originalClosedRequestId, severity, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 		try (PreparedStatement pstmt = connection.prepareStatement(
 				insertRequest, Statement.RETURN_GENERATED_KEYS)) {
@@ -2069,7 +2260,9 @@ public int getNumAdmins() throws SQLException
 				pstmt.setInt(5, request.getOriginalClosedRequestId());
 			}
 
-			pstmt.setTimestamp(6, Timestamp.valueOf(request.getCreatedAt()));
+			String sev = request.getSeverity();
+			pstmt.setString(6, (sev != null && !sev.isEmpty()) ? sev : "Medium");
+			pstmt.setTimestamp(7, Timestamp.valueOf(request.getCreatedAt()));
 			pstmt.executeUpdate();
 
 			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
@@ -2098,7 +2291,7 @@ public int getNumAdmins() throws SQLException
  */
 	public Request getRequestById(int requestId) {
 		String query = "SELECT requestId, authorUsername, title, description, status, "
-				+ "originalClosedRequestId, createdAt FROM Requests WHERE requestId = ?";
+				+ "originalClosedRequestId, severity, closeComment, createdAt FROM Requests WHERE requestId = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setInt(1, requestId);
 			ResultSet rs = pstmt.executeQuery();
@@ -2134,7 +2327,7 @@ public int getNumAdmins() throws SQLException
 				: anchor.getOriginalClosedRequestId();
 
 		String query = "SELECT requestId, authorUsername, title, description, status, "
-				+ "originalClosedRequestId, createdAt FROM Requests "
+				+ "originalClosedRequestId, severity, closeComment, createdAt FROM Requests "
 				+ "WHERE requestId = ? OR originalClosedRequestId = ? "
 				+ "ORDER BY createdAt ASC, requestId ASC";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -2243,14 +2436,59 @@ public int getNumAdmins() throws SQLException
 /*******
  * <p> Method: int closeRequest(int requestId) </p>
  *
- * <p> Description: Marks an existing request row as CLOSED.  The row is intentionally retained so
- * later reopened versions can link back to it and preserve the request history. </p>
+ * <p> Description: Marks an existing request row as CLOSED with no close comment.
+ * Delegates to {@link #closeRequest(int, String)}. </p>
  *
  * @param requestId the requestId to close
  * @return the number of rows updated
  */
 	public int closeRequest(int requestId) {
-		String update = "UPDATE Requests SET status = 'CLOSED' WHERE requestId = ?";
+		return closeRequest(requestId, null);
+	}
+
+
+/*******
+ * <p> Method: int closeRequest(int requestId, String comment) </p>
+ *
+ * <p> Description: Marks an existing request row as CLOSED and records the admin's
+ * close comment explaining the resolution.  The row is intentionally retained so later
+ * reopened versions can link back to it and preserve the request history. </p>
+ *
+ * @param requestId the requestId to close
+ * @param comment   the admin's resolution note; may be null or empty
+ * @return the number of rows updated
+ */
+	public int closeRequest(int requestId, String comment) {
+		String update = "UPDATE Requests SET status = 'CLOSED', closeComment = ? WHERE requestId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(update)) {
+			if (comment == null || comment.isBlank()) {
+				pstmt.setNull(1, Types.VARCHAR);
+			} else {
+				pstmt.setString(1, comment.trim());
+			}
+			pstmt.setInt(2, requestId);
+			return pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+/*******
+ * <p> Method: int reopenRequest(int requestId) </p>
+ *
+ * <p> Description: Sets the status of an existing CLOSED request back to OPEN.  This is an
+ * admin-only direct status update — it modifies the existing row rather than creating a new
+ * history row.  It is distinct from {@link #reopenClosedRequest} which is the staff workflow
+ * that preserves history by inserting a new linked row. </p>
+ *
+ * @param requestId the requestId to reopen
+ * @return the number of rows updated
+ */
+	public int reopenRequest(int requestId) {
+		// Clear closeComment when reopening so stale resolution notes are not shown
+		String update = "UPDATE Requests SET status = 'OPEN', closeComment = NULL WHERE requestId = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(update)) {
 			pstmt.setInt(1, requestId);
 			return pstmt.executeUpdate();
@@ -2351,13 +2589,99 @@ public int getNumAdmins() throws SQLException
 
 		List<Request> requests = new ArrayList<>();
 		String query = "SELECT requestId, authorUsername, title, description, status, "
-				+ "originalClosedRequestId, createdAt FROM Requests "
+				+ "originalClosedRequestId, severity, closeComment, createdAt FROM Requests "
 				+ "ORDER BY createdAt DESC, requestId DESC";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				requests.add(buildRequestFromResultSet(rs));
 			}
+		}
+		return requests;
+	}
+
+
+/*******
+ * <p> Method: int submitStaffRequest(String staffUsername, String title, String description) </p>
+ *
+ * <p> Description: Validates the title and description using the project recognizers and then
+ * inserts a new OPEN request row authored by the given staff user.  The
+ * {@code originalClosedRequestId} is left null because this is an original request, not a
+ * reopen.  Any staff user (not just users with the staffRole flag) may call this method from
+ * the GUI; role enforcement is handled at the page level. </p>
+ *
+ * @param staffUsername the username of the staff user submitting the request
+ * @param title         the request title
+ * @param description   the full description of the requested admin action
+ * @return the auto-generated requestId assigned by the database
+ * @throws SQLException if validation fails or the INSERT fails
+ */
+	public int submitStaffRequest(String staffUsername, String title, String description,
+			String severity) throws SQLException {
+
+		String titleError = recognizers.TitleRecognizer.evaluateTitle(title);
+		if (!titleError.isEmpty()) {
+			throw new SQLException("submitStaffRequest: " + titleError);
+		}
+
+		String descError = recognizers.PostContentRecognizer.evaluatePostContent(description);
+		if (!descError.isEmpty()) {
+			throw new SQLException("submitStaffRequest: " + descError);
+		}
+
+		String resolvedSeverity = (severity != null && !severity.isEmpty()) ? severity : "Medium";
+		Request request = new Request(staffUsername, title, description, "OPEN", null,
+				resolvedSeverity, LocalDateTime.now());
+		return createRequest(request);
+	}
+
+
+/*******
+ * <p> Method: int updateRequestSeverity(int requestId, String severity) </p>
+ *
+ * <p> Description: Updates the severity level of an existing request.  Called by admins from
+ * the Request Queue page to re-classify a ticket after reviewing it. </p>
+ *
+ * @param requestId the request to update
+ * @param severity  the new severity level (Low / Medium / High / Critical)
+ * @return the number of rows updated
+ */
+	public int updateRequestSeverity(int requestId, String severity) {
+		String update = "UPDATE Requests SET severity = ? WHERE requestId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(update)) {
+			pstmt.setString(1, severity);
+			pstmt.setInt(2, requestId);
+			return pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+/*******
+ * <p> Method: List<Request> getAllRequests() </p>
+ *
+ * <p> Description: Returns every row in the Requests table ordered by createdAt ascending
+ * (oldest first) so the queue presents the highest-priority, longest-pending items at the
+ * top.  Both OPEN and CLOSED requests are included so admins and staff have a complete
+ * historical view.  No role check is performed here; callers are responsible for ensuring
+ * only authorised users reach this method. </p>
+ *
+ * @return a chronologically ordered list of all request rows; empty if the table is empty
+ */
+	public List<Request> getAllRequests() {
+		List<Request> requests = new ArrayList<>();
+		String query = "SELECT requestId, authorUsername, title, description, status, "
+				+ "originalClosedRequestId, severity, closeComment, createdAt FROM Requests "
+				+ "ORDER BY createdAt ASC, requestId ASC";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				requests.add(buildRequestFromResultSet(rs));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return requests;
 	}
@@ -2372,6 +2696,16 @@ public int getNumAdmins() throws SQLException
 	 */
 	private Request buildRequestFromResultSet(ResultSet rs) throws SQLException {
 		Integer originalId = (Integer) rs.getObject("originalClosedRequestId");
+
+		String severity = "Medium";
+		try {
+			String s = rs.getString("severity");
+			if (s != null && !s.isBlank()) severity = s;
+		} catch (SQLException ignored) { }
+
+		String closeComment = null;
+		try { closeComment = rs.getString("closeComment"); } catch (SQLException ignored) { }
+
 		return new Request(
 				rs.getInt("requestId"),
 				rs.getString("authorUsername"),
@@ -2379,7 +2713,44 @@ public int getNumAdmins() throws SQLException
 				rs.getString("description"),
 				rs.getString("status"),
 				originalId,
+				severity,
+				closeComment,
 				rs.getTimestamp("createdAt").toLocalDateTime());
 	}
+	
+	
+	/*******
+	 * <p> Method: List<Post>; getRepliesByAuthor(String username) </p>
+	 *
+	 * <p> Description: Returns ALL Replies written by the given user (including soft-deleted ones),
+	 * ordered by timestamp descending (newest first) so the student sees their most recent
+	 * content at the top.  Soft-deleted posts are included so the student can see their full
+	 * history; the caller should check {@link Post#isDeleted()} and mark them accordingly. </p>
+	 *
+	 * @param username  the authorUsername to filter on
+	 * @return a List of Reply objects (active and deleted); empty if the user has no replies
+	 */
+		public List<Reply> getRepliesByAuthor(String username) {
+			List<Reply> replies = new ArrayList<>();
+			String query = "SELECT replyId, postId, authorUsername, content, timestamp, isDeleted "
+					+ "FROM Replies WHERE authorUsername = ? "
+					+ "ORDER BY timestamp DESC";
+			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+				pstmt.setString(1, username);
+				ResultSet rs = pstmt.executeQuery();
+				while (rs.next()) {
+					replies.add(new Reply(
+							rs.getInt("replyId"),
+							rs.getInt("postId"),
+							rs.getString("authorUsername"),
+							rs.getString("content"),
+							rs.getTimestamp("timestamp").toLocalDateTime(),
+							rs.getBoolean("isDeleted")));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return replies;
+		}
 	
 }
