@@ -22,8 +22,7 @@ import javafx.stage.Stage;
 /*******
  * <p> Title: ViewMessageThread Class. </p>
  *
- * <p> Description: The View component of the Message Thread MVC triplet. This singleton page
- * shows the currently logged-in user all private messages exchanged with one other user,
+ * <p> Description: This page shows the currently logged-in user all private messages exchanged with one other user,
  * ordered chronologically. When a message references a valid Post or Reply, the page also
  * displays a note showing what that message is responding to. This page also supports
  * composing a new message, optionally pre-linked to a Post or Reply selected elsewhere

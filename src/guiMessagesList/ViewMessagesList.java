@@ -13,20 +13,12 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /*******
- * <p> Title: ViewMyPosts Class. </p>
+ * <p> Title: ViewMessageList Class. </p>
  *
- * <p> Description: The View component of the My Posts MVC triplet.  This singleton page
- * shows the currently logged-in student all of their own posts, with per-post reply counts
- * and unread reply counts, satisfying the Phase 2 user story:
- * "As a student, I can see which posts have been replied to and which replies have not been
- * read by me."
+ * <p> Description: The View component of the MessageList MVC triplet.  This singleton page
+ * shows the currently logged-in student all messages that concern them (any message where they are 
+ * the author or the recipient)
  *
- * Layout (800 × 600):
- * <ul>
- *   <li>Area 1 — page title, username label, Return button, horizontal rule at y = 95.</li>
- *   <li>Area 2 — post-count label and a ListView of post summaries (newest first).</li>
- *   <li>Area 3 — horizontal rule at y = 525, Logout and Quit buttons.</li>
- * </ul>
  *
  * The ListView is populated (and repopulated on every visit) by
  * {@link ControllerMessagesList#doLoadMyMessages()}. </p>
@@ -35,7 +27,7 @@ import javafx.stage.Stage;
  *
  * @author CSE 360 Team
  *
- * @version 1.00	2026-02-23	Initial version for Phase 2 — Student Discussion System
+ * @version 1.00	2026-04-09	Initial version for Phase 3
  */
 public class ViewMessagesList {
 
