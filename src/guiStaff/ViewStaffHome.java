@@ -75,6 +75,11 @@ public class ViewStaffHome {
 	protected static Button button_browsePosts = new Button("Browse Posts");
 	
 	/**
+	 * The button to navigate to thread management
+	 */
+	protected static Button button_manageThreads = new Button("Manage Threads");
+	
+	/**
 	 * The button to navigate to messages list
 	 */
 	protected static Button button_messagesList = new Button("My Messages");
@@ -194,36 +199,38 @@ public class ViewStaffHome {
 		button_UpdateThisUser.setOnAction((_) -> {ControllerStaffHome.performUpdate(); });
 		
 		// GUI Area 2
-
-			// This is a stub, so this area is empty - not anymore
-		setupButtonUI(button_viewUserMetrics, "Dialog", 18, 300, Pos.CENTER, 250, 220);
-		button_viewUserMetrics.setOnAction((_) -> { ControllerStaffHome.goToUserMetrics(); });
-
-		setupButtonUI(button_SubmitRequest, "Dialog", 18, 300, Pos.CENTER, 250, 340);
-		button_SubmitRequest.setOnAction((_) -> { ControllerStaffHome.goToSubmitRequest(); });
-
-		setupButtonUI(button_ViewQueue, "Dialog", 18, 300, Pos.CENTER, 250, 400);
-		button_ViewQueue.setOnAction((_) -> { ControllerStaffHome.goToRequestQueue(); });
-		
+		// This is a stub, so this area is empty - not anymore
 		setupButtonUI(button_browsePosts, "Dialog", 18, 300, Pos.CENTER, 250, 160);
 		button_browsePosts.setOnAction((_) -> { ControllerStaffHome.goToBrowsePosts(); });
-		
-		setupButtonUI(button_messagesList, "Dialog", 18, 300, Pos.CENTER, 250, 280);
+
+		setupButtonUI(button_manageThreads, "Dialog", 18, 300, Pos.CENTER, 250, 220);
+		button_manageThreads.setOnAction((_) -> { ControllerStaffHome.goToManageThreads(); });
+
+		setupButtonUI(button_viewUserMetrics, "Dialog", 18, 300, Pos.CENTER, 250, 280);
+		button_viewUserMetrics.setOnAction((_) -> { ControllerStaffHome.goToUserMetrics(); });
+				
+		setupButtonUI(button_messagesList, "Dialog", 18, 300, Pos.CENTER, 250, 340);
 		button_messagesList.setOnAction((_) -> { ControllerStaffHome.goToMessagesList(); });
-		
+
+		setupButtonUI(button_SubmitRequest, "Dialog", 18, 300, Pos.CENTER, 250, 400);
+		button_SubmitRequest.setOnAction((_) -> { ControllerStaffHome.goToSubmitRequest(); });
+
+		setupButtonUI(button_ViewQueue, "Dialog", 18, 300, Pos.CENTER, 250, 460);
+		button_ViewQueue.setOnAction((_) -> { ControllerStaffHome.goToRequestQueue(); });
+	
 		// GUI Area 3
-        setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
-        button_Logout.setOnAction((_) -> {ControllerStaffHome.performLogout(); });
-        
-        setupButtonUI(button_Quit, "Dialog", 18, 250, Pos.CENTER, 300, 540);
-        button_Quit.setOnAction((_) -> {ControllerStaffHome.performQuit(); });
+		setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
+		button_Logout.setOnAction((_) -> {ControllerStaffHome.performLogout(); });
+    
+		setupButtonUI(button_Quit, "Dialog", 18, 250, Pos.CENTER, 300, 540);
+		button_Quit.setOnAction((_) -> {ControllerStaffHome.performQuit(); });
 
 		// This is the end of the GUI initialization code
 		
 		// Place all of the widget items into the Root Pane's list of children
         theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1, button_viewUserMetrics,
-	        line_Separator4, button_Logout, button_Quit, button_browsePosts, button_messagesList, button_SubmitRequest, button_ViewQueue);
+	        line_Separator4, button_Logout, button_Quit, button_browsePosts, button_manageThreads, button_messagesList, button_SubmitRequest, button_ViewQueue);
 	}
 	
 	

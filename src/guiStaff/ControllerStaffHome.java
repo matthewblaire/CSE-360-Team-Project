@@ -90,6 +90,18 @@ public class ControllerStaffHome {
 				ViewStaffHome.getTheUser());
 	}
 	
+	/**********
+	 * <p> Method: goToManageThreads() </p>
+	 *
+	 * <p> Description: This method directs the staff user to the Thread CRUD page where
+	 * discussion threads can be created, viewed, updated, and deleted. </p>
+	 *
+	 */
+	protected static void goToManageThreads() {
+		guiThreadCRUD.ViewThreadCRUD.displayThreadCRUD(ViewStaffHome.theStage,
+				ViewStaffHome.getTheUser());
+	}
+	
 	protected static void goToMessagesList()
 	{
 		guiMessagesList.ViewMessagesList.displayMessagesList(ViewStaffHome.theStage,

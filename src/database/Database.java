@@ -12,6 +12,8 @@ import entityClasses.Reply;
 import entityClasses.User;
 import entityClasses.Request;
 
+import recognizers.TitleRecognizer;
+
 import java.time.LocalDateTime;
 
 /*******
@@ -1090,6 +1092,189 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 		return threads;
 	}
 
+	/*******
+	 * <p> Method: boolean doesThreadTitleExist(String title) </p>
+	 *
+	 * <p> Description: Returns true if a DiscussionThread already exists with the given
+	 * title.  This is used to prevent duplicate thread names before the UNIQUE constraint
+	 * in the database fires. </p>
+	 *
+	 * @param title the thread title to look up
+	 * @return true if a thread with that title already exists; false otherwise
+	 */
+		public boolean doesThreadTitleExist(String title) {
+			String query = "SELECT COUNT(*) FROM DiscussionThreads WHERE title = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+				pstmt.setString(1, title);
+				ResultSet rs = pstmt.executeQuery();
+				if (rs.next()) return rs.getInt(1) > 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+
+
+	/*******
+	 * <p> Method: boolean isDefaultThread(int threadId) </p>
+	 *
+	 * <p> Description: Returns true if the specified threadId belongs to the seeded default
+	 * discussion thread named "General".  Staff are not allowed to delete this thread. </p>
+	 *
+	 * @param threadId the threadId to examine
+	 * @return true if the thread is the default "General" thread; false otherwise
+	 */
+		public boolean isDefaultThread(int threadId) {
+			String query = "SELECT COUNT(*) FROM DiscussionThreads "
+					+ "WHERE threadId = ? AND title = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+				pstmt.setInt(1, threadId);
+				pstmt.setString(2, "General");
+				ResultSet rs = pstmt.executeQuery();
+				if (rs.next()) return rs.getInt(1) > 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+
+
+	/*******
+	 * <p> Method: boolean doesThreadHavePosts(int threadId) </p>
+	 *
+	 * <p> Description: Returns true if the specified thread currently has one or more Posts.
+	 * Staff are not allowed to delete a thread that still contains posts. </p>
+	 *
+	 * @param threadId the threadId to examine
+	 * @return true if one or more Posts reference this threadId; false otherwise
+	 */
+		public boolean doesThreadHavePosts(int threadId) {
+			String query = "SELECT COUNT(*) FROM Posts WHERE threadId = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+				pstmt.setInt(1, threadId);
+				ResultSet rs = pstmt.executeQuery();
+				if (rs.next()) return rs.getInt(1) > 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+
+
+	/*******
+	 * <p> Method: int createThread(String title) </p>
+	 *
+	 * <p> Description: Inserts a new DiscussionThread row into the database and returns the
+	 * generated threadId.  The title is validated before insertion, and duplicate thread
+	 * titles are rejected. </p>
+	 *
+	 * @param title the new thread title
+	 * @return the auto-generated threadId assigned by the database
+	 * @throws SQLException if the title is invalid, already exists, the INSERT fails, or no
+	 *         generated key is returned
+	 */
+		public int createThread(String title) throws SQLException {
+
+			String titleEvaluation = TitleRecognizer.evaluateTitle(title);
+			if (!titleEvaluation.isEmpty())
+				throw new SQLException(titleEvaluation);
+
+			if (doesThreadTitleExist(title))
+				throw new SQLException("Title \"" + title
+						+ "\" already exists in Discussion Threads.");
+
+			String insertThread =
+					"INSERT INTO DiscussionThreads (title) VALUES (?)";
+
+			try (PreparedStatement pstmt = connection.prepareStatement(
+					insertThread, Statement.RETURN_GENERATED_KEYS)) {
+
+				pstmt.setString(1, title);
+				pstmt.executeUpdate();
+
+				try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+					if (generatedKeys.next()) {
+						return generatedKeys.getInt(1);
+					} else {
+						throw new SQLException("createThread: INSERT succeeded but no generated key "
+								+ "was returned.");
+					}
+				}
+			}
+		}
+
+
+	/*******
+	 * <p> Method: int updateThreadTitle(int threadId, String newTitle) </p>
+	 *
+	 * <p> Description: Updates the title of an existing DiscussionThread and returns the number
+	 * of rows updated.  The new title is validated before the update, and duplicate titles are
+	 * rejected. </p>
+	 *
+	 * @param threadId the threadId to update
+	 * @param newTitle the replacement title
+	 * @return 1 if the update succeeded; 0 otherwise
+	 * @throws SQLException if the thread does not exist, the title is invalid, or the new title
+	 *         is already in use by a different thread
+	 */
+		public int updateThreadTitle(int threadId, String newTitle) throws SQLException {
+
+			if (!doesThreadExist(threadId))
+				throw new SQLException("The selected thread does not exist.");
+
+			String titleEvaluation = TitleRecognizer.evaluateTitle(newTitle);
+			if (!titleEvaluation.isEmpty())
+				throw new SQLException(titleEvaluation);
+
+			String duplicateQuery = "SELECT COUNT(*) FROM DiscussionThreads "
+					+ "WHERE title = ? AND threadId <> ?";
+			try (PreparedStatement duplicateStmt = connection.prepareStatement(duplicateQuery)) {
+				duplicateStmt.setString(1, newTitle);
+				duplicateStmt.setInt(2, threadId);
+				ResultSet rs = duplicateStmt.executeQuery();
+				if (rs.next() && rs.getInt(1) > 0)
+					throw new SQLException("Title \"" + newTitle
+							+ "\" already exists in Discussion Threads.");
+			}
+
+			String update = "UPDATE DiscussionThreads SET title = ? WHERE threadId = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(update)) {
+				pstmt.setString(1, newTitle);
+				pstmt.setInt(2, threadId);
+				return pstmt.executeUpdate();
+			}
+		}
+
+
+	/*******
+	 * <p> Method: int deleteThread(int threadId) </p>
+	 *
+	 * <p> Description: Physically deletes a DiscussionThread row, but only if the thread exists,
+	 * is not the default "General" thread, and has no Posts.  This preserves the seeded default
+	 * thread and prevents orphaned post data. </p>
+	 *
+	 * @param threadId the threadId to delete
+	 * @return 1 if the delete succeeded; 0 otherwise
+	 * @throws SQLException if the thread does not exist, is the default thread, or still has posts
+	 */
+		public int deleteThread(int threadId) throws SQLException {
+
+			if (!doesThreadExist(threadId))
+				throw new SQLException("The selected thread does not exist.");
+
+			if (isDefaultThread(threadId))
+				throw new SQLException("The default \"General\" thread cannot be deleted.");
+
+			if (doesThreadHavePosts(threadId))
+				throw new SQLException("This thread cannot be deleted because it still has posts.");
+
+			String delete = "DELETE FROM DiscussionThreads WHERE threadId = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(delete)) {
+				pstmt.setInt(1, threadId);
+				return pstmt.executeUpdate();
+			}
+		}
+	
 
 /*******
  * <p> Method: boolean doesPostExist(int postId) </p>
