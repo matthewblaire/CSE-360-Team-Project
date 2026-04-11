@@ -1642,6 +1642,17 @@ public class Tester {
 					+ e.getMessage() + " - FAIL");
 			numFailed++;
 		}
+		
+		// -- Post test cleanup --
+		try {
+
+			db.remove(adminUser.getUserName());
+			db.remove(staffUser.getUserName());
+		} catch (SQLException e)
+		{
+			System.err.println("Failed to remove users related to staff/admin request testing.");
+		}
+		
 	}
 	
 	
