@@ -91,7 +91,7 @@ public class FoundationsMain extends Application {
     // This flag enables testing on application startup. Subject to change
     private final static Boolean ENABLE_TESTING = true;
     
-    private final static Boolean RESET_DATABASE_ON_STARTUP = false;
+    private final static Boolean RESET_DATABASE_ON_STARTUP = true;
 
 	/** Tracks which role's home page is currently active (0 = admin). */
 	public static int activeHomePage = 0;		// Which role's home page is currently active?
