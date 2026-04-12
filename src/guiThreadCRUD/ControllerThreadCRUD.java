@@ -1,5 +1,14 @@
 package guiThreadCRUD;
 
+import java.sql.SQLException;
+
+import applicationMain.FoundationsMain;
+import database.Database;
+import entityClasses.User;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Stage;
+
 /*******
  * <p> Title: ControllerThreadCRUD Class. </p>
  * 
@@ -15,8 +24,10 @@ package guiThreadCRUD;
 
 public class ControllerThreadCRUD {
 	
-	/*-*******************************************************************************************
+	private  Alert alert = new Alert(AlertType.ERROR);
 
+	/*-*******************************************************************************************
+	
 	User Interface Actions for this page
 	
 	This controller is not a class that gets instantiated. It is a collection of protected
@@ -24,10 +35,83 @@ public class ControllerThreadCRUD {
 	
 	 */
 	
+	private static Database theDatabase = FoundationsMain.database;
+	private static Alert alert1 = new Alert(AlertType.ERROR);	
 	/**
 	 * Default constructor is not used.
 	 */
+
 	public ControllerThreadCRUD() {
+	}
+	
+	/**********
+	 * <p> Method: void performCreatethread(Stage theStage, User theUser, String newThreadName) </p>
+	 * 
+	 * <p> Description: creates a new thread. </p>
+	 * 
+	 * @param stage the gui stage to pass to view
+	 * @param user current user object
+	 * @param newThreadName new thread name (String) to be created 
+	 */
+	protected static void performCreatethread(Stage theStage, User theUser, String newThreadName) {
+		try {
+			theDatabase.createThread(newThreadName);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+//			e.printStackTrace();
+			alert1.setTitle("Error Dialog");
+			alert1.setHeaderText("Error Dialog");
+			alert1.setContentText(e.getMessage());
+			alert1.showAndWait();
+		}
+		ViewThreadCRUD.displayThreadCRUD(theStage, theUser);
+	}
+	
+	/**********
+	 * <p> Method: void performUpdatethread(Stage theStage, User theUser, String newThreadName, int threadId) </p>
+	 * 
+	 * <p> Description: updates thread's title. </p>
+	 * 
+	 * @param stage the gui stage to pass to view
+	 * @param user current user object
+	 * @param newThreadName new thread name (String) to be updated 
+	 * @param threadId ID of the thread to be updated
+	 */
+	protected static void performUpdatethread(Stage theStage, User theUser, String newThreadName, int threadId) {
+		try {
+			theDatabase.updateThreadTitle(threadId, newThreadName);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+//			e.printStackTrace();
+			alert1.setTitle("Error Dialog");
+			alert1.setHeaderText("Error Dialog");
+			alert1.setContentText(e.getMessage());
+			alert1.showAndWait();
+		}
+		ViewThreadCRUD.displayThreadCRUD(theStage, theUser);
+	}
+	
+	/**********
+	 * <p> Method: void performDeletethread(Stage theStage, User theUser, int threadId) </p>
+	 * 
+	 * <p> Description: deletes a thread. </p>
+	 * 
+	 * @param stage the gui stage to pass to view
+	 * @param user current user object
+	 * @param threadId ID of the thread to be deleted
+	 */
+	protected static void performDeletethread(Stage theStage, User theUser, int threadId) {
+		try {
+			theDatabase.deleteThread(threadId);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+//			e.printStackTrace();
+			alert1.setTitle("Error Dialog");
+			alert1.setHeaderText("Error Dialog");
+			alert1.setContentText(e.getMessage());
+			alert1.showAndWait();
+		}
+		ViewThreadCRUD.displayThreadCRUD(theStage, theUser);
 	}
 	
 	/**********

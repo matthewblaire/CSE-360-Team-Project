@@ -2,10 +2,12 @@ package guiThreadCRUD;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
@@ -14,6 +16,7 @@ import javafx.stage.Stage;
 import database.Database;
 
 import entityClasses.User;
+import guiPost.ControllerPost;
 import entityClasses.DiscussionThread;
 
 /*******
@@ -75,6 +78,7 @@ public class ViewThreadCRUD {
 	protected static Stage theStage;
 	protected static Pane theRootPane;
 	protected static User theUser;
+	protected static Alert alert1 = new Alert(AlertType.ERROR);	
 
 	private static Scene theThreadCRUDScene;
 
@@ -166,7 +170,11 @@ public class ViewThreadCRUD {
 
 
 		setupButtonUI(button_CreateThread, "Dialog", 18, 220, Pos.CENTER, 420, 205);
-
+		button_CreateThread.setOnAction(_ -> {
+			ControllerThreadCRUD.performCreatethread(theStage, theUser, textField_NewThreadTitle.getText());
+        });
+		
+		
 		setupLabelUI(label_EditThreadTitle, "Arial", 18, 280, Pos.CENTER, 390, 255);
 
 		textField_EditThreadTitle.setLayoutX(390);
@@ -175,9 +183,32 @@ public class ViewThreadCRUD {
 		textField_EditThreadTitle.setPrefWidth(310);
 
 		setupButtonUI(button_UpdateThread, "Dialog", 18, 220, Pos.CENTER, 420, 335);
-
+		button_UpdateThread.setOnAction(_ -> {
+			DiscussionThread dt = listView_Threads.getSelectionModel().getSelectedItem();
+			if (dt == null) {
+				alert1.setTitle("Error Dialog");
+				alert1.setHeaderText("Error Dialog");
+				alert1.setContentText("Please select from the list to perform the action on.");
+				alert1.showAndWait();
+				return;
+			}
+			ControllerThreadCRUD.performUpdatethread(theStage, theUser,
+					textField_EditThreadTitle.getText(), dt.getThreadId());
+        });
+		
 		setupButtonUI(button_DeleteThread, "Dialog", 18, 220, Pos.CENTER, 420, 380);
-
+		button_DeleteThread.setOnAction(_ -> {
+			DiscussionThread dt = listView_Threads.getSelectionModel().getSelectedItem();
+			if (dt == null) {
+				alert1.setTitle("Error Dialog");
+				alert1.setHeaderText("Error Dialog");
+				alert1.setContentText("Please select from the list to perform the action on.");
+				alert1.showAndWait();
+				return;
+			}
+			ControllerThreadCRUD.performDeletethread(theStage, theUser, dt.getThreadId());
+        });
+		
 		setupButtonUI(button_Refresh, "Dialog", 18, 220, Pos.CENTER, 420, 425);
 
 		setupLabelUI(label_Status, "Arial", 16, 620, Pos.BASELINE_LEFT, 40, 470);
