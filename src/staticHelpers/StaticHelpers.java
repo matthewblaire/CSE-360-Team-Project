@@ -7,18 +7,18 @@ public class StaticHelpers {
 	
 	public static void routeUserToHomeScreen(Stage theStage, User theUser)
 	{
-		if (theUser.getNumRoles() > 1)
+		if (theUser.getNumRoles() > 1 && theUser.getCurrentRole() == null)
 		{
 			guiMultipleRoleDispatch.ViewMultipleRoleDispatch.
 			displayMultipleRoleDispatch(theStage, theUser);
 		} else {
 			
 			// Admin role
-			if (theUser.getAdminRole()) {
+			if (theUser.getCurrentRole().equals("Admin")) {
 				guiAdminHome.ViewAdminHome.displayAdminHome(theStage, theUser);
-			} else if (theUser.getNewStudentRole()) {
+			} else if (theUser.getCurrentRole().equals("Student")) {
 				guiStudent.ViewStudentHome.displayStudentHome(theStage, theUser);
-			} else if (theUser.getNewStaffRole()) {
+			} else if (theUser.getCurrentRole().equals("Staff")) {
 				guiStaff.ViewStaffHome.displayStaffHome(theStage, theUser);
 								// Other roles
 			} else {

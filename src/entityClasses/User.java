@@ -28,7 +28,7 @@ public class User {
     private boolean adminRole;
     private boolean studentRole;
     private boolean staffRole;
-    
+    private String currentRole;
     
     /*****
      * <p> Method: User() </p>
@@ -80,6 +80,7 @@ public class User {
         this.adminRole = r1;
         this.studentRole = r2;
         this.staffRole = r3;
+        this.currentRole = null;
     }
 
     
@@ -296,5 +297,29 @@ public class User {
     	if (studentRole) numRoles++;
     	if (staffRole) numRoles++;
     	return numRoles;
+    }
+    
+    /*****
+     * <p> Method: public void setCurrentRole(String role) </p>
+     * 
+     * <p> Description: sets the current role the user is performing </p>
+     * 
+     * @param role Current role of the user
+	 *
+     */
+    public void setCurrentRole(String role) {
+    	this.currentRole = role;
+    }
+    
+    /*****
+     * <p> Method: public String getCurrentRole(String role) </p>
+     * 
+     * <p> Description: gets the current role the user is performing </p>
+     * 
+     * @return role Current role of the user
+	 *
+     */
+    public String getCurrentRole() {
+    	return this.currentRole;
     }
 }
