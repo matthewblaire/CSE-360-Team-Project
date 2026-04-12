@@ -29,7 +29,7 @@ import javafx.stage.Stage;
  * </ul>
  *
  * The ListView is populated (and repopulated on every visit) by
- * {@link ControllerMyPosts#doLoadMyPosts()}. </p>
+ * {@link ControllerMyPosts#doLoadMyPosts()}. 
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *

@@ -35,7 +35,7 @@ import javafx.stage.Stage;
  *
  * Admin-only widgets are hidden via {@code setVisible(false)} for staff users.
  * The list, detail panel, and action controls are reset on every call to
- * {@link #displayRequestQueue(Stage, User)}. </p>
+ * {@link #displayRequestQueue(Stage, User)}.
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *

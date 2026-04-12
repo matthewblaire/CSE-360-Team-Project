@@ -454,7 +454,7 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 
 
 /*******
- * <p> Method: List<Post>; getPostsByThread(int threadId) </p>
+ * <p> Method: List&lt;Post&gt;; getPostsByThread(int threadId) </p>
  *
  * <p> Description: Returns ALL Posts belonging to the given thread (including soft-deleted
  * ones), ordered by timestamp ascending so students read the conversation in chronological
@@ -491,7 +491,7 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 
 
 /*******
- * <p> Method: List<Post>; getPostsByAuthor(String username) </p>
+ * <p> Method: List&lt;Post&gt;; getPostsByAuthor(String username) </p>
  *
  * <p> Description: Returns ALL Posts written by the given user (including soft-deleted ones),
  * ordered by timestamp descending (newest first) so the student sees their most recent
@@ -527,7 +527,7 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 
 
 /*******
- * <p> Method: List<Post>; searchPosts(String keyword, int threadId) </p>
+ * <p> Method: List&lt;Post&gt;; searchPosts(String keyword, int threadId) </p>
  *
  * <p> Description: Returns non-deleted Posts whose content contains the given keyword
  * (case-insensitive substring match).  If {@code threadId} is -1, all threads are searched;
@@ -574,7 +574,7 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 
 
 /*******
- * <p> Method: List<Reply>; getRepliesForPost(int postId) </p>
+ * <p> Method: List&lt;Reply&gt;; getRepliesForPost(int postId) </p>
  *
  * <p> Description: Returns all Replies for the given postId, ordered by timestamp ascending
  * so the conversation thread reads in chronological order.  Soft-deleted replies are included
@@ -1068,7 +1068,7 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 
 
 /*******
- * <p> Method: List<DiscussionThread>; getThreadList() </p>
+ * <p> Method: List&lt;DiscussionThread&gt;; getThreadList() </p>
  *
  * <p> Description: Returns a list of all DiscussionThread objects currently in the database,
  * ordered by threadId ascending so that "General" (threadId = 1) always appears first.
@@ -2506,7 +2506,7 @@ public int getNumAdmins() throws SQLException
 
 
 /*******
- * <p> Method: List<Request> getRequestHistory(int requestId) </p>
+ * <p> Method: List&lt;Request&gt; getRequestHistory(int requestId) </p>
  *
  * <p> Description: Returns the full history chain for a request. If {@code requestId} is the
  * original closed request, the result includes that row and every reopened descendant. If
@@ -2771,7 +2771,7 @@ public int getNumAdmins() throws SQLException
 
 
 /*******
- * <p> Method: List<Request> getRequestsVisibleToAdmin(String adminUsername) </p>
+ * <p> Method: List&lt;Request&gt; getRequestsVisibleToAdmin(String adminUsername) </p>
  *
  * <p> Description: Returns all request rows visible to an administrator, including original and
  * reopened versions. This supports admin review of reopened requests and their preserved
@@ -2813,6 +2813,7 @@ public int getNumAdmins() throws SQLException
  * @param staffUsername the username of the staff user submitting the request
  * @param title         the request title
  * @param description   the full description of the requested admin action
+ * @param severity      the severity level for the request; defaults to Medium if empty
  * @return the auto-generated requestId assigned by the database
  * @throws SQLException if validation fails or the INSERT fails
  */
@@ -2860,7 +2861,7 @@ public int getNumAdmins() throws SQLException
 
 
 /*******
- * <p> Method: List<Request> getAllRequests() </p>
+ * <p> Method: List&lt;Request&gt; getAllRequests() </p>
  *
  * <p> Description: Returns every row in the Requests table ordered by createdAt ascending
  * (oldest first) so the queue presents the highest-priority, longest-pending items at the
@@ -2920,7 +2921,7 @@ public int getNumAdmins() throws SQLException
 	
 	
 	/*******
-	 * <p> Method: List<Post>; getRepliesByAuthor(String username) </p>
+	 * <p> Method: List&lt;Reply&gt;; getRepliesByAuthor(String username) </p>
 	 *
 	 * <p> Description: Returns ALL Replies written by the given user (including soft-deleted ones),
 	 * ordered by timestamp descending (newest first) so the student sees their most recent

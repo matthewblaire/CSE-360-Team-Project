@@ -22,7 +22,7 @@ import javafx.collections.FXCollections;
  * </ul>
  *
  * A parallel {@link #currentRequests} list keeps {@link Request} objects index-aligned with
- * the ListView rows so a selected index maps directly to a database primary key. </p>
+ * the ListView rows so a selected index maps directly to a database primary key.
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *

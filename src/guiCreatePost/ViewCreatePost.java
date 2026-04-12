@@ -41,7 +41,7 @@ import javafx.stage.Stage;
  *
  * Static widget layout is performed once in the private constructor.  Dynamic data (username
  * label, thread ComboBox contents, field resets) is refreshed on every call to
- * {@link #displayCreatePost(Stage, User)}. </p>
+ * {@link #displayCreatePost(Stage, User)}.
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
@@ -154,7 +154,6 @@ public class ViewCreatePost {
 	 *   <li>Refreshes dynamic content: username label, thread ComboBox, field resets.</li>
 	 *   <li>Sets the Scene and shows the window.</li>
 	 * </ol>
-	 * </p>
 	 *
 	 * @param ps    the primary JavaFX Stage
 	 * @param user  the currently logged-in Student

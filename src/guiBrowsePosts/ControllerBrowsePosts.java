@@ -26,7 +26,7 @@ import javafx.stage.Stage;
  * </ul>
  *
  * This controller is a collection of protected static methods — it is never instantiated.
- * All widget access goes through the public static fields of {@link ViewBrowsePosts}. </p>
+ * All widget access goes through the public static fields of {@link ViewBrowsePosts}.
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
@@ -116,10 +116,9 @@ public class ControllerBrowsePosts {
 	 *   <li>Marks the post as read for the current user.</li>
 	 *   <li>Loads all replies for that post from the database.</li>
 	 *   <li>Marks every visible reply as read for the current user.</li>
-	 *   <li>Populates {@link ViewBrowsePosts#listview_Replies} with formatted Strings.</li>
+	 *   <li>Populates {@link ViewBrowsePosts#listview_Posts} with formatted Strings.</li>
 	 *   <li>Refreshes the posts list so the read indicator (✓/○) updates immediately.</li>
 	 * </ol>
-	 * </p>
 	 */
 	protected static void doSelectPost() {
 

@@ -23,7 +23,7 @@ import javafx.stage.Stage;
  * </ul>
  *
  * This controller is a collection of protected static methods — it is never instantiated.
- * All widget access goes through the public static fields of {@link ViewMyPosts}. </p>
+ * All widget access goes through the public static fields of {@link ViewMyPosts}.
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *

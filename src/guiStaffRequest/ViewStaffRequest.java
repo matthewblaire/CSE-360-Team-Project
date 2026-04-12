@@ -35,7 +35,7 @@ import javafx.stage.Stage;
  *
  * Static widget layout is performed once in the private constructor.  Dynamic data (username
  * label, field resets) is refreshed on every call to
- * {@link #displayStaffRequest(Stage, User)}. </p>
+ * {@link #displayStaffRequest(Stage, User)}.
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
@@ -147,7 +147,6 @@ public class ViewStaffRequest {
 	 *   <li>Refreshes dynamic content: username label, clears form fields.</li>
 	 *   <li>Sets the Scene and shows the window.</li>
 	 * </ol>
-	 * </p>
 	 *
 	 * @param ps    the primary JavaFX Stage
 	 * @param user  the currently logged-in Staff user
