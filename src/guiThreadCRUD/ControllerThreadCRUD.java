@@ -5,8 +5,12 @@ package guiThreadCRUD;
  * 
  * <p> Description: The Java/FX-based Thread CRUD page controller. This class provides
  * the controller actions based on the user's use of the JavaFX GUI widgets defined by
- * the View class. </p>
+ * the View class.
  * 
+ * This controller supports Staff User Story S3: as a staff member, I can create, read,
+ * update, and delete discussion threads. The controller delegates those actions to the
+ * model layer, which is validated primarily by the JUnit tests in
+ * {@code FullStaffThreadCRUDTester}. </p>
  * 
  * @author Saam Kavusi
  * 
@@ -46,6 +50,9 @@ public class ControllerThreadCRUD {
 	 * <p> Description: This method requests creation of a new discussion thread using the
 	 * title entered by the staff user. </p>
 	 * 
+	 * This function is validated through the database-level behavior checked by
+	 * {@code FullStaffThreadCRUDTester.NormalTest01()} and
+	 * {@code FullStaffThreadCRUDTester.RobustTest01()}.
 	 */
 	protected static void performCreateThread() {
 		ModelThreadCRUD.createThread();
@@ -57,6 +64,9 @@ public class ControllerThreadCRUD {
 	 * <p> Description: This method requests an update to the selected discussion thread's
 	 * title using the values entered by the staff user. </p>
 	 * 
+	 *  This function is validated through the database-level behavior checked by
+	 * {@code FullStaffThreadCRUDTester.NormalTest02()} and
+	 * {@code FullStaffThreadCRUDTester.RobustTest03()}.
 	 */
 	protected static void performUpdateThread() {
 		ModelThreadCRUD.updateThread();
@@ -67,6 +77,9 @@ public class ControllerThreadCRUD {
 	 * 
 	 * <p> Description: This method requests deletion of the selected discussion thread. </p>
 	 * 
+	 * This function is validated through the database-level behavior checked by
+	 * {@code FullStaffThreadCRUDTester.NormalTest03()} and
+	 * {@code FullStaffThreadCRUDTester.RobustTest02()}.
 	 */
 	protected static void performDeleteThread() {
 		ModelThreadCRUD.deleteThread();
@@ -78,6 +91,11 @@ public class ControllerThreadCRUD {
 	 * <p> Description: This method refreshes the visible list of discussion threads shown
 	 * on the page. </p>
 	 * 
+	 * The thread-list content displayed by this action depends on the thread-creation,
+	 * update, and deletion behaviors validated by
+	 * {@code FullStaffThreadCRUDTester.NormalTest01()},
+	 * {@code FullStaffThreadCRUDTester.NormalTest02()}, and
+	 * {@code FullStaffThreadCRUDTester.NormalTest03()}.
 	 */
 	protected static void refreshThreadList() {
 		ModelThreadCRUD.performRefresh();

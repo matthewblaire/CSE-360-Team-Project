@@ -285,7 +285,7 @@ public class ViewStaffHome {
 	/**********
 	 * Protected local method to return the current user
 	 * 
-	 * @param theUser		current user
+	 * @return the current logged-in user
 	 */
 	protected static User getTheUser() {
 		return theUser;
