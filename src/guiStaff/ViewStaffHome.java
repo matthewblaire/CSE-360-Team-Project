@@ -153,6 +153,7 @@ public class ViewStaffHome {
 		
 		// If not yet established, populate the static aspects of the GUI
 		if (theView == null) theView = new ViewStaffHome();		// Instantiate singleton if needed
+		user.setCurrentRole("Staff");
 		
 		// Populate the dynamic aspects of the GUI with the data from the user and the current
 		// state of the system.
