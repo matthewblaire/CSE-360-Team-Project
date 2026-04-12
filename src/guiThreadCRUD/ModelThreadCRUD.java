@@ -14,7 +14,12 @@ import recognizers.TitleRecognizer;
  * 
  * <p> Description: The model for the staff discussion thread CRUD page. This class
  * performs the validation and database operations needed to create, update, delete,
- * and display discussion threads. </p>
+ * and display discussion threads.
+ * 
+ * This model implements the core application behavior for Staff User Story S3:
+ * as a staff member, I can create, read, update, and delete discussion threads.
+ * Its thread-management behavior is validated primarily by the JUnit tests in
+ * {@code FullStaffThreadCRUDTester}. </p>
  * 
  * @author Saam Kavusi
  * 
@@ -25,9 +30,24 @@ public class ModelThreadCRUD {
 	
 	private static Database theDatabase = applicationMain.FoundationsMain.database;
 	
+	/**
+	 * Default constructor is not used.
+	 */
 	public ModelThreadCRUD() {
 	}
 	
+	/**********
+	 * <p> Method: refreshThreadList() </p>
+	 * 
+	 * <p> Description: This method reloads the current set of discussion threads from the
+	 * database and repopulates the list view shown on the page. It also clears any prior
+	 * status message so the refreshed view reflects the latest thread state. </p>
+	 * 
+	 * The database thread list used by this method is validated by
+	 * {@code FullStaffThreadCRUDTester.NormalTest01()},
+	 * {@code FullStaffThreadCRUDTester.NormalTest02()}, and
+	 * {@code FullStaffThreadCRUDTester.NormalTest03()}.
+	 */
 	protected static void refreshThreadList() {
 		List<DiscussionThread> threads = theDatabase.getThreadList();
 		ViewThreadCRUD.listView_Threads.getItems().clear();
@@ -37,6 +57,17 @@ public class ModelThreadCRUD {
 		ViewThreadCRUD.label_Status.setText("");
 	}
 	
+	/**********
+	 * <p> Method: performRefresh() </p>
+	 * 
+	 * <p> Description: This method refreshes the thread list and then informs the user that
+	 * the visible discussion thread list has been updated successfully. </p>
+	 * 
+	 * The refreshed list content depends on the same thread-list behavior validated by
+	 * {@code FullStaffThreadCRUDTester.NormalTest01()},
+	 * {@code FullStaffThreadCRUDTester.NormalTest02()}, and
+	 * {@code FullStaffThreadCRUDTester.NormalTest03()}.
+	 */
 	protected static void performRefresh() {
 		refreshThreadList();
 		
@@ -47,6 +78,18 @@ public class ModelThreadCRUD {
 		infoAlert.showAndWait();
 	}
 	
+	/**********
+	 * <p> Method: createThread() </p>
+	 * 
+	 * <p> Description: This method reads the new discussion thread title entered by the staff
+	 * user, validates it, and requests creation of the thread in the database. If creation
+	 * succeeds, the visible list is refreshed and the status message reports success. If
+	 * validation or database creation fails, an error is shown to the user. </p>
+	 * 
+	 * The database thread-creation behavior used here is validated by
+	 * {@code FullStaffThreadCRUDTester.NormalTest01()} for successful creation and
+	 * {@code FullStaffThreadCRUDTester.RobustTest01()} for duplicate-title rejection.
+	 */
 	protected static void createThread() {
 		String title = ViewThreadCRUD.textField_NewThreadTitle.getText().trim();
 		
@@ -67,6 +110,19 @@ public class ModelThreadCRUD {
 		}
 	}
 	
+	/**********
+	 * <p> Method: updateThread() </p>
+	 * 
+	 * <p> Description: This method updates the title of the currently selected discussion
+	 * thread using the replacement title entered by the staff user. The method verifies that
+	 * a thread has been selected and that the new title is valid before requesting the update.
+	 * If the update succeeds, the page is refreshed and the user is informed of success.
+	 * Otherwise, an error is shown. </p>
+	 * 
+	 * The database thread-update behavior used here is validated by
+	 * {@code FullStaffThreadCRUDTester.NormalTest02()} for successful update and
+	 * {@code FullStaffThreadCRUDTester.RobustTest03()} for duplicate-title rejection.
+	 */
 	protected static void updateThread() {
 		DiscussionThread selectedThread =
 				ViewThreadCRUD.listView_Threads.getSelectionModel().getSelectedItem();
@@ -94,6 +150,20 @@ public class ModelThreadCRUD {
 		}
 	}
 	
+	/**********
+	 * <p> Method: deleteThread() </p>
+	 * 
+	 * <p> Description: This method requests deletion of the currently selected discussion
+	 * thread. It first checks that a thread is selected, then relies on the database rules
+	 * to reject deletion of protected threads such as the default "General" thread or any
+	 * thread that still contains posts. If the delete succeeds, the page is refreshed and
+	 * the user is informed of success. Otherwise, an error is shown. </p>
+	 * 
+	 * The database thread-deletion behavior used here is validated by
+	 * {@code FullStaffThreadCRUDTester.NormalTest03()} for successful deletion and
+	 * {@code FullStaffThreadCRUDTester.RobustTest02()} for protection of the default
+	 * "General" thread.
+	 */
 	protected static void deleteThread() {
 		DiscussionThread selectedThread =
 				ViewThreadCRUD.listView_Threads.getSelectionModel().getSelectedItem();
@@ -114,6 +184,21 @@ public class ModelThreadCRUD {
 		}
 	}
 	
+	/**********
+	 * <p> Method: showError(String message) </p>
+	 * 
+	 * <p> Description: This helper method displays a thread-management error to the user in
+	 * two ways: it places the error message into the page status label and also shows a JavaFX
+	 * error dialog with the same message. This keeps the cause of the failure visible even
+	 * after the dialog is dismissed. </p>
+	 * 
+	 * This method supports failure handling for the same create, update, and delete paths
+	 * validated by {@code FullStaffThreadCRUDTester.RobustTest01()},
+	 * {@code FullStaffThreadCRUDTester.RobustTest02()}, and
+	 * {@code FullStaffThreadCRUDTester.RobustTest03()}.
+	 * 
+	 * @param message specifies the error message to be shown to the user
+	 */
 	private static void showError(String message) {
 		ViewThreadCRUD.label_Status.setText(message);
 		ViewThreadCRUD.label_Status.setStyle("-fx-text-fill: red;");

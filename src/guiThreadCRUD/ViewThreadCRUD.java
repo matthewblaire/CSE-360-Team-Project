@@ -21,7 +21,12 @@ import entityClasses.DiscussionThread;
  * 
  * <p> Description: The Java/FX-based Staff Thread CRUD page. This page allows staff
  * users to create, read, update, and delete discussion threads while preserving the
- * visual style and page flow used by the rest of the project. </p>
+ * visual style and page flow used by the rest of the project.
+ * 
+ * This view supports Staff User Story S3 by providing the user interface used to
+ * access the thread CRUD functions. The underlying thread-management behavior shown
+ * through this page is validated primarily by the JUnit tests in
+ * {@code FullStaffThreadCRUDTester}. </p>
  * 
  * @author Saam Kavusi
  * 
@@ -90,6 +95,12 @@ public class ViewThreadCRUD {
 	 * <p> Description: This method is the single entry point from outside this package to
 	 * cause the Thread CRUD page to be displayed. </p>
 	 * 
+	 * The thread data displayed through this page depends on the thread-list, create,
+	 * update, and delete behaviors validated by
+	 * {@code FullStaffThreadCRUDTester.NormalTest01()},
+	 * {@code FullStaffThreadCRUDTester.NormalTest02()}, and
+	 * {@code FullStaffThreadCRUDTester.NormalTest03()}.
+	 * 
 	 * @param ps specifies the JavaFX Stage to be used for this GUI and its methods
 	 * 
 	 * @param user specifies the User for this GUI and its methods
@@ -116,6 +127,14 @@ public class ViewThreadCRUD {
 	 * 
 	 * <p> Description: This method initializes all the elements of the graphical user
 	 * interface. This is a singleton and is only performed once. </p>
+	 * 
+	 * This page structure enables the staff thread CRUD behavior validated by
+	 * {@code FullStaffThreadCRUDTester.NormalTest01()},
+	 * {@code FullStaffThreadCRUDTester.NormalTest02()},
+	 * {@code FullStaffThreadCRUDTester.NormalTest03()},
+	 * {@code FullStaffThreadCRUDTester.RobustTest01()},
+	 * {@code FullStaffThreadCRUDTester.RobustTest02()}, and
+	 * {@code FullStaffThreadCRUDTester.RobustTest03()}.
 	 */
 	private ViewThreadCRUD() {
 		
@@ -204,6 +223,24 @@ public class ViewThreadCRUD {
 
 	 */
 
+	/**********
+	 * <p> Method: setupLabelUI(Label l, String ff, double f, double w, Pos p, double x,
+	 * double y) </p>
+	 * 
+	 * <p> Description: This helper method applies the common JavaFX formatting values used
+	 * for labels on this page, including font, width, alignment, and screen position. </p>
+	 * 
+	 * This helper supports the presentation of the thread CRUD page used to exercise the
+	 * thread-management behavior validated by {@code FullStaffThreadCRUDTester}.
+	 * 
+	 * @param l specifies the Label object to be initialized
+	 * @param ff specifies the font family
+	 * @param f specifies the font size
+	 * @param w specifies the minimum width of the label
+	 * @param p specifies the alignment of the label
+	 * @param x specifies the x-axis location from the left edge
+	 * @param y specifies the y-axis location from the top edge
+	 */
 	private static void setupLabelUI(Label l, String ff, double f, double w, Pos p, double x,
 			double y) {
 		l.setFont(Font.font(ff, f));
@@ -213,6 +250,24 @@ public class ViewThreadCRUD {
 		l.setLayoutY(y);
 	}
 
+	/**********
+	 * <p> Method: setupButtonUI(Button b, String ff, double f, double w, Pos p, double x,
+	 * double y) </p>
+	 * 
+	 * <p> Description: This helper method applies the common JavaFX formatting values used
+	 * for buttons on this page, including font, width, alignment, and screen position. </p>
+	 * 
+	 * This helper supports the button presentation for the thread CRUD actions whose
+	 * underlying behavior is validated by {@code FullStaffThreadCRUDTester}.
+	 * 
+	 * @param b specifies the Button object to be initialized
+	 * @param ff specifies the font family
+	 * @param f specifies the font size
+	 * @param w specifies the minimum width of the button
+	 * @param p specifies the alignment of the button
+	 * @param x specifies the x-axis location from the left edge
+	 * @param y specifies the y-axis location from the top edge
+	 */
 	private static void setupButtonUI(Button b, String ff, double f, double w, Pos p, double x,
 			double y) {
 		b.setFont(Font.font(ff, f));
