@@ -161,7 +161,7 @@ public class ControllerReply {
 	         return;
     	 }
     	 // Mark as deleted in database
-    	 boolean success = theDatabase.softDeleteReply(reply.getReplyId(), user.getUserName()) == 1;
+    	 boolean success = theDatabase.softDeleteReply(reply.getReplyId(), reply.getAuthorUsername()) == 1;
     	 if (success) {
             // Refresh the post view to show updated reply list
         	ViewPost.displayPost(stage, user, post.getPostId());

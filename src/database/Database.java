@@ -514,8 +514,8 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 						rs.getInt("postId"),
 						rs.getInt("threadId"),
 						rs.getString("authorUsername"),
-						rs.getString("title"),
-						rs.getString("content"),
+						rs.getBoolean("isDeleted") ? "***Deleted***" : rs.getString("title"),
+						rs.getBoolean("isDeleted") ? "***Deleted***" : rs.getString("content"),
 						rs.getTimestamp("timestamp").toLocalDateTime(),
 						rs.getBoolean("isDeleted")));
 			}
