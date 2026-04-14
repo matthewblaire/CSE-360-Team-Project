@@ -238,8 +238,9 @@ public class ControllerDeleteUser {
 	 * 
 	 */
 	protected static void performReturn() {
-		guiAdminHome.ViewAdminHome.displayAdminHome(ViewDeleteUser.theStage,
+		staticHelpers.StaticHelpers.routeUserToHomeScreen(ViewDeleteUser.theStage,
 				ViewDeleteUser.theUser);
+		
 	}
 	
 	

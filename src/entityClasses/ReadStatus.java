@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
  *   <li>{@code "post"}  — the targetId refers to a row in the Posts table.</li>
  *   <li>{@code "reply"} — the targetId refers to a row in the Replies table.</li>
  * </ul>
- * </p>
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *

@@ -16,6 +16,7 @@ import entityClasses.User;
 import guiStaff.ViewStaffHome;
 import javafx.scene.control.TextArea;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -60,6 +61,8 @@ public class ViewUserMetrics {
     protected static User  theUser;
     protected static Post  currentPost;
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
+    
     private static Scene            theViewScene;
 	/** The combo box for selecting a user to show metrics. */
     protected static ComboBox<String> combobox_SelectUser = new ComboBox<String>();
@@ -134,7 +137,7 @@ public class ViewUserMetrics {
 				            LocalDateTime timestamp = (LocalDateTime) row[0];
 				            Integer len = (Integer) row[1];
 				            postsTotalLength += len;
-				        	textMetrics += "Posted at: " + timestamp + " Length:" + len +"\n";
+				        	textMetrics += "Posted at: " + timestamp.format(formatter)  + "   Length:" + len +"\n";
 				        }
 					}
 					Double postsAvgLength = Math.ceil(postsTotalLength / (postsMetrics.size() + 10E-10));
@@ -149,7 +152,7 @@ public class ViewUserMetrics {
 				            Integer len = (Integer) row[1];
 				            repliesTotalLength += len;
 				            System.out.println();
-				            textMetrics += "Replied at: " + timestamp + " Length:" + len +"\n";
+				            textMetrics += "Replied at: " + timestamp.format(formatter) + "   Length:" + len +"\n";
 				        }
 					}
 					Double repliesAvgLength = Math.ceil(repliesTotalLength / (repliesMetrics.size() + 10E-10));

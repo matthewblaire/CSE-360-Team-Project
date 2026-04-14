@@ -90,6 +90,8 @@ public class FoundationsMain extends Application {
     
     // This flag enables testing on application startup. Subject to change
     private final static Boolean ENABLE_TESTING = true;
+    
+    private final static Boolean RESET_DATABASE_ON_STARTUP = true;
 
 	/** Tracks which role's home page is currently active (0 = admin). */
 	public static int activeHomePage = 0;		// Which role's home page is currently active?
@@ -101,6 +103,14 @@ public class FoundationsMain extends Application {
 		try {
 			// Connect to the database
 			database.connectToDatabase();
+			
+			if (RESET_DATABASE_ON_STARTUP)
+			{
+				database.dropAllObjects();
+				// need to run createTables again 
+				database.createTables();
+			}
+			
 		} catch (SQLException e) {
 			// If the connection request fails, it usually means some other app is using it
 			databaseInUse.setTitle("*** ERROR ***");

@@ -18,7 +18,7 @@ package recognizers;
  *
  * This class does NOT perform a JavaFX GUI operation; it only processes its String argument and
  * returns a result string, which makes it safe to call from both the Controller and the
- * Tester. </p>
+ * Tester. 
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *

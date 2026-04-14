@@ -139,6 +139,7 @@ public class ViewStudentHome {
 		
 		// If not yet established, populate the static aspects of the GUI
 		if (theView == null) theView = new ViewStudentHome();		// Instantiate singleton if needed
+		user.setCurrentRole("Student");
 		
 		// Populate the dynamic aspects of the GUI with the data from the user and the current
 		// state of the system.

@@ -152,7 +152,7 @@ public class Post {
 	/*****
 	 * <p> Method: void setContent() </p>
 	 * <p> Description: Sets the body text of this post. </p>
-	 * @param the content string
+	 * @param newContent the content string
 	 */
 	public void setContent(String newContent) { this.content = newContent; }
 

@@ -44,7 +44,7 @@ public class ViewMessagesList {
 	// ---- Area 1: Header ----
 
 	/** Page title label. */
-	protected static Label label_PageTitle   = new Label("My Posts");
+	protected static Label label_PageTitle   = new Label("My Messages");
 	/** Shows the currently logged-in username. */
 	protected static Label label_UserDetails = new Label();
 	/** Returns the student to the Student Home page. */

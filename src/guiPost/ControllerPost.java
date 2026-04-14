@@ -125,8 +125,8 @@ public class ControllerPost {
 	 */	
     public static void performMarkPostDeleted(Stage stage, User user, Post post) {
     	int postId = post.getPostId();
-    	String postUserUsername = user.getUserName();
-        if (post.getAuthorUsername().equals(postUserUsername) || user.getNewStaffRole() || user.getAdminRole()) {
+    	String postUserUsername = post.getAuthorUsername();
+        if (postUserUsername.equals(user.getUserName()) || user.getNewStaffRole() || user.getAdminRole()) {
         	theDatabase.softDeletePost(postId, postUserUsername);
         	ViewBrowsePosts.displayBrowsePosts(stage, user);
         } 

@@ -12,6 +12,8 @@ import entityClasses.Reply;
 import entityClasses.User;
 import entityClasses.Request;
 
+import recognizers.TitleRecognizer;
+
 import java.time.LocalDateTime;
 
 /*******
@@ -76,21 +78,36 @@ public class Database {
 	}
 	
 	
+	
+	/**
+	 * Method: dropAllObjects
+	 * 
+	 * Description: Drops all objects in the database for testing purposes.
+	 */
+	public void dropAllObjects() {
+		try {
+			statement = connection.createStatement();
+			statement.execute("DROP ALL OBJECTS");
+		} catch (SQLException e){
+			System.err.println("Failed to drop all objects");
+		}
+	}
+	
 /*******
  * <p> Method: connectToDatabase </p>
  * 
  * <p> Description: Used to establish the in-memory instance of the H2 database from secondary
  *		storage.</p>
- *
  * @throws SQLException when the DriverManager is unable to establish a connection
  * 
  */
+	
 	public void connectToDatabase() throws SQLException {
 		try {
 			Class.forName(JDBC_DRIVER); // Load the JDBC driver
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
 			statement = connection.createStatement();
-
+			
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
 			System.err.println("JDBC Driver not found: " + e.getMessage());
@@ -104,7 +121,7 @@ public class Database {
  * <p> Description: Used to create new instances of the two database tables used by this class.</p>
  * 
  */
-	private void createTables() throws SQLException {
+	public void createTables() throws SQLException {
 		// Create the user database
 		String userTable = "CREATE TABLE IF NOT EXISTS userDB ("
 				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
@@ -437,7 +454,7 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 
 
 /*******
- * <p> Method: List<Post>; getPostsByThread(int threadId) </p>
+ * <p> Method: List&lt;Post&gt;; getPostsByThread(int threadId) </p>
  *
  * <p> Description: Returns ALL Posts belonging to the given thread (including soft-deleted
  * ones), ordered by timestamp ascending so students read the conversation in chronological
@@ -474,7 +491,7 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 
 
 /*******
- * <p> Method: List<Post>; getPostsByAuthor(String username) </p>
+ * <p> Method: List&lt;Post&gt;; getPostsByAuthor(String username) </p>
  *
  * <p> Description: Returns ALL Posts written by the given user (including soft-deleted ones),
  * ordered by timestamp descending (newest first) so the student sees their most recent
@@ -497,8 +514,8 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 						rs.getInt("postId"),
 						rs.getInt("threadId"),
 						rs.getString("authorUsername"),
-						rs.getString("title"),
-						rs.getString("content"),
+						rs.getBoolean("isDeleted") ? "***Deleted***" : rs.getString("title"),
+						rs.getBoolean("isDeleted") ? "***Deleted***" : rs.getString("content"),
 						rs.getTimestamp("timestamp").toLocalDateTime(),
 						rs.getBoolean("isDeleted")));
 			}
@@ -510,7 +527,7 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 
 
 /*******
- * <p> Method: List<Post>; searchPosts(String keyword, int threadId) </p>
+ * <p> Method: List&lt;Post&gt;; searchPosts(String keyword, int threadId) </p>
  *
  * <p> Description: Returns non-deleted Posts whose content contains the given keyword
  * (case-insensitive substring match).  If {@code threadId} is -1, all threads are searched;
@@ -557,7 +574,7 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 
 
 /*******
- * <p> Method: List<Reply>; getRepliesForPost(int postId) </p>
+ * <p> Method: List&lt;Reply&gt;; getRepliesForPost(int postId) </p>
  *
  * <p> Description: Returns all Replies for the given postId, ordered by timestamp ascending
  * so the conversation thread reads in chronological order.  Soft-deleted replies are included
@@ -1051,7 +1068,7 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 
 
 /*******
- * <p> Method: List<DiscussionThread>; getThreadList() </p>
+ * <p> Method: List&lt;DiscussionThread&gt;; getThreadList() </p>
  *
  * <p> Description: Returns a list of all DiscussionThread objects currently in the database,
  * ordered by threadId ascending so that "General" (threadId = 1) always appears first.
@@ -1075,6 +1092,189 @@ public List<PrivateMessage> getMessagesConcerning(String user) {
 		return threads;
 	}
 
+	/*******
+	 * <p> Method: boolean doesThreadTitleExist(String title) </p>
+	 *
+	 * <p> Description: Returns true if a DiscussionThread already exists with the given
+	 * title.  This is used to prevent duplicate thread names before the UNIQUE constraint
+	 * in the database fires. </p>
+	 *
+	 * @param title the thread title to look up
+	 * @return true if a thread with that title already exists; false otherwise
+	 */
+		public boolean doesThreadTitleExist(String title) {
+			String query = "SELECT COUNT(*) FROM DiscussionThreads WHERE title = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+				pstmt.setString(1, title);
+				ResultSet rs = pstmt.executeQuery();
+				if (rs.next()) return rs.getInt(1) > 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+
+
+	/*******
+	 * <p> Method: boolean isDefaultThread(int threadId) </p>
+	 *
+	 * <p> Description: Returns true if the specified threadId belongs to the seeded default
+	 * discussion thread named "General".  Staff are not allowed to delete this thread. </p>
+	 *
+	 * @param threadId the threadId to examine
+	 * @return true if the thread is the default "General" thread; false otherwise
+	 */
+		public boolean isDefaultThread(int threadId) {
+			String query = "SELECT COUNT(*) FROM DiscussionThreads "
+					+ "WHERE threadId = ? AND title = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+				pstmt.setInt(1, threadId);
+				pstmt.setString(2, "General");
+				ResultSet rs = pstmt.executeQuery();
+				if (rs.next()) return rs.getInt(1) > 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+
+
+	/*******
+	 * <p> Method: boolean doesThreadHavePosts(int threadId) </p>
+	 *
+	 * <p> Description: Returns true if the specified thread currently has one or more Posts.
+	 * Staff are not allowed to delete a thread that still contains posts. </p>
+	 *
+	 * @param threadId the threadId to examine
+	 * @return true if one or more Posts reference this threadId; false otherwise
+	 */
+		public boolean doesThreadHavePosts(int threadId) {
+			String query = "SELECT COUNT(*) FROM Posts WHERE threadId = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+				pstmt.setInt(1, threadId);
+				ResultSet rs = pstmt.executeQuery();
+				if (rs.next()) return rs.getInt(1) > 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+
+
+	/*******
+	 * <p> Method: int createThread(String title) </p>
+	 *
+	 * <p> Description: Inserts a new DiscussionThread row into the database and returns the
+	 * generated threadId.  The title is validated before insertion, and duplicate thread
+	 * titles are rejected. </p>
+	 *
+	 * @param title the new thread title
+	 * @return the auto-generated threadId assigned by the database
+	 * @throws SQLException if the title is invalid, already exists, the INSERT fails, or no
+	 *         generated key is returned
+	 */
+		public int createThread(String title) throws SQLException {
+
+			String titleEvaluation = TitleRecognizer.evaluateTitle(title);
+			if (!titleEvaluation.isEmpty())
+				throw new SQLException(titleEvaluation);
+
+			if (doesThreadTitleExist(title))
+				throw new SQLException("Title \"" + title
+						+ "\" already exists in Discussion Threads.");
+
+			String insertThread =
+					"INSERT INTO DiscussionThreads (title) VALUES (?)";
+
+			try (PreparedStatement pstmt = connection.prepareStatement(
+					insertThread, Statement.RETURN_GENERATED_KEYS)) {
+
+				pstmt.setString(1, title);
+				pstmt.executeUpdate();
+
+				try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+					if (generatedKeys.next()) {
+						return generatedKeys.getInt(1);
+					} else {
+						throw new SQLException("createThread: INSERT succeeded but no generated key "
+								+ "was returned.");
+					}
+				}
+			}
+		}
+
+
+	/*******
+	 * <p> Method: int updateThreadTitle(int threadId, String newTitle) </p>
+	 *
+	 * <p> Description: Updates the title of an existing DiscussionThread and returns the number
+	 * of rows updated.  The new title is validated before the update, and duplicate titles are
+	 * rejected. </p>
+	 *
+	 * @param threadId the threadId to update
+	 * @param newTitle the replacement title
+	 * @return 1 if the update succeeded; 0 otherwise
+	 * @throws SQLException if the thread does not exist, the title is invalid, or the new title
+	 *         is already in use by a different thread
+	 */
+		public int updateThreadTitle(int threadId, String newTitle) throws SQLException {
+
+			if (!doesThreadExist(threadId))
+				throw new SQLException("The selected thread does not exist.");
+
+			String titleEvaluation = TitleRecognizer.evaluateTitle(newTitle);
+			if (!titleEvaluation.isEmpty())
+				throw new SQLException(titleEvaluation);
+
+			String duplicateQuery = "SELECT COUNT(*) FROM DiscussionThreads "
+					+ "WHERE title = ? AND threadId <> ?";
+			try (PreparedStatement duplicateStmt = connection.prepareStatement(duplicateQuery)) {
+				duplicateStmt.setString(1, newTitle);
+				duplicateStmt.setInt(2, threadId);
+				ResultSet rs = duplicateStmt.executeQuery();
+				if (rs.next() && rs.getInt(1) > 0)
+					throw new SQLException("Title \"" + newTitle
+							+ "\" already exists in Discussion Threads.");
+			}
+
+			String update = "UPDATE DiscussionThreads SET title = ? WHERE threadId = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(update)) {
+				pstmt.setString(1, newTitle);
+				pstmt.setInt(2, threadId);
+				return pstmt.executeUpdate();
+			}
+		}
+
+
+	/*******
+	 * <p> Method: int deleteThread(int threadId) </p>
+	 *
+	 * <p> Description: Physically deletes a DiscussionThread row, but only if the thread exists,
+	 * is not the default "General" thread, and has no Posts.  This preserves the seeded default
+	 * thread and prevents orphaned post data. </p>
+	 *
+	 * @param threadId the threadId to delete
+	 * @return 1 if the delete succeeded; 0 otherwise
+	 * @throws SQLException if the thread does not exist, is the default thread, or still has posts
+	 */
+		public int deleteThread(int threadId) throws SQLException {
+
+			if (!doesThreadExist(threadId))
+				throw new SQLException("The selected thread does not exist.");
+
+			if (isDefaultThread(threadId))
+				throw new SQLException("The default \"General\" thread cannot be deleted.");
+
+			if (doesThreadHavePosts(threadId))
+				throw new SQLException("This thread cannot be deleted because it still has posts.");
+
+			String delete = "DELETE FROM DiscussionThreads WHERE threadId = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(delete)) {
+				pstmt.setInt(1, threadId);
+				return pstmt.executeUpdate();
+			}
+		}
+	
 
 /*******
  * <p> Method: boolean doesPostExist(int postId) </p>
@@ -2306,7 +2506,7 @@ public int getNumAdmins() throws SQLException
 
 
 /*******
- * <p> Method: List<Request> getRequestHistory(int requestId) </p>
+ * <p> Method: List&lt;Request&gt; getRequestHistory(int requestId) </p>
  *
  * <p> Description: Returns the full history chain for a request. If {@code requestId} is the
  * original closed request, the result includes that row and every reopened descendant. If
@@ -2571,7 +2771,7 @@ public int getNumAdmins() throws SQLException
 
 
 /*******
- * <p> Method: List<Request> getRequestsVisibleToAdmin(String adminUsername) </p>
+ * <p> Method: List&lt;Request&gt; getRequestsVisibleToAdmin(String adminUsername) </p>
  *
  * <p> Description: Returns all request rows visible to an administrator, including original and
  * reopened versions. This supports admin review of reopened requests and their preserved
@@ -2613,6 +2813,7 @@ public int getNumAdmins() throws SQLException
  * @param staffUsername the username of the staff user submitting the request
  * @param title         the request title
  * @param description   the full description of the requested admin action
+ * @param severity      the severity level for the request; defaults to Medium if empty
  * @return the auto-generated requestId assigned by the database
  * @throws SQLException if validation fails or the INSERT fails
  */
@@ -2660,7 +2861,7 @@ public int getNumAdmins() throws SQLException
 
 
 /*******
- * <p> Method: List<Request> getAllRequests() </p>
+ * <p> Method: List&lt;Request&gt; getAllRequests() </p>
  *
  * <p> Description: Returns every row in the Requests table ordered by createdAt ascending
  * (oldest first) so the queue presents the highest-priority, longest-pending items at the
@@ -2720,7 +2921,7 @@ public int getNumAdmins() throws SQLException
 	
 	
 	/*******
-	 * <p> Method: List<Post>; getRepliesByAuthor(String username) </p>
+	 * <p> Method: List&lt;Reply&gt;; getRepliesByAuthor(String username) </p>
 	 *
 	 * <p> Description: Returns ALL Replies written by the given user (including soft-deleted ones),
 	 * ordered by timestamp descending (newest first) so the student sees their most recent

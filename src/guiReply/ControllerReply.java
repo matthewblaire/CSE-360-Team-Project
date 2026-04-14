@@ -40,7 +40,7 @@ public class ControllerReply {
 	 * @param post object that the reply is associated with
 	 * 
 	 * @param content string of the new reply content
-	 * @throws SQLException 
+	 * @throws SQLException if the reply cannot be created in the database
 	 * 
 	 */	
     public static void performCreateReply(Stage stage, User user, Post post, String content) throws SQLException {
@@ -70,7 +70,7 @@ public class ControllerReply {
     }
     
 	/**********
-	 * <p> Method: List<Reply> performGetReplies(Post post) </p>
+	 * <p> Method: List&lt;Reply&gt; performGetReplies(Post post) </p>
 	 * 
 	 * <p> Description: Gets the replies of a certain post from the DB.
 	 * 
@@ -91,7 +91,7 @@ public class ControllerReply {
 	 * 
 	 * @param reply object of the Reply to be updated
 	 * 
-	 * @param content string of the new reply content
+	 * @param newContent string of the new reply content
 	 * 
 	 * @param user current user object
 	 * 
@@ -161,7 +161,7 @@ public class ControllerReply {
 	         return;
     	 }
     	 // Mark as deleted in database
-    	 boolean success = theDatabase.softDeleteReply(reply.getReplyId(), user.getUserName()) == 1;
+    	 boolean success = theDatabase.softDeleteReply(reply.getReplyId(), reply.getAuthorUsername()) == 1;
     	 if (success) {
             // Refresh the post view to show updated reply list
         	ViewPost.displayPost(stage, user, post.getPostId());

@@ -26,7 +26,7 @@ import javafx.stage.Stage;
  * </ul>
  *
  * This controller is a collection of protected static methods — it is never instantiated.
- * All widget access goes through the public static fields of {@link ViewBrowsePosts}. </p>
+ * All widget access goes through the public static fields of {@link ViewBrowsePosts}.
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
@@ -116,10 +116,9 @@ public class ControllerBrowsePosts {
 	 *   <li>Marks the post as read for the current user.</li>
 	 *   <li>Loads all replies for that post from the database.</li>
 	 *   <li>Marks every visible reply as read for the current user.</li>
-	 *   <li>Populates {@link ViewBrowsePosts#listview_Replies} with formatted Strings.</li>
+	 *   <li>Populates {@link ViewBrowsePosts#listview_Posts} with formatted Strings.</li>
 	 *   <li>Refreshes the posts list so the read indicator (✓/○) updates immediately.</li>
 	 * </ol>
-	 * </p>
 	 */
 	protected static void doSelectPost() {
 
@@ -211,25 +210,7 @@ public class ControllerBrowsePosts {
 	 * <p> Description: Returns the student to the Student Home page. </p>
 	 */
 	protected static void performReturn() {
-		if (ViewBrowsePosts.theUser.getNumRoles() > 1)
-		{
-			guiMultipleRoleDispatch.ViewMultipleRoleDispatch.
-			displayMultipleRoleDispatch(ViewBrowsePosts.theStage, ViewBrowsePosts.theUser);
-		} else {
-			
-			// Admin role
-			if (ViewBrowsePosts.theUser.getAdminRole()) {
-				guiAdminHome.ViewAdminHome.displayAdminHome(ViewBrowsePosts.theStage, ViewBrowsePosts.theUser);
-			} else if (ViewBrowsePosts.theUser.getNewStudentRole()) {
-				guiStudent.ViewStudentHome.displayStudentHome(ViewBrowsePosts.theStage, ViewBrowsePosts.theUser);
-			} else if (ViewBrowsePosts.theUser.getNewStaffRole()) {
-				guiStaff.ViewStaffHome.displayStaffHome(ViewBrowsePosts.theStage, ViewBrowsePosts.theUser);
-								// Other roles
-			} else {
-				System.out.println("***** BrowsePosts goToUserHome request has an invalid role");
-			}
-			
-		}
+		staticHelpers.StaticHelpers.routeUserToHomeScreen(ViewBrowsePosts.theStage, ViewBrowsePosts.theUser);
 		
 	}
 

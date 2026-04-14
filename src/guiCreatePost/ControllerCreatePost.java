@@ -25,7 +25,7 @@ import recognizers.PostContentRecognizer;
  * </ul>
  *
  * All validation is delegated to {@link PostContentRecognizer} so that the same rules are
- * exercised by both the GUI and the automated test suite. </p>
+ * exercised by both the GUI and the automated test suite.
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
@@ -66,7 +66,6 @@ public class ControllerCreatePost {
 	 *   <li>Shows a success alert that includes the generated postId.</li>
 	 *   <li>Clears the post content TextArea so the form is ready for a new post.</li>
 	 * </ol>
-	 * </p>
 	 */
 	protected static void doCreatePost() {
 
@@ -165,8 +164,8 @@ public class ControllerCreatePost {
 	 * unsaved content. </p>
 	 */
 	protected static void performReturn() {
-		guiStudent.ViewStudentHome.displayStudentHome(
-				ViewCreatePost.theStage, ViewCreatePost.theUser);
+		
+		staticHelpers.StaticHelpers.routeUserToHomeScreen(ViewCreatePost.theStage, ViewCreatePost.theUser);
 	}
 
 

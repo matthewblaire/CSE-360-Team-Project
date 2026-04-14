@@ -40,7 +40,7 @@ import javafx.stage.Stage;
  *
  * Selecting a row in the Posts ListView triggers
  * {@link ControllerBrowsePosts#doSelectPost()}, which marks the post and all its replies as
- * read for the current user, then repopulates the Replies ListView. </p>
+ * read for the current user, then repopulates the Replies ListView.
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
@@ -137,7 +137,6 @@ public class ViewBrowsePosts {
 	 *   <li>Clears both ListViews so they are empty on every visit.</li>
 	 *   <li>Sets the Scene and shows the window.</li>
 	 * </ol>
-	 * </p>
 	 *
 	 * @param ps    the primary JavaFX Stage
 	 * @param user  the currently logged-in Student
